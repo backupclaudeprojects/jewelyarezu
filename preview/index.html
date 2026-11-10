@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!--ARTIFACT:START-->
+<title>Arezoo Yousefi Preview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&family=Vazirmatn:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="assets/preview.css">
+<!--ARTIFACT:HEADEND-->
+</head>
+<body>
+<!--ARTIFACT:BODY-->
+<a class="skip" href="#home" id="skipLink">Skip to content</a>
+
+<!-- shared SVG filters and gradients for the hero artwork -->
+<svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="wc" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".028" numOctaves="2" seed="7" result="n1"/>
+      <feDisplacementMap in="SourceGraphic" in2="n1" scale="9" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feGaussianBlur in="d" stdDeviation=".8" result="b"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".16" numOctaves="2" seed="3" result="n2"/>
+      <feColorMatrix in="n2" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -.8 1.3" result="grain"/>
+      <feComposite in="b" in2="grain" operator="in" result="g"/>
+      <feTurbulence type="fractalNoise" baseFrequency=".011" numOctaves="2" seed="21" result="n3"/>
+      <feColorMatrix in="n3" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.1 1.42" result="tone"/>
+      <feComposite in="g" in2="tone" operator="in"/>
+    </filter>
+    <filter id="wcSoft" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".04" numOctaves="2" seed="12" result="n1"/>
+      <feDisplacementMap in="SourceGraphic" in2="n1" scale="5" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feGaussianBlur in="d" stdDeviation=".5"/>
+    </filter>
+    <filter id="pencil" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="5" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <radialGradient id="gPetal" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="100">
+      <stop offset="0" stop-color="#E06C88"/><stop offset=".3" stop-color="#F09CB0"/><stop offset=".72" stop-color="#F8C9D2"/><stop offset="1" stop-color="#FCE6EA"/>
+    </radialGradient>
+    <radialGradient id="gPetalPale" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="100">
+      <stop offset="0" stop-color="#EE95AB"/><stop offset=".4" stop-color="#F8CDD6"/><stop offset="1" stop-color="#FDF0F2"/>
+    </radialGradient>
+    <linearGradient id="gLeafA" x1="0" x2="1"><stop offset="0" stop-color="#6E9A78"/><stop offset="1" stop-color="#B9CF9A"/></linearGradient>
+    <linearGradient id="gLeafB" x1="0" x2="1"><stop offset="0" stop-color="#2F6657"/><stop offset="1" stop-color="#6FA890"/></linearGradient>
+    <linearGradient id="gLeafC" x1="0" x2="1"><stop offset="0" stop-color="#8FA7A0"/><stop offset="1" stop-color="#C9D8D2"/></linearGradient>
+    <linearGradient id="gLeafD" x1="0" x2="1"><stop offset="0" stop-color="#5FB7AE"/><stop offset="1" stop-color="#B5E6E0"/></linearGradient>
+    <linearGradient id="gBody" x1="0" y1="0" x2=".35" y2="1"><stop offset="0" stop-color="#1F6F78"/><stop offset=".42" stop-color="#58BDB6"/><stop offset=".72" stop-color="#BFE6DF"/><stop offset="1" stop-color="#F3F1E6"/></linearGradient>
+    <linearGradient id="gFeather" x1="0" x2="1"><stop offset="0" stop-color="#1D5E69"/><stop offset=".5" stop-color="#3F9CA0"/><stop offset="1" stop-color="#9FD8D4"/></linearGradient>
+    <linearGradient id="gFeatherFar" x1="0" x2="1"><stop offset="0" stop-color="#5E9EA6"/><stop offset="1" stop-color="#DDF1EF"/></linearGradient>
+    <linearGradient id="gTail" x1="0" x2="1"><stop offset="0" stop-color="#1B5560"/><stop offset="1" stop-color="#4C9DA4"/></linearGradient>
+  </defs>
+</svg>
+
+<header class="hdr glass" id="hdr">
+  <a class="brand" href="#home" aria-label="Arezoo Yousefi, home">
+    <span class="logo" aria-hidden="true"></span>
+    <span class="brand-name">Arezoo Yousefi</span>
+  </a>
+  <nav class="hdr-nav" aria-label="Main">
+    <a href="#home" data-nav="home">Home</a>
+    <a href="#collections" data-nav="collections">Collections</a>
+    <a href="#about" data-nav="about">About Me</a>
+    <a href="#contact" data-nav="contact">Contact</a>
+  </nav>
+</header>
+
+<main id="main" tabindex="-1">
+
+<!-- ============================= HOME ============================= -->
+<div class="page" data-page="home">
+  <section class="hero" id="hero" aria-labelledby="heroTitle">
+    <div class="hero-art" aria-hidden="true"><div class="scene" id="scene"></div></div>
+    <div class="hero-copy">
+      <p class="eyebrow">Arezoo Yousefi &middot; Jewelry Design</p>
+      <h1 id="heroTitle" class="hero-title">Every Jewel <em>Begins as a Line</em></h1>
+      <p class="hero-sub">Original jewelry concepts, bespoke design and collection development.</p>
+      <a class="btn btn-line" href="#collections">Explore Jewelry <span class="arr" aria-hidden="true"></span></a>
+    </div>
+  </section>
+
+  <section class="band-intro">
+    <div class="wrap intro">
+      <p class="eyebrow">Jewelry Designer</p>
+      <p class="intro-text">I specialize in jewelry design, concept development, and visual presentation.</p>
+      <a class="tlink" href="#about">About me <span class="arr" aria-hidden="true"></span></a>
+    </div>
+  </section>
+
+  <section class="hscroll" id="hscroll" aria-labelledby="hsTitle">
+    <div class="wrap sec-head">
+      <p class="eyebrow">Portfolio</p>
+      <h2 id="hsTitle">Selected pieces</h2>
+    </div>
+    <div class="hs-rows" id="hsRows"></div>
+  </section>
+
+  <section class="stack-sec" aria-labelledby="stTitle">
+    <div class="wrap sec-head">
+      <p class="eyebrow">Collections</p>
+      <h2 id="stTitle">Three collections, piece by piece</h2>
+    </div>
+    <div class="wrap stack" id="stack"></div>
+  </section>
+
+  <section class="lab" aria-labelledby="labTitle">
+    <div class="wrap">
+      <div class="lab-note" dir="rtl" lang="fa">
+        <strong>فقط برای پیش‌نمایش</strong>
+        <span>این بخش جزو طراحی پیش‌فرض سایت نیست. دو روش افکت سه‌بعدی اختیاری را نشان می‌دهد تا یکی (یا هر دو) را انتخاب کنید. در قالب نهایی این افکت روی هر ویجت، دکمه یا کانتینر جداگانه روشن می‌شود و پیش‌فرض خاموش است.</span>
+      </div>
+      <h2 id="labTitle" class="lab-title">Optional depth effect</h2>
+      <div class="lab-grid">
+        <div class="lab-col">
+          <p class="lab-label" dir="rtl" lang="fa">روش الف: کج شدن با موس، عمق لایه‌ها و نور متحرک</p>
+          <div class="tilt" id="tiltCard" tabindex="0">
+            <div class="tilt-in">
+              <span class="tilt-glare" aria-hidden="true"></span>
+              <img class="tilt-img" src="assets/img/works/emerald-kite-drop.webp" alt="Emerald kite earring" loading="lazy">
+              <div class="tilt-txt"><span class="eyebrow">Kite</span><strong>Emerald Kite Drop</strong></div>
+            </div>
+          </div>
+          <a class="btn tilt-btn" href="#collections" id="tiltBtn"><span>Explore Jewelry</span></a>
+        </div>
+        <div class="lab-col">
+          <p class="lab-label" dir="rtl" lang="fa">روش ب: ضخامت واقعی، برجسته و قابل فشردن</p>
+          <div class="raised" tabindex="0">
+            <img src="assets/img/works/blue-bow-studs.webp" alt="Blue bow stud earrings" loading="lazy">
+            <div class="tilt-txt"><span class="eyebrow">Bow</span><strong>Blue Bow Studs</strong></div>
+          </div>
+          <a class="btn raised-btn" href="#collections">Explore Jewelry</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="closing">
+    <div class="wrap closing-in">
+      <h2>Have a question about a piece or a collection?</h2>
+      <a class="btn" href="#contact">Get in touch <span class="arr" aria-hidden="true"></span></a>
+    </div>
+  </section>
+</div>
+
+<!-- ========================== COLLECTIONS ========================== -->
+<div class="page" data-page="collections" hidden>
+  <section class="page-head wrap">
+    <p class="eyebrow">Portfolio</p>
+    <h1>Collections</h1>
+    <p class="lede">Browse every piece, or narrow the view by collection and by type.</p>
+  </section>
+  <section class="wrap archive">
+    <div class="filters" id="filters">
+      <div class="filter-row" role="group" aria-label="Collection">
+        <span class="filter-label">Collection</span>
+        <div class="filter-items" id="fCollection"></div>
+      </div>
+      <div class="filter-row" role="group" aria-label="Type">
+        <span class="filter-label">Type</span>
+        <div class="filter-items" id="fType"></div>
+      </div>
+    </div>
+    <p class="count" id="count" aria-live="polite"></p>
+    <div class="grid" id="grid"></div>
+    <p class="empty" id="gridEmpty" hidden>No pieces match these filters.</p>
+  </section>
+</div>
+
+<!-- ========================== SINGLE WORK ========================== -->
+<div class="page" data-page="work" hidden>
+  <article class="wrap work" id="work"></article>
+</div>
+
+<!-- ============================ ABOUT ============================ -->
+<div class="page" data-page="about" hidden>
+  <section class="wrap about-top">
+    <div class="about-copy">
+      <p class="eyebrow">About Me</p>
+      <h1>Arezoo Yousefi</h1>
+      <p class="role">Jewelry Designer</p>
+      <p class="lede">I specialize in jewelry design, concept development, and visual presentation. My services include original jewelry concepts, bespoke design, collection development, and digital renderings tailored to each project’s creative direction and requirements.</p>
+      <p>I collaborate with jewelry brands, manufacturers, and industry professionals on individual designs, exclusive collections, and creative development projects.</p>
+      <p class="sample" dir="rtl" lang="fa">متن نمونه (برگرفته از پاسخ‌های سوالات متداول). زندگی‌نامه و عکس واقعی شما جایگزین می‌شود.</p>
+    </div>
+    <div class="portrait" aria-label="Portrait placeholder">
+      <div class="portrait-art" id="portraitArt" aria-hidden="true"></div>
+      <span class="portrait-logo" aria-hidden="true"></span>
+      <span class="portrait-cap">Portrait</span>
+    </div>
+  </section>
+
+  <section class="wrap tl-sec" aria-labelledby="tlTitle">
+    <div class="sec-head">
+      <p class="eyebrow">The Design Process</p>
+      <h2 id="tlTitle">From a first conversation to the final design</h2>
+    </div>
+    <ol class="tl" id="tl">
+      <li class="tl-item"><span class="tl-dot" aria-hidden="true"></span><h3>Initial discussion</h3><p>The process begins with an initial discussion about your ideas, preferences, and project requirements.</p></li>
+      <li class="tl-item"><span class="tl-dot" aria-hidden="true"></span><h3>Inspiration and references</h3><p>Reference images, sketches, gemstones, architectural forms, cultural influences, or personal stories can all serve as inspiration.</p></li>
+      <li class="tl-item"><span class="tl-dot" aria-hidden="true"></span><h3>Design concept</h3><p>From there, I develop the design concept and refine the details through a collaborative process.</p></li>
+      <li class="tl-item"><span class="tl-dot" aria-hidden="true"></span><h3>Digital renderings</h3><p>Digital renderings communicate the design’s form, proportions, materials, and gemstones through detailed visual presentations.</p></li>
+      <li class="tl-item"><span class="tl-dot" aria-hidden="true"></span><h3>Final design</h3><p>The final design aligns with the agreed creative direction.</p></li>
+    </ol>
+  </section>
+
+  <section class="closing">
+    <div class="wrap closing-in">
+      <h2>See the work itself</h2>
+      <a class="btn" href="#collections">Explore Jewelry <span class="arr" aria-hidden="true"></span></a>
+    </div>
+  </section>
+</div>
+
+<!-- ============================ CONTACT ============================ -->
+<div class="page" data-page="contact" hidden>
+  <section class="page-head wrap">
+    <p class="eyebrow">Contact</p>
+    <h1>Write to me</h1>
+    <p class="lede">Every message is read and answered personally.</p>
+  </section>
+  <section class="wrap">
+    <ul class="contact-list">
+      <li class="contact-item">
+        <span class="ic" data-ic="mail" aria-hidden="true"></span>
+        <span class="contact-kind">Email</span>
+        <span class="contact-val" id="mailVal">hello@arezooyousefi.com</span>
+        <button class="copy" type="button" id="copyMail" data-copy="hello@arezooyousefi.com">Copy</button>
+      </li>
+      <li class="contact-item">
+        <span class="ic" data-ic="instagram" aria-hidden="true"></span>
+        <span class="contact-kind">Instagram</span>
+        <span class="contact-val">@arezooyousefi</span>
+        <a class="copy" href="https://www.instagram.com/" target="_blank" rel="noopener">Open</a>
+      </li>
+      <li class="contact-item">
+        <span class="ic" data-ic="telegram" aria-hidden="true"></span>
+        <span class="contact-kind">Telegram</span>
+        <span class="contact-val">@arezooyousefi</span>
+        <a class="copy" href="https://telegram.org/" target="_blank" rel="noopener">Open</a>
+      </li>
+    </ul>
+    <p class="sample" dir="rtl" lang="fa">نشانی ایمیل و شناسه‌ها نمونه هستند؛ نشانی‌های واقعی شما جایگزین می‌شود.</p>
+  </section>
+
+  <section class="wrap faq-sec" id="faqSec" aria-labelledby="faqTitle">
+    <div class="sec-head">
+      <p class="eyebrow">FAQ</p>
+      <h2 id="faqTitle">Frequently asked questions</h2>
+    </div>
+    <div class="faq" id="faq"></div>
+  </section>
+</div>
+
+<!-- ============================== 404 ============================== -->
+<div class="page" data-page="notfound" hidden>
+  <section class="wrap nf">
+    <div class="nf-art" id="nfArt" aria-hidden="true"></div>
+    <p class="eyebrow">Error 404</p>
+    <h1>This page is not in the collection</h1>
+    <p class="lede">The link may be old, or the piece may have been renamed.</p>
+    <a class="btn" href="#collections">Explore Jewelry <span class="arr" aria-hidden="true"></span></a>
+  </section>
+</div>
+
+</main>
+
+<footer class="ftr" id="ftr">
+  <div class="ftr-card">
+    <div class="ftr-top">
+      <a class="brand brand-lg" href="#home" aria-label="Arezoo Yousefi, home">
+        <span class="logo" aria-hidden="true"></span>
+        <span class="brand-name">Arezoo Yousefi</span>
+      </a>
+      <p class="ftr-line">Jewelry design, concept development and visual presentation.</p>
+    </div>
+    <div class="ftr-cols">
+      <nav class="ftr-nav" aria-label="Footer">
+        <a href="#home">Home</a>
+        <a href="#collections">Collections</a>
+        <a href="#about">About Me</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <ul class="ftr-social">
+        <li><span class="ic" data-ic="mail" aria-hidden="true"></span><span>hello@arezooyousefi.com</span></li>
+        <li><span class="ic" data-ic="instagram" aria-hidden="true"></span><a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram</a></li>
+        <li><span class="ic" data-ic="telegram" aria-hidden="true"></span><a href="https://telegram.org/" target="_blank" rel="noopener">Telegram</a></li>
+      </ul>
+    </div>
+    <p class="ftr-copy">&copy; 2026 Arezoo Yousefi. All designs are original work.</p>
+  </div>
+</footer>
+
+<nav class="dock glass" id="dock" aria-label="Quick links">
+  <div class="dock-links">
+    <a href="#home" data-nav="home"><span class="ic" data-ic="home" aria-hidden="true"></span><span class="dock-t">Home</span></a>
+    <a href="#collections" data-nav="collections"><span class="ic" data-ic="gem" aria-hidden="true"></span><span class="dock-t">Collections</span></a>
+    <a href="#about" data-nav="about"><span class="ic" data-ic="user" aria-hidden="true"></span><span class="dock-t">About Me</span></a>
+    <a href="#contact" data-nav="contact"><span class="ic" data-ic="mail" aria-hidden="true"></span><span class="dock-t">Contact</span></a>
+  </div>
+  <span class="dock-sep" aria-hidden="true"></span>
+  <div class="dock-social">
+    <a href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram"><span class="ic" data-ic="instagram" aria-hidden="true"></span></a>
+    <a href="https://telegram.org/" target="_blank" rel="noopener" aria-label="Telegram"><span class="ic" data-ic="telegram" aria-hidden="true"></span></a>
+    <a href="#contact" aria-label="Email"><span class="ic" data-ic="mail" aria-hidden="true"></span></a>
+    <button type="button" id="toTop" aria-label="Back to top"><span class="ic" data-ic="up" aria-hidden="true"></span></button>
+  </div>
+</nav>
+
+<!-- ===================== PREVIEW CONTROLS (Persian) ===================== -->
+<button class="pv-tab" id="pvTab" type="button" aria-expanded="false" aria-controls="pvPanel" dir="rtl" lang="fa">
+  <span class="pv-dot" aria-hidden="true"></span>پیش‌نمایش · تنظیمات
+</button>
+<aside class="pv" id="pvPanel" dir="rtl" lang="fa" aria-label="تنظیمات پیش‌نمایش" hidden>
+  <div class="pv-head">
+    <div>
+      <strong>تنظیمات پیش‌نمایش</strong>
+      <p>این پنل جایگزین موقت کنترل‌های المنتور است تا رفتارها را امتحان کنید. خودِ سایت این پنل را ندارد.</p>
+    </div>
+    <button type="button" class="pv-x" id="pvClose" aria-label="بستن">✕</button>
+  </div>
+  <div class="pv-body" id="pvBody"></div>
+</aside>
+
+<script src="assets/faq-data.js"></script>
+<script src="assets/preview.js"></script>
+<!--ARTIFACT:END-->
+</body>
+</html>
