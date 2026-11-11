@@ -46,26 +46,33 @@
   };
   function paintIcons(root) { $$('[data-ic]', root).forEach(function (el) { if (!el.firstChild) el.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + (ICONS[el.getAttribute('data-ic')] || '') + '</svg>'; }); }
 
-  /* ------------------------------------------------- 48 colour themes
-     4 families (by page background) x 12 role combinations: 3 accents x 2 button styles x 2 surface treatments.
-     Only the four brand colours and their tints / shades are used. */
-  var P = { R: '#32292F', T: '#99E1D9', M: '#F0F7F4', W: '#705D56' };
+  /* ------------------------------------------------- 96 colour themes
+     Two palettes x 4 families (by page background) x 12 role combinations (3 accents x 2 button styles x 2 surface
+     treatments) = 96 themes. Only each palette's own colours and their tints / shades are used. */
+  var PA = { R: '#32292F', T: '#99E1D9', M: '#F0F7F4', W: '#705D56' };                 /* first palette */
+  var PB = { K: '#0B1421', P: '#272737', S: '#B5B9BC', N: '#283041', L: '#DFDFDF' };   /* second palette (night) */
   function h2r(h) { return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]; }
   function r2h(r) { return '#' + r.map(function (v) { return ('0' + Math.round(clamp(v, 0, 255)).toString(16)).slice(-2); }).join('').toUpperCase(); }
   function mix(a, b, t) { var x = h2r(a), y = h2r(b); return r2h([x[0] + (y[0] - x[0]) * t, x[1] + (y[1] - x[1]) * t, x[2] + (y[2] - x[2]) * t]); }
   function lum(h) { var c = h2r(h).map(function (v) { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; }
   function contrast(a, b) { var x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); }
-  function readable(bg) { return contrast(bg, P.R) >= contrast(bg, P.M) ? P.R : P.M; }
-  var NAMES = {}; NAMES[P.R] = 'ریزن بلک'; NAMES[P.T] = 'آبی تیفانی'; NAMES[P.M] = 'مینت کرم'; NAMES[P.W] = 'ونگه';
+  var NAMES = {}; NAMES[PA.R] = 'ریزن بلک'; NAMES[PA.T] = 'آبی تیفانی'; NAMES[PA.M] = 'مینت کرم'; NAMES[PA.W] = 'ونگه';
+  NAMES[PB.K] = 'سرمه‌ای شب'; NAMES[PB.P] = 'بادمجانی دودی'; NAMES[PB.S] = 'نقره‌ای'; NAMES[PB.N] = 'سرمه‌ای دودی'; NAMES[PB.L] = 'خاکستری روشن';
+  var SETS = [{ id: 'b', fa: 'پالت دوم · شب (۴۸ تم)' }, { id: 'a', fa: 'پالت اول · مینت (۴۸ تم)' }];
   var FAMILIES = [
-    { id: 'mint', fa: 'مینت کرم (روشن)', bg: P.M, ink: P.R, muted: P.W, accents: [P.T, P.W, P.R], bands: [P.R, P.W] },
-    { id: 'tiffany', fa: 'آبی تیفانی', bg: P.T, ink: P.R, muted: mix(P.R, P.T, .22), accents: [P.R, P.W, P.M], bands: [P.R, P.W] },
-    { id: 'wenge', fa: 'ونگه', bg: P.W, ink: P.M, muted: mix(P.M, P.W, .28), accents: [P.T, P.M, P.R], bands: [P.R, mix(P.W, P.R, .55)] },
-    { id: 'raisin', fa: 'ریزن بلک (تیره)', bg: P.R, ink: P.M, muted: mix(P.M, P.R, .34), accents: [P.T, P.W, P.M], bands: [mix(P.R, '#000000', .32), P.W] }
+    { id: 'midnight', set: 'b', fa: 'سرمه‌ای شب', bg: PB.K, ink: PB.L, muted: mix(PB.S, PB.K, .12), accents: [PB.S, PB.L, PB.P], bands: [mix(PB.K, '#000000', .4), PB.P], dk: PB.K, lt: PB.L },
+    { id: 'plum', set: 'b', fa: 'بادمجانی دودی', bg: PB.P, ink: PB.L, muted: mix(PB.S, PB.P, .14), accents: [PB.S, PB.L, PB.K], bands: [PB.K, PB.N], dk: PB.K, lt: PB.L },
+    { id: 'slate', set: 'b', fa: 'سرمه‌ای دودی', bg: PB.N, ink: PB.L, muted: mix(PB.S, PB.N, .14), accents: [PB.S, PB.L, PB.K], bands: [PB.K, PB.P], dk: PB.K, lt: PB.L },
+    { id: 'silver', set: 'b', fa: 'خاکستری روشن', bg: PB.L, ink: PB.K, muted: mix(PB.N, PB.L, .22), accents: [PB.N, PB.P, PB.S], bands: [PB.K, PB.N], dk: PB.K, lt: PB.L },
+    { id: 'mint', set: 'a', fa: 'مینت کرم (روشن)', bg: PA.M, ink: PA.R, muted: PA.W, accents: [PA.T, PA.W, PA.R], bands: [PA.R, PA.W], dk: PA.R, lt: PA.M },
+    { id: 'tiffany', set: 'a', fa: 'آبی تیفانی', bg: PA.T, ink: PA.R, muted: mix(PA.R, PA.T, .22), accents: [PA.R, PA.W, PA.M], bands: [PA.R, PA.W], dk: PA.R, lt: PA.M },
+    { id: 'wenge', set: 'a', fa: 'ونگه', bg: PA.W, ink: PA.M, muted: mix(PA.M, PA.W, .28), accents: [PA.T, PA.M, PA.R], bands: [PA.R, mix(PA.W, PA.R, .55)], dk: PA.R, lt: PA.M },
+    { id: 'raisin', set: 'a', fa: 'ریزن بلک (تیره)', bg: PA.R, ink: PA.M, muted: mix(PA.M, PA.R, .34), accents: [PA.T, PA.W, PA.M], bands: [mix(PA.R, '#000000', .32), PA.W], dk: PA.R, lt: PA.M }
   ];
   var THEMES = [];
   FAMILIES.forEach(function (f) {
     var dark = lum(f.bg) < .3, n = 0;
+    var readable = function (bg) { return contrast(bg, f.dk) >= contrast(bg, f.lt) ? f.dk : f.lt; };
     f.accents.forEach(function (acc) {
       ['ink', 'accent'].forEach(function (btn) {
         ['soft', 'tint'].forEach(function (surf, si) {
@@ -76,7 +83,7 @@
           var at = acc; if (contrast(at, f.bg) < 3) at = mix(acc, f.ink, .58); if (contrast(at, f.bg) < 3) at = f.ink;
           var band = f.bands[si], bandInk = readable(band);
           THEMES.push({
-            id: f.id + '-' + ('0' + n).slice(-2), fam: f.id, famFa: f.fa, n: n,
+            id: f.id + '-' + ('0' + n).slice(-2), fam: f.id, set: f.set, famFa: f.fa, n: n,
             fa: f.fa + ' ' + ('0' + n).slice(-2) + ' · تأکید: ' + NAMES[acc] + ' · دکمه: ' + (btn === 'ink' ? 'رنگ متن' : 'رنگ تأکید') + ' · سطح: ' + (surf === 'soft' ? 'ملایم' : 'رنگی'),
             dark: dark,
             vars: { '--bg': f.bg, '--surface': surface, '--surface-2': surface2, '--ink': f.ink, '--muted': f.muted, '--accent': acc, '--accent-text': at,
@@ -89,27 +96,30 @@
   });
 
   /* ----------------------------------------------------------------- state */
-  var DEFAULTS = { theme: 'mint-01', spd: 1, spdBranch: 1, spdBird: 1, spdFloat: 1, spdGem: 1, mouse: true,
+  var DEFAULTS = { theme: 'midnight-01', heroDemo: 'photo', spd: 1, amp: 1, kDandelion: 1, kBranch: 1, kNecklace: 1, sparks: true, floats: true, mouse: true, outline: false,
     hdrBlur: 16, hdrOp: .62, dockBlur: 16, dockOp: .76,
     hsMult: .3, hsAuto: true, hsDelay: 3, hsSpeed: 60,
     stackOn: true, stackStep: .03, stackGap: 28, stackMin: .8,
-    fx: 'line', faqLayout: 'sidebar', faqSearch: true, wcOn: true, wcColor: '#99E1D9', wcOp: .28 };
+    fx: 'line', faqLayout: 'sidebar', faqSearch: true, wcOn: true, wcColor: '#B5B9BC', wcOp: .28 };
   var state = {}; Object.keys(DEFAULTS).forEach(function (k) { state[k] = DEFAULTS[k]; });
-  try { var saved = JSON.parse(localStorage.getItem('ay-preview-v1') || '{}'); Object.keys(DEFAULTS).forEach(function (k) { if (typeof saved[k] === typeof DEFAULTS[k]) state[k] = saved[k]; }); } catch (e) { /* storage unavailable: defaults */ }
-  function save() { try { localStorage.setItem('ay-preview-v1', JSON.stringify(state)); } catch (e) { /* ignore */ } }
+  try { var saved = JSON.parse(localStorage.getItem('ay-preview-v2') || '{}'); Object.keys(DEFAULTS).forEach(function (k) { if (typeof saved[k] === typeof DEFAULTS[k]) state[k] = saved[k]; }); } catch (e) { /* storage unavailable: defaults */ }
+  function save() { try { localStorage.setItem('ay-preview-v2', JSON.stringify(state)); } catch (e) { /* ignore */ } }
 
   var root = document.documentElement;
   function applyTheme() {
     var t = THEMES.filter(function (x) { return x.id === state.theme; })[0] || THEMES[0];
     Object.keys(t.vars).forEach(function (k) { root.style.setProperty(k, t.vars[k]); });
     root.style.colorScheme = t.dark ? 'dark' : 'light';
+    document.body.classList.toggle('is-dark', t.dark);
     $$('.pv-th').forEach(function (b) { b.classList.toggle('is-on', b.getAttribute('data-id') === t.id); b.setAttribute('aria-pressed', b.getAttribute('data-id') === t.id); });
     var cur = $('#pvCur'); if (cur) cur.textContent = t.fa;
   }
   function applyState() {
     var s = root.style;
-    s.setProperty('--spd', Math.max(state.spd, .05)); s.setProperty('--spd-branch', state.spdBranch); s.setProperty('--spd-bird', state.spdBird);
-    s.setProperty('--spd-float', state.spdFloat); s.setProperty('--spd-gem', state.spdGem);
+    s.setProperty('--spd', Math.max(state.spd, .05));
+    var hero = $('#hero'); if (hero) { hero.classList.toggle('hero--photo', state.heroDemo === 'photo'); hero.classList.toggle('hero--paint', state.heroDemo !== 'photo'); }
+    if (photo) photo.update({ speed: state.spd, amp: state.amp, mouse: state.mouse, outline: state.outline,
+      groups: { dandelion: { k: state.kDandelion }, seeds: { k: state.kDandelion, on: true }, branch: { k: state.kBranch }, leaves: { k: state.kBranch }, necklace: { k: state.kNecklace }, sparks: { on: state.sparks }, floaters: { on: state.floats } } });
     s.setProperty('--hdr-blur', state.hdrBlur + 'px'); s.setProperty('--hdr-op', state.hdrOp);
     s.setProperty('--dock-blur', state.dockBlur + 'px'); s.setProperty('--dock-op', state.dockOp);
     s.setProperty('--stack-gap', state.stackGap + 'px');
@@ -236,7 +246,33 @@
   function art(cls, x, y, w, h, vb, inner, style) {
     return '<svg class="art ' + cls + '" viewBox="' + vb + '" style="left:' + x + 'px;top:' + y + 'px;width:' + w + 'px;height:' + h + 'px;' + (style || '') + '" aria-hidden="true">' + inner + '</svg>';
   }
+  /* Main hero: the client's picture, unchanged, with motion regions, sparkle points and drifting seeds cut from the same picture. */
+  var photo = null;
+  var HERO = { img: 'assets/img/hero/night-garden.jpg', w: 1672, h: 941, focus: [.68, .5], mouseAmt: .006,
+    regions: [
+      { g: 'dandelion', x: .215, y: .56, rx: .17, ry: .40, f: .55, type: 'sway', amp: .014, speed: .55, px: .135, py: .93, depth: .6 },
+      { g: 'dandelion', x: .245, y: .42, rx: .12, ry: .20, f: .8, type: 'wave', amp: .0016, speed: 1.1, depth: .3 },
+      { g: 'seeds', x: .100, y: .31, rx: .05, ry: .085, f: .7, type: 'wave', amp: .003, speed: .8, depth: 1.2 },
+      { g: 'seeds', x: .045, y: .42, rx: .05, ry: .09, f: .7, type: 'wave', amp: .003, speed: .7, phase: 1.4, depth: 1.2 },
+      { g: 'seeds', x: .390, y: .405, rx: .04, ry: .06, f: .7, type: 'wave', amp: .003, speed: .9, phase: 2.6, depth: 1.2 },
+      { g: 'seeds', x: .375, y: .585, rx: .045, ry: .055, f: .7, type: 'wave', amp: .003, speed: .75, phase: 4, depth: 1.2 },
+      { g: 'branch', x: .335, y: .165, rx: .15, ry: .16, f: .6, type: 'sway', amp: .012, speed: .45, px: .5, py: .12, phase: 1, depth: .4 },
+      { g: 'branch', x: .445, y: .05, rx: .05, ry: .08, f: .6, type: 'sway', amp: .010, speed: .5, px: .49, py: .1, phase: 2.2, depth: .4 },
+      { g: 'branch', x: .9, y: .2, rx: .07, ry: .14, f: .6, type: 'sway', amp: .014, speed: .5, px: .88, py: .11, phase: 2, depth: .4 },
+      { g: 'branch', x: .9, y: .05, rx: .05, ry: .06, f: .7, type: 'wave', amp: .0015, speed: .9, depth: .3 },
+      { g: 'leaves', x: .24, y: .74, rx: .11, ry: .14, f: .6, type: 'sway', amp: .012, speed: .5, px: .225, py: .9, phase: .6, depth: .8 },
+      { g: 'leaves', x: .39, y: .84, rx: .10, ry: .13, f: .6, type: 'sway', amp: .010, speed: .4, px: .31, py: .93, phase: 3, depth: .9 },
+      { g: 'leaves', x: .81, y: .84, rx: .075, ry: .13, f: .6, type: 'sway', amp: .010, speed: .42, px: .86, py: .93, phase: 1.5, depth: .9 },
+      { g: 'leaves', x: .925, y: .72, rx: .075, ry: .15, f: .6, type: 'sway', amp: .012, speed: .48, px: .93, py: .9, phase: 2.2, depth: .8 },
+      { g: 'necklace', x: .62, y: .5, rx: .19, ry: .46, f: .35, type: 'sway', amp: .0045, speed: .38, px: .63, py: .08, depth: .9 }
+    ],
+    sparks: [[1010, 585, 1.4, 4.2, 0], [892, 738, 1.1, 5, 1.7], [1000, 745, 1, 4.6, 3.1], [1190, 765, 1.3, 5.4, .8], [805, 470, .9, 6, 2.4], [1075, 735, 1.2, 4.4, 3.8], [955, 672, .9, 5.2, 1.1], [1188, 660, .8, 6.2, 4.4], [1262, 500, .8, 5.6, 2.9], [760, 318, .6, 6.6, .4], [1345, 318, .6, 7, 3.5]]
+      .map(function (p) { return { g: 'sparks', x: p[0] / 1672, y: p[1] / 941, s: p[2], dur: p[3], dl: p[4] }; }),
+    floats: [['a', 24, 30, 6.5, 38, -22, 50, 34, 0], ['c', 30, 40, 5.5, 45, -8, -40, 42, 12], ['d', 22, 48, 7, 52, 10, 70, 38, 22], ['b', 18, 24, 7.5, 30, -30, -60, 46, 30], ['c', 28, 36, 4.5, 60, -16, 90, 52, 40]]
+      .map(function (f) { return { g: 'floaters', src: 'assets/img/hero/seed-' + f[0] + '.png', x: f[1], y: f[2], w: f[3], dx: f[4], dy: f[5], rot: f[6], dur: f[7], dl: f[8], o: .85 }; })
+  };
   function buildHero() {
+    var ph = $('#heroPhoto'); if (ph && window.AYHero) photo = window.AYHero.mount(ph, HERO);
     var scene = $('#scene'); if (!scene) return;
     var h = '';
     /* 1 · pencil sketch layer */
@@ -302,12 +338,12 @@
     var tx = 0, ty = 0, cx = 0, cy = 0, raf = 0;
     var tick = function () { cx += (tx - cx) * .06; cy += (ty - cy) * .06; scene.style.setProperty('--mx', cx.toFixed(4)); scene.style.setProperty('--my', cy.toFixed(4)); raf = (Math.abs(tx - cx) > .002 || Math.abs(ty - cy) > .002) ? requestAnimationFrame(tick) : 0; };
     var hero = $('#hero');
-    hero.addEventListener('pointermove', function (e) { if (!state.mouse || reduced || e.pointerType === 'touch') return; var r = hero.getBoundingClientRect(); tx = ((e.clientX - r.left) / r.width - .5) * -1; ty = ((e.clientY - r.top) / r.height - .5) * -1; if (!raf) raf = requestAnimationFrame(tick); });
+    hero.addEventListener('pointermove', function (e) { if (!state.mouse || reduced || e.pointerType === 'touch' || state.heroDemo === 'photo') return; var r = hero.getBoundingClientRect(); tx = ((e.clientX - r.left) / r.width - .5) * -1; ty = ((e.clientY - r.top) / r.height - .5) * -1; if (!raf) raf = requestAnimationFrame(tick); });
     hero.addEventListener('pointerleave', function () { tx = 0; ty = 0; if (!raf) raf = requestAnimationFrame(tick); });
     if ('IntersectionObserver' in window) new IntersectionObserver(function (en) { heroVisible = en[0].isIntersecting; heroStill(); }).observe(hero);
   }
   var heroVisible = true;
-  function heroStill() { var sc = $('#scene'); if (sc) sc.classList.toggle('is-still', reduced || state.spd <= 0 || !heroVisible); }
+  function heroStill() { var sc = $('#scene'); if (sc) sc.classList.toggle('is-still', reduced || state.spd <= 0 || !heroVisible || state.heroDemo === 'photo'); }
 
   /* ====================================================== horizontal portfolio */
   var hsRows = [], hsAutoX = 0, hsLastScroll = 0, hsVisible = false, hsRaf = 0, hsPrev = 0;
@@ -498,11 +534,13 @@
 
   /* ========================================================== preview controls */
   var SECTIONS = [
-    { t: 'تم رنگی (۴۸ تم)', themes: true },
-    { t: 'هیرو: حرکت', go: ['home', 'hero'], rows: [
-      ['range', 'spd', 'سرعت کلی حرکت', 0, 2, .05, '×'], ['range', 'spdBranch', 'شاخه و شکوفه‌ها', .2, 3, .1, '×'], ['range', 'spdBird', 'پرنده', .2, 3, .1, '×'],
-      ['range', 'spdFloat', 'قاصدک و گلبرگ‌ها', .2, 3, .1, '×'], ['range', 'spdGem', 'جواهر و برق آن', .2, 3, .1, '×'], ['switch', 'mouse', 'واکنش به حرکت موس']],
-      hint: 'سرعت کلی صفر یعنی تصویر ثابت. هر لایه سرعت جدا دارد.' },
+    { t: 'تم رنگی (۹۶ تم)', themes: true },
+    { t: 'هیرو', go: ['home', 'hero'], rows: [
+      ['select', 'heroDemo', 'دموی هیرو', [['photo', '۱ · عکس شما (پیش‌فرض)'], ['paint', '۲ · هیروی روشن آبرنگی']]],
+      ['range', 'spd', 'سرعت کلی حرکت', 0, 2, .05, '×'], ['range', 'amp', 'شدت کلی حرکت', 0, 3, .1, '×'],
+      ['range', 'kDandelion', 'قاصدک و دانه‌ها', 0, 3, .1, '×'], ['range', 'kBranch', 'شاخه، برگ‌ها و گل‌ها', 0, 3, .1, '×'], ['range', 'kNecklace', 'گردنبند', 0, 3, .1, '×'],
+      ['switch', 'sparks', 'برق نگین‌ها'], ['switch', 'floats', 'دانه‌های شناور'], ['switch', 'mouse', 'واکنش به حرکت موس'], ['switch', 'outline', 'نمایش ناحیه‌های حرکت']],
+      hint: 'سرعت کلی صفر یعنی همان عکس، بدون هیچ حرکتی. «نمایش ناحیه‌ها» بیضی‌هایی را نشان می‌دهد که در ویجت هیرو جابه‌جا و تنظیم می‌شوند. کنترل‌های شدت فقط برای دموی ۱ هستند.' },
     { t: 'هدر و نوار پایین: شیشه', rows: [
       ['range', 'hdrBlur', 'تاری هدر', 0, 30, 1, 'px'], ['range', 'hdrOp', 'پوشش رنگ هدر', 0, 1, .02, ''], ['range', 'dockBlur', 'تاری نوار پایین', 0, 30, 1, 'px'], ['range', 'dockOp', 'پوشش رنگ نوار پایین', 0, 1, .02, '']] },
     { t: 'پورتفولیوی افقی', go: ['home', 'hscroll'], rows: [
@@ -525,12 +563,15 @@
       h += '<section class="pv-sec"><h4><span>' + sec.t + '</span>' + (sec.go ? '<button type="button" class="pv-go" data-go="' + sec.go.join(',') + '">نمایش در صفحه</button>' : '') + '</h4>';
       if (sec.themes) {
         h += '<p class="pv-cur" id="pvCur"></p>';
-        FAMILIES.forEach(function (f) {
-          h += '<p class="pv-fam">' + f.fa + '</p><div class="pv-themes">' + THEMES.filter(function (t) { return t.fam === f.id; }).map(function (t) {
-            return '<button type="button" class="pv-th" data-id="' + t.id + '" title="' + t.fa + '" aria-label="' + t.fa + '" style="--b:' + t.vars['--bg'] + ';--s:' + t.vars['--surface-2'] + ';--bt:' + t.vars['--btn-bg'] + ';--a:' + t.vars['--accent'] + '"><i></i></button>';
-          }).join('') + '</div>';
+        SETS.forEach(function (set) {
+          h += '<p class="pv-set">' + set.fa + '</p>';
+          FAMILIES.filter(function (f) { return f.set === set.id; }).forEach(function (f) {
+            h += '<p class="pv-fam">' + f.fa + '</p><div class="pv-themes">' + THEMES.filter(function (t) { return t.fam === f.id; }).map(function (t) {
+              return '<button type="button" class="pv-th" data-id="' + t.id + '" title="' + t.fa + '" aria-label="' + t.fa + '" style="--b:' + t.vars['--bg'] + ';--s:' + t.vars['--surface-2'] + ';--bt:' + t.vars['--btn-bg'] + ';--a:' + t.vars['--accent'] + '"><i></i></button>';
+            }).join('') + '</div>';
+          });
         });
-        h += '<p class="pv-hint">هر مربع یک تم است: زمینه، سطح، دکمه و رنگ تأکید. تم پیش‌فرض دموی اصلی «مینت کرم ۰۱» است.</p>';
+        h += '<p class="pv-hint">هر مربع یک تم است: زمینه، سطح، دکمه و رنگ تأکید. تم پیش‌فرض دموی اصلی «سرمه‌ای شب ۰۱» است.</p>';
       }
       (sec.rows || []).forEach(function (r) {
         var id = 'pv_' + r[1];
