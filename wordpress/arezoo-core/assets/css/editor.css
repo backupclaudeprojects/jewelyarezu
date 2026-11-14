@@ -1,0 +1,3 @@
+/* Arezoo controls inside the Elementor editor panel */
+.elementor-control .ay-note,.elementor-panel .elementor-control-raw-html.ay-note{font-size:12px;line-height:1.9;direction:rtl;text-align:right}
+.elementor-element [class*="ay-"] .elementor-icon{font-style:normal}

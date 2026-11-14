@@ -1,0 +1,20 @@
+/* Arezoo theme — the thin frame around Elementor content. Widget styles live in the Arezoo Core plugin. */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background-color:var(--ay-bg,#0B1421);color:var(--ay-ink,#DFDFDF);font-family:"Jost","Helvetica Neue",Arial,sans-serif;font-weight:300;font-size:17px;line-height:1.7;overflow-x:clip;-webkit-font-smoothing:antialiased}
+img{max-width:100%;height:auto}
+a{color:inherit}
+h1,h2,h3,h4{font-family:"Cormorant Garamond","Iowan Old Style",Georgia,serif;font-weight:500;line-height:1.1;margin:0 0 .5em;text-wrap:balance}
+:focus-visible{outline:2px solid var(--ay-ink,#DFDFDF);outline-offset:3px;border-radius:6px}
+.ay-skip{position:fixed;left:16px;top:-80px;z-index:100000;background:var(--ay-btn,#DFDFDF);color:var(--ay-btnink,#0B1421);padding:10px 16px;border-radius:999px;text-decoration:none}
+.ay-skip:focus{top:12px}
+.ay-main{display:block;min-height:60vh}
+.ay-main:focus{outline:none}
+/* plain fallback when a page is not built with Elementor, or before the site is set up */
+.ay-plain{max-width:820px;margin:0 auto;padding:150px 20px 90px}
+.ay-plain-head{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;max-width:1180px;margin:0 auto;padding:22px 20px}
+.ay-plain-head a{text-decoration:none}
+.ay-plain-head ul{display:flex;gap:24px;list-style:none;margin:0;padding:0;flex-wrap:wrap}
+.ay-plain-foot{max-width:1180px;margin:0 auto;padding:40px 20px 120px;color:var(--ay-muted,#A1A5A9);font-size:14px}
+.ay-plain .entry-title{font-size:clamp(2.4rem,6vw,4rem)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
