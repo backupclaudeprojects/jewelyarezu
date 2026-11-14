@@ -25,8 +25,11 @@ a:hover>.ay-arr{transform:translateX(5px)}
    frames) are measured correctly. An explicit Elementor width (auto / custom) still wins. */
 .e-con>:where([class*="elementor-widget-ay-"]),.e-con-inner>:where([class*="elementor-widget-ay-"]){width:100%}
 .ay-part{display:block}
-body .ay-part-header{position:relative;z-index:60}
-body .ay-part-footer{position:relative;z-index:55}
+/* The header always sits above everything on the page (hero, containers, widgets); the footer bar just below it.
+   The rule also catches a header that comes from another wrapper (e.g. an Elementor Pro Theme Builder location). */
+html body .ay-part-header,html body .elementor-location-header,html body>*:has(.e-con.ay-float-top){position:relative!important;z-index:9990!important}
+html body .ay-part-footer,html body .elementor-location-footer,html body>*:has(.ay-dock-fixed){position:relative!important;z-index:9980!important}
+html body .ay-main,html body main{z-index:1}
 
 /* ================================================================ hero scene */
 .ay-hero{position:relative;overflow:hidden;width:100%;height:var(--ay-hero-h,70vh);background-color:#0B1421;opacity:var(--ay-hero-op,1)}
@@ -285,6 +288,7 @@ body [class*="ay-skbg-"]{isolation:isolate;overflow:clip}
 body.ay-has-wall{position:relative}
 body.ay-has-wall>*:not(.ay-wall):not(script):not(style){position:relative;z-index:1}
 body.ay-has-wall>#wpadminbar{position:fixed;z-index:99999}
+body.ay-has-wall>.ay-part-header,body.ay-has-wall>.ay-part-footer{z-index:9990}
 
 /* ======================================================================= FAQ */
 .ay-fq{display:flex;flex-direction:column;gap:26px;font-family:var(--ay-body)}
@@ -400,7 +404,9 @@ body .ay-mo .ay-mo-wire{width:100%;height:auto;aspect-ratio:1;display:block;max-
 .ay-pr-side-right .ay-pr-media{order:2}
 .ay-pr-media{position:relative;align-self:stretch}
 .ay-pr-stick{position:relative}
-.ay-pr-sticky-yes .ay-pr-stick{position:sticky;top:var(--ay-pr-top,110px)}
+.ay-pr-sticky-yes .ay-pr-stick{position:sticky;top:var(--ay-pr-top,110px);will-change:transform}
+.ay-pr-sticky-yes .ay-pr-stick.is-js{position:relative;top:auto}
+.ay-pr-frame{max-height:calc(100vh - var(--ay-pr-top,110px) - 90px);margin-inline:auto}
 .ay-pr-frame{position:relative;aspect-ratio:var(--ay-pr-aspect,.8);border-radius:var(--ay-pr-radius,30px);background:var(--ay-pr-bezel,#15181d);padding:var(--ay-pr-bw,12px);box-shadow:0 40px 70px -40px rgba(0,0,0,.7),0 0 0 1px color-mix(in srgb,var(--ay-ink) 14%,transparent);transform:perspective(1400px) rotateY(var(--ay-pr-ry,0deg)) rotateX(var(--ay-pr-rx,0deg));transition:transform .5s var(--ay-ease);transform-style:preserve-3d}
 .ay-pr-frame-plain .ay-pr-frame{padding:0;background:none}
 .ay-pr-frame-paper .ay-pr-frame{background:#f6f3ee;padding:14px 14px 46px;border-radius:6px;transform:perspective(1400px) rotateY(var(--ay-pr-ry,0deg)) rotateX(var(--ay-pr-rx,0deg)) rotate(-1.5deg)}
@@ -480,7 +486,7 @@ body .ay-mo .ay-mo-wire{width:100%;height:auto;aspect-ratio:1;display:block;max-
 /* ============================================ abilities on every element (Advanced) */
 .ay-glass-yes{background-color:color-mix(in srgb,var(--ay-g-color,var(--ay-surface)) calc(var(--ay-g-op,.62)*100%),transparent)!important;-webkit-backdrop-filter:blur(var(--ay-g-blur,16px)) saturate(var(--ay-g-sat,1.25));backdrop-filter:blur(var(--ay-g-blur,16px)) saturate(var(--ay-g-sat,1.25));
   border:var(--ay-g-lw,1px) solid var(--ay-g-line,color-mix(in srgb,var(--ay-ink) 11%,transparent))!important;box-shadow:0 1px 0 rgba(255,255,255,calc(var(--ay-g-shine,.5)*.28)) inset,0 18px 40px -26px rgba(0,0,0,var(--ay-g-sh,.55))!important}
-.e-con.ay-float-top,.e-con.ay-float-bottom{position:fixed!important;left:50%;transform:translateX(-50%);width:min(var(--ay-f-width,1040px),calc(100% - var(--ay-f-side,16px)*2))!important;max-width:none;z-index:var(--ay-f-z,60);transition:transform .6s var(--ay-ease),opacity .4s}
+.e-con.ay-float-top,.e-con.ay-float-bottom{position:fixed!important;left:50%;transform:translateX(-50%);width:min(var(--ay-f-width,1040px),calc(100% - var(--ay-f-side,16px)*2))!important;max-width:none;z-index:var(--ay-f-z,9990);transition:transform .6s var(--ay-ease),opacity .4s}
 .e-con.ay-float-top{top:calc(var(--ay-f-offset,14px) + env(safe-area-inset-top,0px) + var(--wp-admin--admin-bar--height,0px))}
 .e-con.ay-float-bottom{bottom:calc(var(--ay-f-offset,14px) + env(safe-area-inset-bottom,0px))}
 .e-con.ay-float-top.is-away{transform:translate(-50%,calc(-100% - 60px));opacity:0}

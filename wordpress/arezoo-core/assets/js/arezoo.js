@@ -241,6 +241,14 @@
         steps.forEach(function (s, k) { var r = s.getBoundingClientRect(), c = r.top + r.height / 2, dist = Math.abs(c - mid); if (dist < bd) { bd = dist; best = k; } });
       }
       go(best);
+      /* keep the frame pinned while this section scrolls; if CSS sticky is blocked by an ancestor
+         (overflow hidden from another plugin or theme), move it with a transform instead */
+      var stick = $('.ay-pr-stick', el), wrap = el.closest('.elementor-widget') || el;
+      if (stick && !stacked && wrap.classList.contains('ay-pr-sticky-yes')) {
+        var top = parseFloat(getComputedStyle(wrap).getPropertyValue('--ay-pr-top')) || 110, mr = media.getBoundingClientRect(), want = clamp(top - mr.top, 0, Math.max(mr.height - stick.offsetHeight, 0));
+        if (!stick.classList.contains('is-js') && want > 2 && Math.abs((stick.getBoundingClientRect().top - mr.top) - want) > 3) stick.classList.add('is-js');
+        if (stick.classList.contains('is-js')) stick.style.transform = 'translate3d(0,' + want.toFixed(1) + 'px,0)';
+      } else if (stick) { stick.classList.remove('is-js'); stick.style.transform = ''; }
       if (cfg.tilt && frame && !reduced()) { var r = el.getBoundingClientRect(), p = clamp((w.innerHeight / 2 - r.top) / Math.max(r.height, 1), 0, 1); frame.style.setProperty('--ay-pr-ry', ((p - .5) * -9).toFixed(2) + 'deg'); frame.style.setProperty('--ay-pr-rx', ((.5 - p) * 3).toFixed(2) + 'deg'); }
     }, el);
   }
