@@ -195,6 +195,28 @@ abstract class Base extends \Elementor\Widget_Base {
 		), $extra ) );
 	}
 
+	/** Tilt with the pointer, layered depth, glare and a glow that follows the pointer — for portfolio cards. */
+	protected function card_fx_controls( $default = 'yes' ) {
+		$this->sec( 's_cardfx', 'سه‌بعدی و نور کارت‌ها' );
+		$this->note( 'cfx_note', 'با حرکت موس روی هر طرح، قاب کج می‌شود، طرح و نور پشتش در دو لایهٔ جدا جابه‌جا می‌شوند و هالهٔ نور همراه موس حرکت می‌کند. هر کدام جدا خاموش و روشن می‌شود.' );
+		$this->sw( 'c_tilt', 'کج شدن قاب با موس', $default, array( 'prefix_class' => 'ay-ct-' ) );
+		$this->cssvar( 'c_angle', 'بیشترین زاویه', '--ay-ct-angle', 0, 30, 1, 10, '', array( 'condition' => array( 'c_tilt' => 'yes' ) ), false );
+		$this->cssvar( 'c_persp', 'فاصلهٔ دید (پرسپکتیو)', '--ay-ct-persp', 300, 2000, 20, 900, 'px', array( 'condition' => array( 'c_tilt' => 'yes' ) ), false );
+		$this->cssvar( 'c_shadow', 'شدت سایهٔ متحرک', '--ay-ct-shadow', 0, 1, 0.05, 0.6, '', array( 'condition' => array( 'c_tilt' => 'yes' ) ), false );
+		$this->sw( 'c_depth', 'عمق لایه‌ها (طرح جلوتر از زمینه)', $default, array( 'prefix_class' => 'ay-cd-' ) );
+		$this->cssvar( 'c_depth_k', 'مقدار عمق', '--ay-cd-k', 0, 40, 1, 12, '', array( 'condition' => array( 'c_depth' => 'yes' ) ), false );
+		$this->sw( 'c_glow', 'هالهٔ نور پشت طرح، همراه موس', $default, array( 'prefix_class' => 'ay-cg-' ) );
+		$this->color( 'c_glow_c', 'رنگ هاله', '--ay-cg-c', array( 'condition' => array( 'c_glow' => 'yes' ), 'description' => 'خالی = رنگ تأکید تم' ) );
+		$this->cssvar( 'c_glow_op', 'شفافیت هاله', '--ay-cg-op', 0, 1, 0.02, 0.55, '', array( 'condition' => array( 'c_glow' => 'yes' ) ), false );
+		$this->cssvar( 'c_glow_size', 'اندازهٔ هاله', '--ay-cg-size', 15, 120, 1, 58, '%', array( 'condition' => array( 'c_glow' => 'yes' ) ), false );
+		$this->cssvar( 'c_glow_blur', 'نرمی هاله', '--ay-cg-blur', 0, 60, 1, 14, 'px', array( 'condition' => array( 'c_glow' => 'yes' ) ), false );
+		$this->sw( 'c_glow_always', 'هاله همیشه دیده شود (نه فقط هنگام هاور)', '', array( 'prefix_class' => 'ay-cg-always-', 'condition' => array( 'c_glow' => 'yes' ) ) );
+		$this->sw( 'c_glare', 'برق نور روی طرح', $default, array( 'prefix_class' => 'ay-cgl-' ) );
+		$this->cssvar( 'c_glare_op', 'شدت برق', '--ay-cgl-op', 0, 1, 0.05, 0.6, '', array( 'condition' => array( 'c_glare' => 'yes' ) ), false );
+		$this->sw( 'c_touch', 'روی صفحه‌های لمسی هم فعال باشد', '', array( 'prefix_class' => 'ay-ct-touch-' ) );
+		$this->done();
+	}
+
 	protected function in_editor() {
 		return \Elementor\Plugin::$instance->editor->is_edit_mode() || \Elementor\Plugin::$instance->preview->is_preview_mode();
 	}

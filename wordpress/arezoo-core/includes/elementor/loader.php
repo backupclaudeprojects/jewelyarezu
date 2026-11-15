@@ -20,7 +20,7 @@ function ay_load_widgets() {
 		return false;
 	}
 	require_once AY_DIR . 'includes/elementor/base.php';
-	foreach ( array( 'hero', 'portfolio', 'work', 'site', 'content', 'studio' ) as $file ) {
+	foreach ( array( 'hero', 'portfolio', 'work', 'site', 'content', 'studio', 'story' ) as $file ) {
 		require_once AY_DIR . 'includes/elementor/widgets/' . $file . '.php';
 	}
 	return true;
@@ -36,7 +36,7 @@ add_action( 'elementor/widgets/register', function ( $manager ) {
 	if ( ! ay_load_widgets() ) {
 		return;
 	}
-	foreach ( array( 'Hero', 'Hscroll', 'Stack', 'Archive', 'Related', 'Work_Gallery', 'Work_Field', 'Work_Specs', 'Work_Nav', 'Logo', 'Nav', 'Dock', 'Contact', 'Sketch', 'Faq', 'Timeline', 'Motion', 'Process', 'Compare', 'Strip' ) as $class ) {
+	foreach ( array( 'Hero', 'Hscroll', 'Stack', 'Archive', 'Related', 'Work_Gallery', 'Work_Field', 'Work_Specs', 'Work_Nav', 'Logo', 'Nav', 'Dock', 'Contact', 'Sketch', 'Faq', 'Timeline', 'Motion', 'Process', 'Compare', 'Strip', 'Story' ) as $class ) {
 		$fqcn = '\\Arezoo\\Widgets\\' . $class;
 		$manager->register( new $fqcn() );
 	}

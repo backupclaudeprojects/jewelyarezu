@@ -216,7 +216,12 @@ class Work_Specs extends Base {
 
 		$this->sec( 's_wash', 'پترن آبرنگی' );
 		$this->sw( 'wash', 'پترن آبرنگی کمرنگ روی باکس‌ها', 'yes', array( 'prefix_class' => 'ay-wash-' ) );
-		$this->color( 'wash_color', 'رنگ پترن', '--ay-wash', array( 'condition' => array( 'wash' => 'yes' ) ) );
+		$this->sel( 'wash_style', 'طرح پس‌زمینهٔ آبرنگی', array( 'blots' => 'لکه‌های آبرنگ', 'wash' => 'شستهٔ پهن و نرم', 'bloom' => 'شکفتن از گوشه', 'stroke' => 'ضربه‌های قلم‌مو', 'grain' => 'بافت ریز کاغذ', 'veil' => 'مه یکنواخت', 'image' => 'تصویر دلخواه شما' ), 'blots', array( 'prefix_class' => 'ay-washs-', 'condition' => array( 'wash' => 'yes' ) ) );
+		$this->add_control( 'wash_img', array( 'label' => 'تصویر پس‌زمینه', 'type' => CM::MEDIA, 'selectors' => array( '{{WRAPPER}}' => '--ay-wash-img: url({{URL}});' ), 'condition' => array( 'wash' => 'yes', 'wash_style' => 'image' ), 'description' => 'مثلاً اسکن یک لکهٔ آبرنگ واقعی. روی همهٔ باکس‌ها می‌نشیند.' ) );
+		$this->color( 'wash_color', 'رنگ پترن', '--ay-wash', array( 'condition' => array( 'wash' => 'yes', 'wash_style!' => 'image' ) ) );
+		$this->color( 'wash_color2', 'رنگ دوم (گرادیان)', '--ay-wash2', array( 'condition' => array( 'wash' => 'yes', 'wash_style!' => 'image' ) ) );
+		$this->add_control( 'wash_blend', array( 'label' => 'حالت ترکیب', 'type' => CM::SELECT, 'default' => '', 'options' => array( '' => 'معمولی', 'multiply' => 'Multiply', 'screen' => 'Screen', 'overlay' => 'Overlay', 'soft-light' => 'Soft light' ), 'selectors' => array( '{{WRAPPER}}' => '--ay-wash-blend: {{VALUE}};' ), 'condition' => array( 'wash' => 'yes' ) ) );
+		$this->sw( 'wash_move', 'حرکت خیلی آرام پترن', '', array( 'prefix_class' => 'ay-wash-move-', 'condition' => array( 'wash' => 'yes' ) ) );
 		$this->cssvar( 'wash_op', 'شدت پترن', '--ay-wash-op', 0, 1, 0.01, 0.16, '', array( 'condition' => array( 'wash' => 'yes' ) ), false );
 		$this->cssvar( 'wash_size', 'اندازهٔ لکه‌ها', '--ay-wash-size', 160, 900, 10, 420, 'px', array( 'condition' => array( 'wash' => 'yes' ) ), false );
 		$this->done();

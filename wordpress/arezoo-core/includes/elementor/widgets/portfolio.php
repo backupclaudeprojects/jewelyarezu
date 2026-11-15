@@ -303,7 +303,10 @@ class Archive extends Base {
 		$this->txt( 'f_type_label', 'برچسب فیلتر نوع', 'Type', array( 'condition' => array( 'f_type' => 'yes' ) ) );
 		$this->txt( 'f_all', 'واژهٔ «همه»', 'All' );
 		$this->sw( 'f_empty', 'نمایش دسته‌های بدون اثر', '' );
-		$this->sel( 'fx', 'موشن متن دسته‌ها', self::fx_options(), 'line', array( 'description' => 'دسته‌ها فقط متن‌اند و باکسی پشتشان نیست.' ) );
+		$this->sel( 'f_style', 'ظاهر فیلترها', array( 'text' => 'فقط متن (بدون باکس)', 'capsule' => 'کپسول شیشه‌ای با نشانگر لغزان', 'box' => 'باکس شیشه‌ای با نور و خط لغزان' ), 'text', array( 'description' => 'در دو حالت شیشه‌ای، همهٔ دسته‌ها داخل یک باکس مثل نوار پایین موبایل‌اند و با کلیک، نشانگر با موشن به دستهٔ بعدی می‌رود. دسته‌ها از «آرزو ← دسته‌بندی‌ها» کم و زیاد می‌شوند.' ) );
+		$this->sw( 'f_labels', 'نمایش برچسب کنار باکس', '', array( 'condition' => array( 'f_style!' => 'text' ) ) );
+		$this->add_responsive_control( 'f_align', array( 'label' => 'جای باکس', 'type' => CM::CHOOSE, 'options' => array( 'flex-start' => array( 'title' => 'چپ', 'icon' => 'eicon-text-align-left' ), 'center' => array( 'title' => 'وسط', 'icon' => 'eicon-text-align-center' ), 'flex-end' => array( 'title' => 'راست', 'icon' => 'eicon-text-align-right' ) ), 'default' => 'center', 'selectors' => array( '{{WRAPPER}}' => '--ay-fl-align: {{VALUE}};' ), 'condition' => array( 'f_style!' => 'text' ) ) );
+		$this->sel( 'fx', 'موشن متن دسته‌ها', self::fx_options(), 'line', array( 'description' => 'دسته‌ها فقط متن‌اند و باکسی پشتشان نیست.', 'condition' => array( 'f_style' => 'text' ) ) );
 		$this->sw( 'count', 'نمایش تعداد آثار', 'yes' );
 		$this->txt( 'count_one', 'واژهٔ مفرد', 'piece', array( 'condition' => array( 'count' => 'yes' ) ) );
 		$this->txt( 'count_many', 'واژهٔ جمع', 'pieces', array( 'condition' => array( 'count' => 'yes' ) ) );
@@ -330,6 +333,18 @@ class Archive extends Base {
 		$this->cssvar( 'fgap', 'فاصلهٔ دسته‌ها', '--ay-fl-gap', 4, 80, 1, 26 );
 		$this->color( 'fline', 'رنگ خط بالا و پایین', '--ay-fl-line' );
 		$this->done();
+		$this->card_fx_controls( 'yes' );
+
+		$this->sec( 'st_fbox', 'باکس شیشه‌ای فیلترها', true, array( 'f_style!' => 'text' ) );
+		$this->color( 'fb_color', 'رنگ شیشه', '--ay-g-color' );
+		$this->cssvar( 'fb_op', 'پوشش رنگ شیشه', '--ay-g-op', 0, 1, 0.02, 0.7, '', array(), false );
+		$this->cssvar( 'fb_blur', 'تاری پشت شیشه', '--ay-g-blur', 0, 40, 1, 16, 'px', array(), false );
+		$this->color( 'fb_line', 'رنگ خط دور', '--ay-g-line' );
+		$this->cssvar( 'fb_radius', 'گردی گوشه‌ها (حالت باکس)', '--ay-fc-radius', 0, 40, 1, 22 );
+		$this->cssvar( 'fb_pad', 'فاصلهٔ داخلی', '--ay-fc-pad', 0, 20, 1, 6 );
+		$this->color( 'fb_ind', 'رنگ نشانگر لغزان', '--ay-fc-ind' );
+		$this->color( 'fb_on', 'رنگ متن دستهٔ انتخاب‌شده', '--ay-fc-on' );
+		$this->done();
 		$this->sec( 'st_card', 'کارت‌ها', true );
 		$this->color( 'pic1', 'رنگ قاب تصویر ۱', '--ay-ar-bg1' );
 		$this->color( 'pic2', 'رنگ قاب تصویر ۲', '--ay-ar-bg2' );
@@ -355,7 +370,8 @@ class Archive extends Base {
 				$on = (string) $val === (string) $selected;
 				return '<button type="button" class="ay-fi' . ( $on ? ' is-on' : '' ) . '" data-g="' . esc_attr( $group ) . '" data-v="' . esc_attr( $val ) . '" aria-pressed="' . ( $on ? 'true' : 'false' ) . '"><span class="ay-fi-t" data-t="' . esc_attr( $text ) . '">' . esc_html( $text ) . '</span></button>';
 			};
-			$out = '<div class="ay-fl-row" role="group" aria-label="' . esc_attr( $label ) . '"><span class="ay-fl-label">' . esc_html( $label ) . '</span><div class="ay-fl-items">' . $btn( 'all', $s['f_all'] );
+			$glass = in_array( $s['f_style'], array( 'capsule', 'box' ), true );
+			$out   = '<div class="ay-fl-row" role="group" aria-label="' . esc_attr( $label ) . '">' . ( ! $glass || 'yes' === $s['f_labels'] ? '<span class="ay-fl-label">' . esc_html( $label ) . '</span>' : '' ) . '<div class="ay-fl-items">' . ( $glass ? '<i class="ay-fl-ind" aria-hidden="true"></i>' : '' ) . $btn( 'all', $s['f_all'] );
 			foreach ( $terms as $t ) {
 				$out .= $btn( $t->term_id, $t->name );
 			}
@@ -365,7 +381,8 @@ class Archive extends Base {
 		echo '<div class="ay-ar" data-ay-archive="' . esc_attr( wp_json_encode( $cfg ) ) . '">';
 		$filters = ( 'yes' === $s['f_col'] ? $row( 'col', $s['f_col_label'], 'ay_collection', $pre['collection'] ? $pre['collection'] : 'all' ) : '' ) . ( 'yes' === $s['f_type'] ? $row( 'type', $s['f_type_label'], 'ay_type', $pre['type'] ? $pre['type'] : 'all' ) : '' );
 		if ( $filters ) {
-			echo '<div class="ay-fl ay-fx-' . esc_attr( $fx ) . '">' . $filters . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			$fs = in_array( $s['f_style'], array( 'capsule', 'box' ), true ) ? $s['f_style'] : 'text';
+			echo '<div class="ay-fl ay-fls-' . esc_attr( $fs ) . ( 'text' === $fs ? ' ay-fx-' . esc_attr( $fx ) : '' ) . '">' . $filters . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 		if ( 'yes' === $s['count'] ) {
 			echo '<p class="ay-ar-count" aria-live="polite"></p>';
@@ -407,6 +424,7 @@ class Related extends Base {
 		$this->cssvar( 'gap', 'فاصلهٔ کارت‌ها', '--ay-ar-gap', 0, 80, 1, 30, 'px', array( 'mobile_default' => array( 'unit' => 'px', 'size' => 14 ) ) );
 		$this->add_control( 'aspect', array( 'label' => 'نسبت قاب تصویر', 'type' => CM::SLIDER, 'range' => array( 'px' => array( 'min' => 0.4, 'max' => 2, 'step' => 0.01 ) ), 'default' => array( 'size' => 0.8 ), 'selectors' => array( '{{WRAPPER}}' => '--ay-ar-aspect: {{SIZE}};' ) ) );
 		$this->done();
+		$this->card_fx_controls( '' );
 		$this->sec( 'st_card', 'کارت‌ها', true );
 		$this->color( 'pic1', 'رنگ قاب تصویر ۱', '--ay-ar-bg1' );
 		$this->color( 'pic2', 'رنگ قاب تصویر ۲', '--ay-ar-bg2' );

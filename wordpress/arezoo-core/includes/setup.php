@@ -103,6 +103,7 @@ function ay_setup_part_layout( $slot ) {
  * @return array log lines (Persian)
  */
 function ay_build_site( $args = array() ) {
+	ay_ensure_types();
 	$args = wp_parse_args( $args, array( 'samples' => true, 'force' => false ) );
 	$log  = array();
 	if ( ! ay_elementor_ready() || ! ay_load_widgets() ) {

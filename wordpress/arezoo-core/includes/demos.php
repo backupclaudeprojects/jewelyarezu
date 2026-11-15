@@ -111,6 +111,8 @@ function ay_demo_archive( $v = 1 ) {
 		3 => array( 'layout' => 'list', 'fx' => 'space' ),
 		4 => array( 'layout' => 'editorial', 'fx' => 'shimmer', 'columns' => 4 ),
 		5 => array( 'layout' => 'slider', 'fx' => 'roll' ),
+		6 => array( 'layout' => 'grid', 'columns' => 3, 'f_style' => 'capsule', 'f_col' => '', 'f_empty' => 'yes', 'f_align' => 'center' ),
+		7 => array( 'layout' => 'masonry', 'columns' => 3, 'f_style' => 'box', 'f_empty' => 'yes', 'f_labels' => 'yes', 'f_align' => 'flex-start' ),
 	);
 	$s = isset( $map[ (int) $v ] ) ? $map[ (int) $v ] : $map[1];
 	return ay_band( array( ay_w( 'ay-archive', $s ) ), array( '_element_id' => 'ay-archive', 'padding' => ay_box( 10, 24, 110, 24 ), 'padding_mobile' => ay_box( 6, 16, 70, 16 ) ) );
@@ -187,6 +189,14 @@ function ay_demo_about( $v = 1 ) {
 	$closing  = ay_closing( 'See the work itself', 'Explore Jewelry', ay_page_url( 'collections' ) );
 	$top      = ay_pad_top();
 	switch ( (int) $v ) {
+		case 6:   /* classic: arch portrait stays pinned on the left */
+		case 7:   /* gallery: framed portrait stays pinned on the right */
+			$story = array( 'image' => ay_media( 'img/studio/11-at-work.webp' ) );
+			if ( 7 === (int) $v ) {
+				$story = array_merge( $story, array( 'style' => 'gallery', 'side' => 'right', 'numerals' => 'digit', 'enter' => 'curtain', 'photo_fx' => 'tone' ) );
+			}
+			$head = ay_band( array( ay_eyebrow( 'About Me' ), ay_heading( 'Arezoo Yousefi', 'h1', 74, array( 'ay_txt' => 'lines', 'ay_txt_start' => 'load' ) ) ), array_merge( $top, array( 'flex_gap' => ay_gap( 10 ) ) ) );
+			return array( $head, ay_band( array( ay_w( 'ay-story', $story ) ), array( 'padding' => ay_box( 40, 24, 40, 24 ), 'padding_mobile' => ay_box( 20, 16, 30, 16 ) ) ), $strip, $closing );
 		case 2:
 			return array( ay_band( array( ay_row( array( $half( array( $photo( 'img/studio/11-at-work.webp' ) ), 42 ), $half( $bio, 58, array( 'flex_justify_content' => 'center' ) ) ), array( 'flex_gap' => ay_gap( 90 ), 'flex_align_items' => 'center' ) ) ), $top ), $timeline, $motions(), $closing );
 		case 3:
@@ -332,6 +342,8 @@ function ay_demo_areas() {
 			3 => array( 'فهرست ردیفی', 'هر اثر یک ردیف، موشن «باز شدن حروف»', 'ar-3' ),
 			4 => array( 'مجله‌ای', 'یک اثر بزرگ کنار آثار کوچک، موشن «عبور نور»', 'ar-4' ),
 			5 => array( 'نوار لغزنده', 'نوار افقی قابل کشیدن، موشن «غلتیدن واژه»', 'ar-5' ),
+			6 => array( 'کپسول شیشه‌ای', 'انگشتر، گردنبند، ست و گوشواره داخل یک کپسول شیشه‌ای؛ نشانگر با موشن به دستهٔ انتخابی می‌لغزد', 'ar-6' ),
+			7 => array( 'باکس شیشه‌ای', 'کالکشن و نوع در دو باکس شیشه‌ای با نور و خط لغزان، شبکهٔ ناهم‌ارتفاع', 'ar-7' ),
 		) ),
 		'single'  => array( 'label' => 'صفحهٔ تک‌اثر', 'target' => 'قالب صفحهٔ تک‌اثر (همهٔ آثار)', 'demos' => array(
 			1 => array( 'گالری چپ', 'گالری ثابت چپ، مشخصات راست', 'sg-1' ),
@@ -346,6 +358,8 @@ function ay_demo_areas() {
 			3 => array( 'از اسکچ تا جواهر', 'معرفی وسط‌چین و مقایسهٔ اسکچ با طرح نهایی', 'ab-3' ),
 			4 => array( 'فرایند اسکرولی', 'معرفی و فرایند طراحی دیجیتال با قاب تبلت', 'ab-4' ),
 			5 => array( 'ساده', 'متن، نوار عکس و خط زمانی ساخته‌شده از کانتینرها', 'ab-5' ),
+			6 => array( 'کلاسیک با پرترهٔ چسبان', 'عکس شما در قاب طاقی سمت چپ ثابت می‌ماند و فصل‌ها با خط، شمارهٔ رومی و موشن‌های طراحی از کنارش می‌گذرند', 'ab-6' ),
+			7 => array( 'گالری با پرترهٔ چسبان', 'عکس شما در قاب موزه‌ای سمت راست ثابت می‌ماند؛ متن‌ها مثل پرده از زیر هر سطر بالا می‌آیند', 'ab-7' ),
 		) ),
 		'faq'     => array( 'label' => 'سوالات متداول', 'target' => 'بخش سوالات صفحهٔ Contact', 'demos' => array(
 			1 => array( 'آکاردئون ساده', 'همهٔ گروه‌ها زیر هم', 'fq-1' ),

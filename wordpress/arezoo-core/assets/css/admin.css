@@ -160,3 +160,11 @@
 .ay-ed-check{display:flex;gap:10px;align-items:flex-start;margin:6px 0 12px}
 .ay-ed-check input{margin-top:6px}
 @media (max-width:782px){.ay-ed{grid-template-columns:minmax(0,1fr)}.ay-wrap{padding:0 10px}}
+
+.ay-motif-set{display:flex;gap:8px;margin-top:8px;font-size:12px}
+.ay-motif-set label{display:flex;flex-direction:column;gap:3px;flex:1}
+.ay-motif-set input{width:100%;min-width:0}
+div.ay-motif{display:flex;flex-direction:column}
+div.ay-motif>label{display:flex;flex-direction:column;gap:6px;cursor:pointer}
+.ay-motif-set input{position:static}
+div.ay-motif>label{width:100%;align-items:center}

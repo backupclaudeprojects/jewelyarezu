@@ -190,6 +190,8 @@ function ay_demo_mini( $key ) {
 		'ar-3'   => 'tx:6,8,30,6;ln:6,20,88,1;ft:6,24,10,4;ft:20,24,10,4;cd:6,36,14,16;tx:24,42,40,5;cd:6,56,14,16;tx:24,62,34,5;cd:6,76,14,16;tx:24,82,44,5',
 		'ar-4'   => 'tx:6,8,30,6;ln:6,20,88,1;ft:6,24,10,4;ft:20,24,10,4;cd:6,36,43,54;cd:52,36,20,25;cd:74,36,20,25;cd:52,65,20,25;cd:74,65,20,25',
 		'ar-5'   => 'tx:6,8,30,6;ln:6,20,88,1;ft:6,24,10,4;ft:20,24,10,4;sc:6,38,26,50;sc:35,38,26,50;sc:64,38,26,50;sc:93,38,26,50',
+		'ar-6'   => 'tx:6,8,30,6;gl:24,20,52,10;ft:28,23,9,4;ft:40,23,9,4;ft:52,23,9,4;ft:64,23,9,4;cd:6,36,27,50;cd:36.5,36,27,50;cd:67,36,27,50',
+		'ar-7'   => 'tx:6,8,30,6;gl:6,18,44,8;gl:6,28,52,8;ft:9,20,8,4;ft:20,20,8,4;ft:9,30,8,4;ft:20,30,8,4;cd:6,42,27,52;cd:36.5,42,27,36;cd:67,42,27,46',
 		'sg-1'   => 'cd:6,12,42,62;th:6,78,8,10;th:16,78,8,10;th:26,78,8,10;tx:54,14,34,8;tx:54,28,30,4;bx:54,40,19,12;bx:75,40,19,12;bx:54,56,19,12;bx:75,56,19,12',
 		'sg-2'   => 'tx:6,14,34,8;tx:6,28,30,4;bx:6,40,19,12;bx:27,40,19,12;bx:6,56,19,12;bx:27,56,19,12;cd:60,12,34,62;th:52,12,6,10;th:52,24,6,10;th:52,36,6,10',
 		'sg-3'   => 'tx:30,10,40,8;tx:36,22,28,4;sc:6,34,34,34;sc:43,34,34,34;sc:80,34,34,34;bx:6,74,27,14;bx:36.5,74,27,14;bx:67,74,27,14',
@@ -200,6 +202,8 @@ function ay_demo_mini( $key ) {
 		'ab-3'   => 'tx:30,10,40,8;tx:26,24,48,4;cp:10,38,34,52;tx:52,46,36,7;tx:52,60,32,4;tx:52,68,28,4',
 		'ab-4'   => 'tx:6,10,36,8;tx:6,24,40,4;tb:8,40,30,52;pn:30,62,10,10;tx:48,46,40,6;tx:48,58,34,4;tx:48,76,40,6;tx:48,88,30,4',
 		'ab-5'   => 'tx:6,10,36,8;tx:6,24,48,4;st:0,36,100,22;tl:8,66,2,28;tx:14,68,40,4;tx:14,80,34,4;tx:14,92,30,4',
+		'ab-6'   => 'tx:6,6,36,8;ar:8,22,30,60;tl:46,24,44,1;tx:46,30,36,7;tx:46,42,40,4;mo:80,40,8,14;tl:46,62,44,1;tx:46,68,32,7;tx:46,80,40,4',
+		'ab-7'   => 'tx:6,6,36,8;cd:60,22,32,60;tl:8,24,44,1;tx:8,30,36,7;tx:8,42,40,4;tl:8,62,44,1;tx:8,68,32,7;tx:8,80,40,4',
 		'fq-1'   => 'tx:6,8,40,7;ln:6,24,88,1;q:6,28,88,7;q:6,40,88,7;q:6,52,88,7;ln:6,68,88,1;q:6,72,88,7;q:6,84,88,7',
 		'fq-2'   => 'tx:6,8,40,7;tp:6,28,24,5;tp:6,40,20,5;tp:6,52,26,5;tp:6,64,22,5;q:38,28,56,8;q:38,42,56,8;q:38,56,56,8;q:38,70,56,8',
 		'fq-3'   => 'tx:6,8,40,7;q:6,28,41,7;q:6,40,41,7;q:6,52,41,7;q:53,28,41,7;q:53,40,41,7;q:53,52,41,7;q:6,70,41,7;q:53,70,41,7',
@@ -301,13 +305,22 @@ function ay_page_settings() {
 		} else {
 			$d = ay_wallpaper_defaults();
 			$w = array( 'on' => empty( $_POST['on'] ) ? 0 : 1, 'mobile' => empty( $_POST['mobile'] ) ? 0 : 1 );
-			foreach ( array( 'opacity' => array( 0, 100 ), 'size' => array( 120, 1600 ), 'spacing' => array( 240, 3000 ), 'rotate' => array( 0, 180 ), 'parallax' => array( 0, 60 ), 'blur' => array( 0, 20 ) ) as $k => $range ) {
+			foreach ( array( 'density' => array( 10, 500 ), 'opacity' => array( 0, 100 ), 'size' => array( 120, 1600 ), 'spacing' => array( 240, 3000 ), 'rotate' => array( 0, 180 ), 'parallax' => array( 0, 60 ), 'blur' => array( 0, 20 ) ) as $k => $range ) {
 				$w[ $k ] = isset( $_POST[ $k ] ) ? max( $range[0], min( $range[1], (float) $_POST[ $k ] ) ) : $d[ $k ];
 			}
 			$w['side']   = isset( $_POST['side'] ) && in_array( $_POST['side'], array( 'alt', 'left', 'right', 'center' ), true ) ? sanitize_key( $_POST['side'] ) : 'alt';
 			$w['color']  = ! empty( $_POST['color'] ) ? ay_hex( sanitize_text_field( wp_unslash( $_POST['color'] ) ), '' ) : '';
 			$w['motifs'] = isset( $_POST['motifs'] ) ? array_values( array_intersect( array_map( 'sanitize_key', (array) wp_unslash( $_POST['motifs'] ) ), array_keys( ay_wallpaper_motifs() ) ) ) : array();
 			$w['custom'] = isset( $_POST['custom'] ) ? array_values( array_filter( array_map( 'absint', explode( ',', sanitize_text_field( wp_unslash( $_POST['custom'] ) ) ) ) ) ) : array();
+			$w['weights'] = array();
+			$w['scales']  = array();
+			foreach ( array( 'weights' => array( 0, 6 ), 'scales' => array( 30, 300 ) ) as $field => $range ) {
+				if ( isset( $_POST[ $field ] ) && is_array( $_POST[ $field ] ) ) {
+					foreach ( wp_unslash( $_POST[ $field ] ) as $k => $v ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+						$w[ $field ][ sanitize_key( $k ) ] = max( $range[0], min( $range[1], (float) $v ) );
+					}
+				}
+			}
 			$w['skip']   = isset( $_POST['skip'] ) ? array_values( array_filter( array_map( 'absint', (array) wp_unslash( $_POST['skip'] ) ) ) ) : array();
 			update_option( 'arezoo_wallpaper', $w );
 		}
@@ -339,6 +352,7 @@ function ay_page_settings() {
 		$range = function ( $id, $label, $value, $min, $max, $step, $unit, $help = '' ) {
 			echo '<label class="ay-f ay-range" for="ay_' . esc_attr( $id ) . '"><span>' . esc_html( $label ) . ' <output>' . esc_html( $value . $unit ) . '</output></span><input type="range" id="ay_' . esc_attr( $id ) . '" name="' . esc_attr( $id ) . '" value="' . esc_attr( $value ) . '" min="' . esc_attr( $min ) . '" max="' . esc_attr( $max ) . '" step="' . esc_attr( $step ) . '" data-unit="' . esc_attr( $unit ) . '">' . ( $help ? '<em>' . esc_html( $help ) . '</em>' : '' ) . '</label>';
 		};
+		$range( 'density', 'تراکم طرح‌ها در صفحه', $w['density'], 10, 500, 5, '٪', '۱۰۰ = معمولی. کمتر = خلوت‌تر، بیشتر = پرتر (طرح‌ها در چند ستون پخش می‌شوند).' );
 		$range( 'opacity', 'میزان دیده شدن (شفافیت)', $w['opacity'], 0, 40, 0.5, '٪', 'هرچه کمتر، محوتر. پیشنهاد: ۵ تا ۱۰' );
 		$range( 'size', 'اندازهٔ هر طرح', $w['size'], 160, 1200, 10, 'px' );
 		$range( 'spacing', 'فاصلهٔ طرح‌ها در طول صفحه', $w['spacing'], 300, 2400, 20, 'px', 'هرچه کمتر، طرح‌های بیشتر' );
@@ -351,9 +365,14 @@ function ay_page_settings() {
 		}
 		echo '</select></label>';
 		$field( 'color', 'رنگ دلخواه خط‌ها', $w['color'], 'خالی = خودکار (هم‌رنگ متن تم)', 'text', 'class="ay-color"' );
-		echo '</section><section class="ay-card"><h2>' . ay_icon( 'gem', 22 ) . '<span>طرح‌ها</span></h2><p class="ay-help">طرح‌هایی که تیک دارند به نوبت در صفحه تکرار می‌شوند.</p><div class="ay-motifs">'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo '</section><section class="ay-card"><h2>' . ay_icon( 'gem', 22 ) . '<span>طرح‌ها</span></h2><p class="ay-help">طرح‌هایی که تیک دارند در صفحه تکرار می‌شوند. برای هر طرح جدا تعیین کنید چند بار بیاید («سهم»: ۰ تا ۶) و چه اندازه باشد.</p><div class="ay-motifs">'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		$per = function ( $key ) use ( $w ) {
+			$n = isset( $w['weights'][ $key ] ) ? (int) $w['weights'][ $key ] : 1;
+			$z = isset( $w['scales'][ $key ] ) ? (float) $w['scales'][ $key ] : 100;
+			return '<span class="ay-motif-set"><label>سهم <input type="number" name="weights[' . esc_attr( $key ) . ']" value="' . esc_attr( $n ) . '" min="0" max="6" step="1"></label><label>اندازه ٪ <input type="number" name="scales[' . esc_attr( $key ) . ']" value="' . esc_attr( $z ) . '" min="30" max="300" step="5"></label></span>';
+		};
 		foreach ( ay_wallpaper_motifs() as $k => $label ) {
-			echo '<label class="ay-motif"><input type="checkbox" name="motifs[]" value="' . esc_attr( $k ) . '" ' . checked( in_array( $k, (array) $w['motifs'], true ), true, false ) . '><span class="ay-motif-pic" style="--img:url(' . esc_url( ay_asset( 'img/sketch/' . $k . '.webp' ) ) . ')"></span><span>' . esc_html( $label ) . '</span></label>';
+			echo '<div class="ay-motif"><label><input type="checkbox" name="motifs[]" value="' . esc_attr( $k ) . '" ' . checked( in_array( $k, (array) $w['motifs'], true ), true, false ) . '><span class="ay-motif-pic" style="--img:url(' . esc_url( ay_asset( 'img/sketch/' . $k . '.webp' ) ) . ')"></span><span>' . esc_html( $label ) . '</span></label>' . $per( $k ) . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 		echo '</div><h3>طرح‌های خودتان</h3><p class="ay-help">تصویر PNG یا WebP بدون پس‌زمینه. رنگ خط‌ها مهم نیست؛ فقط شکل آن‌ها استفاده می‌شود.</p><input type="hidden" id="ay_custom" name="custom" value="' . esc_attr( implode( ',', array_map( 'absint', (array) $w['custom'] ) ) ) . '"><div class="ay-ed-gallery" id="ay_custom_list">';
 		foreach ( (array) $w['custom'] as $att ) {
@@ -362,7 +381,18 @@ function ay_page_settings() {
 				echo '<span class="ay-ed-thumb ay-ed-thumb-dark" data-id="' . (int) $att . '"><img src="' . esc_url( $src ) . '" alt=""><button type="button" class="ay-ed-x" aria-label="حذف">×</button></span>';
 			}
 		}
-		echo '</div><p><button type="button" class="button" id="ay_custom_add">افزودن طرح</button></p></section>';
+		echo '</div><p><button type="button" class="button" id="ay_custom_add">افزودن طرح</button></p>';
+		if ( $w['custom'] ) {
+			echo '<p class="ay-help">سهم و اندازهٔ طرح‌های خودتان (بعد از افزودن طرح تازه، یک بار ذخیره کنید تا این‌جا بیاید):</p><div class="ay-motifs">';
+			foreach ( (array) $w['custom'] as $att ) {
+				$src = wp_get_attachment_image_url( absint( $att ), 'thumbnail' );
+				if ( $src ) {
+					echo '<div class="ay-motif"><label><span class="ay-motif-pic" style="--img:url(' . esc_url( $src ) . ')"></span></label>' . $per( (string) absint( $att ) ) . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				}
+			}
+			echo '</div>';
+		}
+		echo '</section>';
 		echo '<section class="ay-card"><h2>' . ay_icon( 'list', 22 ) . '<span>برگه‌های بدون اسکچ</span></h2><p class="ay-help">در برگه‌هایی که تیک می‌زنید پس‌زمینهٔ اسکچ نمایش داده نمی‌شود.</p><div class="ay-skip">'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		foreach ( get_pages( array( 'sort_column' => 'menu_order,post_title' ) ) as $p ) {
 			echo '<label class="ay-check"><input type="checkbox" name="skip[]" value="' . (int) $p->ID . '" ' . checked( in_array( (int) $p->ID, array_map( 'absint', (array) $w['skip'] ), true ), true, false ) . '> <span>' . esc_html( $p->post_title ) . '</span></label>';

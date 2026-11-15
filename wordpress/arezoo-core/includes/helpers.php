@@ -310,6 +310,9 @@ function ay_wallpaper_defaults() {
 		'mobile'   => 1,
 		'motifs'   => array( 'botanical-necklace', 'filigree-rings', 'floral-set', 'ribbon-pendant', 'butterfly-set' ),
 		'custom'   => array(),
+		'density'  => 100,     // percent: how many motifs overall
+		'weights'  => array(), // [ motif key or attachment id => 0..6 ] how often each design appears
+		'scales'   => array(), // [ motif key or attachment id => percent ] size of each design
 		'skip'     => array(),  // post ids without the wallpaper
 	);
 }
@@ -339,23 +342,40 @@ function ay_wallpaper_config() {
 	if ( $id && in_array( (int) $id, array_map( 'absint', (array) $w['skip'] ), true ) ) {
 		return null;
 	}
-	$urls = array();
+	$items = array();
+	$add   = function ( $key, $url ) use ( &$items, $w ) {
+		$n = isset( $w['weights'][ $key ] ) ? max( 0, min( 6, (int) $w['weights'][ $key ] ) ) : 1;
+		$s = isset( $w['scales'][ $key ] ) ? max( 30, min( 300, (float) $w['scales'][ $key ] ) ) / 100 : 1;
+		if ( $n > 0 && $url ) {
+			$items[] = array( 'u' => $url, 's' => $s, 'n' => $n );
+		}
+	};
 	foreach ( (array) $w['motifs'] as $m ) {
 		if ( isset( ay_wallpaper_motifs()[ $m ] ) ) {
-			$urls[] = ay_asset( 'img/sketch/' . $m . '.webp' );
+			$add( $m, ay_asset( 'img/sketch/' . $m . '.webp' ) );
 		}
 	}
 	foreach ( (array) $w['custom'] as $att ) {
-		$u = wp_get_attachment_image_url( absint( $att ), 'large' );
-		if ( $u ) {
-			$urls[] = $u;
-		}
+		$add( (string) absint( $att ), wp_get_attachment_image_url( absint( $att ), 'large' ) );
 	}
-	if ( ! $urls ) {
+	if ( ! $items ) {
 		return null;
+	}
+	/* deal the designs out in turn, so one with a larger share is spread through the page rather than bunched */
+	$urls = array();
+	$list = array();
+	for ( $round = 0; $round < 6; $round++ ) {
+		foreach ( $items as $it ) {
+			if ( $it['n'] > $round ) {
+				$urls[] = $it['u'];
+				$list[] = $it['s'];
+			}
+		}
 	}
 	return array(
 		'urls'     => $urls,
+		'scales'   => $list,
+		'density'  => max( 10, min( 500, (float) $w['density'] ) ) / 100,
 		'opacity'  => max( 0, min( 100, (float) $w['opacity'] ) ) / 100,
 		'size'     => max( 120, (int) $w['size'] ),
 		'spacing'  => max( 240, (int) $w['spacing'] ),

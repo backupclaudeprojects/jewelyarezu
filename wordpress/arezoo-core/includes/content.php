@@ -220,14 +220,14 @@ function ay_sample_works() {
 	return array(
 		array( 'emerald-kite-earrings', 'Emerald Kite Earrings', 'Kite', 'Earrings', '2025', 'White gold', 'Kite-cut green stones, emerald-cut white stones', array( array( 'Pieces', 'Pair' ) ), 'A pair of drop earrings: an emerald-cut white stone above a long kite-cut green stone.', 1 ),
 		array( 'emerald-kite-drop', 'Emerald Kite Drop', 'Kite', 'Earrings', '2025', 'White gold', 'Kite-cut green stone, emerald-cut white stone', array( array( 'Pieces', 'Single earring' ) ), 'The single drop from the Kite pair, shown on its own to read the cut and the setting.', 0 ),
-		array( 'ruby-ribbon-set', 'Ruby Ribbon Set', 'Ribbon', 'Set', '2025', 'White gold, satin ribbon', 'Red stones, white stones', array( array( 'Pieces', 'Necklace, earrings, bracelet' ) ), 'The full set: a necklace tied with a satin ribbon, blossom earrings and a matching bracelet.', 1 ),
-		array( 'ruby-ribbon-necklace', 'Ruby Ribbon Necklace', 'Ribbon', 'Necklace', '2025', 'White gold, satin ribbon', 'Red stones, white stones', array( array( 'Closure', 'Ribbon bow' ) ), 'A graduated line of white stones closing in a red blossom, finished with a ribbon bow.', 0 ),
+		array( 'ruby-ribbon-set', 'Ruby Ribbon Set', 'Ribbon', 'Sets', '2025', 'White gold, satin ribbon', 'Red stones, white stones', array( array( 'Pieces', 'Necklace, earrings, bracelet' ) ), 'The full set: a necklace tied with a satin ribbon, blossom earrings and a matching bracelet.', 1 ),
+		array( 'ruby-ribbon-necklace', 'Ruby Ribbon Necklace', 'Ribbon', 'Necklaces', '2025', 'White gold, satin ribbon', 'Red stones, white stones', array( array( 'Closure', 'Ribbon bow' ) ), 'A graduated line of white stones closing in a red blossom, finished with a ribbon bow.', 0 ),
 		array( 'ruby-blossom-earrings', 'Ruby Blossom Earrings', 'Ribbon', 'Earrings', '2025', 'White gold', 'Red stones, white stones', array( array( 'Pieces', 'Pair' ) ), 'Clustered red blossoms with falling lines of white stones.', 0 ),
-		array( 'ruby-ribbon-bracelet', 'Ruby Ribbon Bracelet', 'Ribbon', 'Bracelet', '2025', 'White gold', 'Red stones, white stones', array( array( 'Motif', 'Single blossom' ) ), 'A line bracelet of white stones with one red blossom at its centre.', 0 ),
-		array( 'blue-bow-set', 'Blue Bow Set', 'Bow', 'Set', '2024', 'Yellow gold, white gold', 'Blue stones', array( array( 'Pieces', 'Necklace, studs, bracelet' ) ), 'The full set: a fine collar, a pair of studs and a bracelet, each tied with a two-tone bow.', 1 ),
-		array( 'blue-bow-necklace', 'Blue Bow Necklace', 'Bow', 'Necklace', '2024', 'Yellow gold, white gold', 'Blue stone', array( array( 'Form', 'Rigid collar' ) ), 'A fine gold collar carrying a two-tone bow and a single blue stone.', 0 ),
+		array( 'ruby-ribbon-bracelet', 'Ruby Ribbon Bracelet', 'Ribbon', 'Bracelets', '2025', 'White gold', 'Red stones, white stones', array( array( 'Motif', 'Single blossom' ) ), 'A line bracelet of white stones with one red blossom at its centre.', 0 ),
+		array( 'blue-bow-set', 'Blue Bow Set', 'Bow', 'Sets', '2024', 'Yellow gold, white gold', 'Blue stones', array( array( 'Pieces', 'Necklace, studs, bracelet' ) ), 'The full set: a fine collar, a pair of studs and a bracelet, each tied with a two-tone bow.', 1 ),
+		array( 'blue-bow-necklace', 'Blue Bow Necklace', 'Bow', 'Necklaces', '2024', 'Yellow gold, white gold', 'Blue stone', array( array( 'Form', 'Rigid collar' ) ), 'A fine gold collar carrying a two-tone bow and a single blue stone.', 0 ),
 		array( 'blue-bow-studs', 'Blue Bow Studs', 'Bow', 'Earrings', '2024', 'Yellow gold, white gold', 'Blue stones', array( array( 'Pieces', 'Pair' ) ), 'Stud earrings: a round blue stone above a bow in yellow and white gold.', 0 ),
-		array( 'blue-bow-bracelet', 'Blue Bow Bracelet', 'Bow', 'Bracelet', '2024', 'Yellow gold, white gold', 'Blue stones', array( array( 'Motif', 'Centre bow' ) ), 'A beaded gold bracelet with a centre bow and three blue stones.', 0 ),
+		array( 'blue-bow-bracelet', 'Blue Bow Bracelet', 'Bow', 'Bracelets', '2024', 'Yellow gold, white gold', 'Blue stones', array( array( 'Motif', 'Centre bow' ) ), 'A beaded gold bracelet with a centre bow and three blue stones.', 0 ),
 	);
 }
 
@@ -287,7 +287,7 @@ function ay_import_samples() {
 	foreach ( array( 'Kite', 'Ribbon', 'Bow' ) as $i => $n ) {
 		$cols[ $n ] = ay_sample_term( $n, 'ay_collection', $i + 1 );
 	}
-	foreach ( array( 'Earrings', 'Necklace', 'Bracelet', 'Set' ) as $i => $n ) {
+	foreach ( array( 'Rings', 'Necklaces', 'Sets', 'Earrings', 'Bracelets' ) as $i => $n ) {
 		$typs[ $n ] = ay_sample_term( $n, 'ay_type', $i + 1 );
 	}
 	$imgs = array();
@@ -353,3 +353,35 @@ function ay_remove_samples() {
 function ay_sample_count() {
 	return count( get_posts( array( 'post_type' => 'ay_work', 'post_status' => 'any', 'numberposts' => -1, 'fields' => 'ids', 'meta_key' => '_ay_sample' ) ) ); // phpcs:ignore WordPress.DB.SlowDBQuery
 }
+
+/** The four basic types always exist (they can be renamed, reordered or deleted in «آرزو ← دسته‌بندی‌ها»). */
+function ay_ensure_types() {
+	foreach ( array( 'Necklace' => 'Necklaces', 'Set' => 'Sets', 'Bracelet' => 'Bracelets' ) as $old => $new ) {
+		$t = get_term_by( 'name', $old, 'ay_type' );
+		if ( $t && ! get_term_by( 'name', $new, 'ay_type' ) ) {
+			wp_update_term( $t->term_id, 'ay_type', array( 'name' => $new, 'slug' => sanitize_title( $new ) ) );
+		}
+	}
+	foreach ( array( 'Rings', 'Necklaces', 'Sets', 'Earrings' ) as $i => $n ) {
+		if ( ! term_exists( $n, 'ay_type' ) ) {
+			$t = wp_insert_term( $n, 'ay_type' );
+			if ( ! is_wp_error( $t ) ) {
+				update_term_meta( $t['term_id'], '_ay_order', $i + 1 );
+			}
+		}
+	}
+}
+
+/* One-time steps after an update of the plugin. */
+add_action( 'admin_init', function () {
+	if ( get_option( 'arezoo_version' ) === AY_VERSION || ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+	if ( get_option( 'arezoo_built' ) && version_compare( (string) get_option( 'arezoo_version', '1.0.0' ), '1.1.0', '<' ) ) {
+		ay_ensure_types();
+	}
+	update_option( 'arezoo_version', AY_VERSION );
+	if ( function_exists( 'ay_elementor_ready' ) && ay_elementor_ready() ) {
+		\Elementor\Plugin::$instance->files_manager->clear_cache();
+	}
+}, 30 );
