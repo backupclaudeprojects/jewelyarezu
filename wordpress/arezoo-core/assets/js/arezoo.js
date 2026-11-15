@@ -39,10 +39,41 @@
   }
 
   /* ------------------------------------------------------------------- hero */
+  function heroPick(el, vs) {   /* the picture whose shape is closest to the frame */
+    var a = el.clientWidth / (el.clientHeight || 1), best = 0, bd = 1e9;
+    vs.forEach(function (v, i) { var q = Math.abs(Math.log(a / (v.w / v.h))) + (v.k === 'tablet' ? .15 : 0); if (q < bd) { bd = q; best = i; } });
+    return best;
+  }
+  function heroSrc(el, v) {
+    var need = Math.max(el.clientWidth / v.w, el.clientHeight / v.h) * v.w * Math.min(w.devicePixelRatio || 1, 2), i;
+    for (i = 0; i < v.set.length; i++) if (v.set[i][1] >= need) return v.set[i][0];
+    return v.set[v.set.length - 1][0];
+  }
   function hero(el) {
     if (!w.AYHero) return;
-    if (el._ayHero) { el._ayHero.destroy(); }
-    el._ayHero = w.AYHero.mount(el, json(el, 'data-ay-hero'));
+    var cfg = json(el, 'data-ay-hero'), vs = cfg.variants;
+    if (el._ayHero) { el._ayHero.destroy(); el._ayHero = null; }
+    if (!vs || !vs.length) { el._ayHero = w.AYHero.mount(el, cfg); return; }
+    var cur = -1, t = 0;
+    function apply(i) {
+      var v = vs[i], img = $('img.ay-hs-img', el), preset = el.getAttribute('data-v');
+      if (el._ayHero) { el._ayHero.destroy(); el._ayHero = null; }
+      if (cur < 0 && img) {   /* first time: keep the picture element that is already in the page */
+        var want = heroSrc(el, v);
+        if (!(img.getAttribute('src') && preset !== null && +preset === i) && img.getAttribute('src') !== want) img.src = want;
+      } else {   /* the frame changed shape and another picture suits it: start from clean markup */
+        el.removeAttribute('data-v'); el._ayTone = 0; el.style.backgroundColor = ''; el.classList.remove('is-live', 'is-letter-x', 'is-letter-y');
+        el.innerHTML = '<img class="ay-hs-img ay-hero-media" alt="" decoding="async"><span class="ay-hero-veil" aria-hidden="true"></span><span class="ay-hero-fade" aria-hidden="true"></span>';
+        img = $('img.ay-hs-img', el); img.alt = cfg.alt || ''; img.src = heroSrc(el, v);
+      }
+      cur = i;
+      var c = {}, k; for (k in cfg) c[k] = cfg[k];
+      c.img = img.getAttribute('src'); c.w = v.w; c.h = v.h; c.safe = v.safe; c.regions = v.regions; c.sparks = v.sparks; c.floats = v.k === 'wide' ? cfg.floats : [];
+      el._ayHero = w.AYHero.mount(el, c);
+    }
+    apply(heroPick(el, vs));
+    if (el._ayRO) el._ayRO.disconnect();
+    if ('ResizeObserver' in w) { el._ayRO = new ResizeObserver(function () { clearTimeout(t); t = setTimeout(function () { if (!el.isConnected) return; var i = heroPick(el, vs); if (i !== cur) apply(i); }, 220); }); el._ayRO.observe(el); }
   }
 
   /* --------------------------------------------------- horizontal portfolio */
@@ -389,12 +420,14 @@
       if (Math.abs(H - lastH) < 60 && W === lastW) return;
       lastH = H; lastW = W; seed = 7; box.style.height = H + 'px';
       var phone = W < 768, base = phone ? Math.min(c.size * .62, W * .78) : Math.min(c.size, W * .5), gap = phone ? c.spacing * .8 : c.spacing, k = c.density || 1;
-      var n = Math.max(1, Math.round(H / gap * k)), rowH = H / n, h = '', i, slots = k > 1.6 && !phone ? ['right', 'left', 'center'] : ['right', 'left'];
+      var slots = k > 1.6 && !phone ? ['right', 'left', 'center'] : ['right', 'left'], big = 1, i, h = '';
+      if (c.scales) c.scales.forEach(function (v) { if (v > big) big = v; });
+      var per = phone || c.side !== 'alt' ? 1 : slots.length, cap = Math.max(1, Math.floor(H / (base * big * 1.25 * 1.12 / per)));   /* room for each design, so none lands on another */
+      var n = Math.min(cap, Math.max(1, Math.round(H / gap * k))), rowH = H / n;
       for (i = 0; i < n; i++) {
         var size = base * ((c.scales && c.scales[i % c.urls.length]) || 1), side = c.side === 'alt' ? slots[i % slots.length] : c.side, x;
-        if (k > 2.4 && !phone && c.side === 'alt') x = rnd() * (W - size * .6) - size * .2;   /* very dense: scattered over the whole width */
-        else if (side === 'left') x = -size * .22 + rnd() * W * .06; else if (side === 'right') x = W - size * .78 - rnd() * W * .06; else x = (W - size) / 2 + (rnd() - .5) * W * .2;
-        var y = i * rowH + rowH * .12 + rnd() * rowH * .3, rot = (rnd() - .5) * 2 * c.rotate;
+        if (side === 'left') x = -size * .22 + rnd() * W * .06; else if (side === 'right') x = W - size * .78 - rnd() * W * .06; else x = (W - size) / 2 + (rnd() - .5) * W * .2;
+        var y = i * rowH + rnd() * Math.max(0, rowH - size * 1.25) * (per > 1 ? 1 : .6), rot = (rnd() - .5) * 2 * c.rotate;
         h += '<i data-y="' + y.toFixed(0) + '" style="left:' + x.toFixed(0) + 'px;top:' + y.toFixed(0) + 'px;width:' + size.toFixed(0) + 'px;height:' + (size * 1.25).toFixed(0) + 'px;--img:url(' + c.urls[i % c.urls.length] + ');--r:' + rot.toFixed(1) + 'deg;transform:rotate(' + rot.toFixed(1) + 'deg)"></i>';
       }
       box.innerHTML = h; drift();
@@ -503,6 +536,51 @@
     if (inEditor() || reduced()) el.classList.add('ay-t-in'); else if (el.classList.contains('ay-txt-start-load')) go(); else watch(el, null, go);
   }
 
+  /* ------------------------------------ certificates: viewer with download */
+  var crv = null, crvList = [], crvAt = 0, crvFrom = null;
+  function crvBuild() {
+    crv = d.createElement('div'); crv.className = 'ay-crv'; crv.setAttribute('role', 'dialog'); crv.setAttribute('aria-modal', 'true'); crv.setAttribute('data-no-curtain', '');
+    crv.innerHTML = '<div class="ay-crv-box"><div class="ay-crv-stage"></div><div class="ay-crv-bar"><div class="ay-crv-cap"><strong></strong><span></span></div><div class="ay-crv-acts">' +
+      '<button type="button" class="ay-crv-btn ay-crv-nav" data-go="-1" aria-label="Previous">‹</button><button type="button" class="ay-crv-btn ay-crv-nav" data-go="1" aria-label="Next">›</button>' +
+      '<a class="ay-crv-btn is-main ay-crv-dl" download></a><button type="button" class="ay-crv-btn ay-crv-x"></button></div></div></div>';
+    d.body.appendChild(crv);
+    crv.addEventListener('click', function (e) {
+      var go = e.target.closest('[data-go]');
+      if (go) { crvShow(crvAt + (+go.getAttribute('data-go'))); return; }
+      if (e.target === crv || e.target.closest('.ay-crv-x')) crvClose();
+    });
+    d.addEventListener('keydown', function (e) {
+      if (!crv.classList.contains('is-open')) return;
+      if (e.key === 'Escape') crvClose(); else if (e.key === 'ArrowRight') crvShow(crvAt + 1); else if (e.key === 'ArrowLeft') crvShow(crvAt - 1);
+      else if (e.key === 'Tab') { var f = $$('button:not([hidden]), a[href]', crv), i = f.indexOf(d.activeElement); e.preventDefault(); (f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length] || f[0]).focus(); }
+    });
+  }
+  function crvShow(i) {
+    if (!crvList.length) return;
+    crvAt = (i + crvList.length) % crvList.length;
+    var b = crvList[crvAt], src = b.getAttribute('data-src'), stage = $('.ay-crv-stage', crv), dl = $('.ay-crv-dl', crv);
+    stage.innerHTML = '';
+    if (b.getAttribute('data-kind') === 'pdf') { var fr = d.createElement('iframe'); fr.title = b.getAttribute('data-title') || ''; fr.src = src; stage.appendChild(fr); }
+    else { var im = d.createElement('img'); im.alt = b.getAttribute('data-title') || ''; im.src = src; stage.appendChild(im); }
+    $('.ay-crv-cap strong', crv).textContent = b.getAttribute('data-title') || ''; $('.ay-crv-cap span', crv).textContent = b.getAttribute('data-meta') || '';
+    dl.href = src; dl.setAttribute('download', (src.split('/').pop() || 'file').split('?')[0]);
+    $$('.ay-crv-nav', crv).forEach(function (n) { n.hidden = crvList.length < 2; });
+  }
+  function crvClose() { crv.classList.remove('is-open'); d.documentElement.classList.remove('ay-lock'); setTimeout(function () { if (!crv.classList.contains('is-open')) $('.ay-crv-stage', crv).innerHTML = ''; }, 500); if (crvFrom) crvFrom.focus(); }
+  function cred(el) {
+    if (!once(el, 'cred')) return;
+    var cfg = json(el, 'data-ay-cred');
+    el.addEventListener('click', function (e) {
+      var b = e.target.closest('button.ay-cr-item'); if (!b || inEditor()) return;
+      if (!crv) crvBuild();
+      crvList = $$('button.ay-cr-item', el); crvFrom = b;
+      var cs = getComputedStyle(el); ['--ay-cr-veil', '--ay-cr-veil-op', '--ay-cr-veil-blur'].forEach(function (k) { var v = cs.getPropertyValue(k); if (v) crv.style.setProperty(k, v); else crv.style.removeProperty(k); });
+      var dl = $('.ay-crv-dl', crv); dl.textContent = cfg.dl || 'Download'; dl.hidden = !cfg.download; dl.style.display = cfg.download ? '' : 'none'; $('.ay-crv-x', crv).textContent = cfg.close || 'Close';
+      crvShow(crvList.indexOf(b)); d.documentElement.classList.add('ay-lock');
+      requestAnimationFrame(function () { crv.classList.add('is-open'); $('.ay-crv-x', crv).focus(); });
+    });
+  }
+
   /* ------------------------------------------------ sticky portrait story */
   function story(el) {
     if (!once(el, 'story')) return;
@@ -521,7 +599,7 @@
   /* --------------------------------------------------------------------- init */
   var MAP = [['[data-ay-hero]', hero], ['[data-ay-hz]', hz], ['[data-ay-stack]', stack], ['[data-ay-archive]', archive], ['[data-ay-gallery]', gallery], ['[data-ay-faq]', faq], ['[data-ay-timeline]', timeline],
     ['.e-con.ay-tl-yes', timelineBox], ['[data-ay-motion]', motion], ['[data-ay-process]', process], ['[data-ay-compare]', compare], ['.ay-depth-tilt', tilt], ['[class*="ay-rv-"]', reveal], ['.ay-skw-draw', reveal],
-    ['[data-ay-dock]', dock], ['.e-con.ay-float-top, .e-con.ay-float-bottom', floatBar], ['[data-ay-story]', story],
+    ['[data-ay-dock]', dock], ['.e-con.ay-float-top, .e-con.ay-float-bottom', floatBar], ['[data-ay-story]', story], ['[data-ay-cred]', cred],
     ['.elementor-element.ay-halo-behind, .elementor-element.ay-halo-ring, .elementor-element.ay-halo-front', halo], ['.elementor-element.ay-shine-hover, .elementor-element.ay-shine-loop, .elementor-element.ay-shine-view', shine],
     ['.elementor-element.ay-pb-bottom, .elementor-element.ay-pb-top, .elementor-element.ay-pb-left, .elementor-element.ay-pb-right', progressLine],
     ['.ay-ptr-shift, .ay-ptr-magnet', pointerFx], ['.ay-spar-yes', scrollPar], ['.ay-txt-words, .ay-txt-letters, .ay-txt-blur, .ay-txt-lines, .ay-txt-type', textFx]];

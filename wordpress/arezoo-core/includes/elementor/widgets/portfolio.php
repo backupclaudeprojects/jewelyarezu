@@ -297,7 +297,7 @@ class Archive extends Base {
 		$this->done();
 
 		$this->sec( 's_filters', 'فیلترها' );
-		$this->sw( 'f_col', 'فیلتر کالکشن', 'yes' );
+		$this->sw( 'f_col', 'فیلتر کالکشن', '' );
 		$this->txt( 'f_col_label', 'برچسب فیلتر کالکشن', 'Collection', array( 'condition' => array( 'f_col' => 'yes' ) ) );
 		$this->sw( 'f_type', 'فیلتر نوع', 'yes' );
 		$this->txt( 'f_type_label', 'برچسب فیلتر نوع', 'Type', array( 'condition' => array( 'f_type' => 'yes' ) ) );

@@ -52,10 +52,25 @@
       var W = root.clientWidth, H = root.clientHeight, f = focus();
       root.style.setProperty('--fx', (f[0] * 100) + '%'); root.style.setProperty('--fy', (f[1] * 100) + '%');
       if (!W || !H || !cfg.w || !cfg.h) return;
-      var sc = Math.max(W / cfg.w, H / cfg.h), sw = cfg.w * sc, sh = cfg.h * sc;
+      var sc = Math.max(W / cfg.w, H / cfg.h), sf = cfg.safe, letter = false;
+      if (sf) {   /* the protected part of the picture always fits; the picture is shown a little smaller if it has to be */
+        var kw = 1 - sf[1] - sf[3], kh = 1 - sf[0] - sf[2], lim = Math.min(W / (cfg.w * kw), H / (cfg.h * kh));
+        if (lim < sc) { sc = lim; letter = true; }
+      }
+      var sw = cfg.w * sc, sh = cfg.h * sc, place = function (box, size, foc, lo, hi) {
+        if (size <= box) return (box - size) / 2;
+        var v = (box - size) * foc;
+        if (sf) v = Math.min(-lo * size, Math.max(box - (1 - hi) * size, v));
+        return Math.min(0, Math.max(box - size, v));
+      };
       stage.style.width = sw.toFixed(1) + 'px'; stage.style.height = sh.toFixed(1) + 'px';
-      stage.style.left = ((W - sw) * f[0]).toFixed(1) + 'px'; stage.style.top = ((H - sh) * f[1]).toFixed(1) + 'px';
+      stage.style.left = place(W, sw, f[0], sf ? sf[3] : 0, sf ? sf[1] : 0).toFixed(1) + 'px'; stage.style.top = place(H, sh, f[1], sf ? sf[0] : 0, sf ? sf[2] : 0).toFixed(1) + 'px';
       stage.style.setProperty('--ay-sw', sw.toFixed(1) + 'px');
+      root.classList.toggle('is-letter-x', letter && sw < W - 1); root.classList.toggle('is-letter-y', letter && sh < H - 1);
+      if (letter && !root._ayTone && img && img.naturalWidth) {   /* bands beside the picture take its own tone */
+        root._ayTone = 1;
+        try { var c1 = document.createElement('canvas'); c1.width = c1.height = 4; var g = c1.getContext('2d'); g.drawImage(img, 0, 0, 4, 4); var px = g.getImageData(0, 0, 1, 1).data; root.style.backgroundColor = 'rgb(' + px[0] + ',' + px[1] + ',' + px[2] + ')'; } catch (e) { /* cross-origin picture: keep the set colour */ }
+      }
       if (canvas) {
         var dpr = Math.min(window.devicePixelRatio || 1, 2), cw = Math.min(Math.round(sw * dpr), 2560), ch = Math.round(cw * cfg.h / cfg.w);
         if (canvas.width !== cw || canvas.height !== ch) { canvas.width = cw; canvas.height = ch; gl.viewport(0, 0, cw, ch); }

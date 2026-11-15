@@ -263,7 +263,7 @@ class Contact extends Base {
 		$this->sel( 'layout', 'چیدمان', array( 'cols' => 'ستونی کنار هم', 'rows' => 'ردیفی زیر هم', 'inline' => 'یک خط فشرده (برای فوتر)' ), 'cols', array( 'prefix_class' => 'ay-ctl-' ) );
 		$this->sw( 'icons', 'نمایش آیکون', 'yes' );
 		$this->sw( 'kinds', 'نمایش عنوان هر راه (Email, Instagram…)', 'yes' );
-		$this->sw( 'actions', 'نمایش دکمهٔ Copy / Open', 'yes' );
+		$this->sw( 'actions', 'نمایش دکمهٔ Copy / Open', '', array( 'description' => 'خاموش: فقط آیکون و خودِ نشانی قابل کلیک‌اند.' ) );
 		$this->txt( 'copy', 'متن دکمهٔ کپی', 'Copy', array( 'label_block' => false, 'condition' => array( 'actions' => 'yes' ) ) );
 		$this->txt( 'copied', 'متن بعد از کپی', 'Copied', array( 'label_block' => false, 'condition' => array( 'actions' => 'yes' ) ) );
 		$this->txt( 'open', 'متن دکمهٔ باز کردن', 'Open', array( 'label_block' => false, 'condition' => array( 'actions' => 'yes' ) ) );
@@ -294,13 +294,15 @@ class Contact extends Base {
 		echo '<ul class="ay-ct">';
 		foreach ( $items as $key => $c ) {
 			echo '<li class="ay-ct-item">';
+			$attr = ' href="' . esc_url( $c['url'] ) . '"' . ( 'email' === $key ? '' : ' target="_blank" rel="noopener"' );
 			if ( 'yes' === $s['icons'] ) {
-				echo '<span class="ay-ct-ic" aria-hidden="true">' . ay_icon( $c['icon'], 30 ) . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo '<a class="ay-ct-ic"' . $attr . ' aria-label="' . esc_attr( $c['label'] ) . '">' . ay_icon( $c['icon'], 30 ) . '</a>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
+			echo '<span class="ay-ct-txt">';
 			if ( 'yes' === $s['kinds'] ) {
 				echo '<span class="ay-ct-kind">' . esc_html( $c['label'] ) . '</span>';
 			}
-			echo '<a class="ay-ct-val" href="' . esc_url( $c['url'] ) . '"' . ( 'email' === $key ? '' : ' target="_blank" rel="noopener"' ) . '>' . esc_html( $c['value'] ) . '</a>';
+			echo '<a class="ay-ct-val"' . $attr . '>' . esc_html( $c['value'] ) . '</a>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			if ( 'yes' === $s['actions'] ) {
 				if ( 'email' === $key ) {
 					echo '<button type="button" class="ay-ct-act" data-ay-copy="' . esc_attr( $c['value'] ) . '" data-done="' . esc_attr( $s['copied'] ) . '">' . esc_html( $s['copy'] ) . '</button>';
@@ -308,6 +310,7 @@ class Contact extends Base {
 					echo '<a class="ay-ct-act" href="' . esc_url( $c['url'] ) . '" target="_blank" rel="noopener">' . esc_html( $s['open'] ) . '</a>';
 				}
 			}
+			echo '</span>';
 			echo '</li>';
 		}
 		echo '</ul>';

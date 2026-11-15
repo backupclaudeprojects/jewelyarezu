@@ -126,7 +126,7 @@ class Process extends Base {
 		$this->done();
 
 		$this->sec( 's_extras', 'جزئیات متحرک' );
-		$this->sw( 'pen', 'قلم متحرک روی عکس', 'yes' );
+		$this->sw( 'pen', 'قلم متحرک روی عکس', '' );
 		$this->sw( 'chips', 'فهرست لایه‌ها کنار قاب (مثل پنل Layers)', 'yes' );
 		$this->txt( 'chips_title', 'عنوان فهرست لایه‌ها', 'Layers', array( 'label_block' => false, 'condition' => array( 'chips' => 'yes' ) ) );
 		$this->sw( 'badge', 'موشن هر مرحله کنار قاب', 'yes' );

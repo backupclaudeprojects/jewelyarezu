@@ -39,8 +39,8 @@ class Hero extends Base {
 
 	/** The motion set-up made for the bundled «باغ شب» picture (all values in percent of the picture). */
 	public static function night_regions() {
-		$r = function ( $label, $x, $y, $w, $h, $feather, $type, $amp, $speed, $px, $py, $phase, $depth ) {
-			return array( 'label' => $label, 'on' => 'yes', 'x' => array( 'size' => $x, 'unit' => '%' ), 'y' => array( 'size' => $y, 'unit' => '%' ), 'w' => array( 'size' => $w, 'unit' => '%' ), 'h' => array( 'size' => $h, 'unit' => '%' ), 'feather' => array( 'size' => $feather ), 'type' => $type, 'amp' => array( 'size' => $amp ), 'speed' => array( 'size' => $speed ), 'px' => array( 'size' => $px, 'unit' => '%' ), 'py' => array( 'size' => $py, 'unit' => '%' ), 'phase' => array( 'size' => $phase ), 'depth' => array( 'size' => $depth ) );
+		$r = function ( $label, $x, $y, $w, $h, $feather, $type, $amp, $speed, $px, $py, $phase, $depth, $for = 'wide' ) {
+			return array( 'label' => $label, 'on' => 'yes', 'for' => $for, 'x' => array( 'size' => $x, 'unit' => '%' ), 'y' => array( 'size' => $y, 'unit' => '%' ), 'w' => array( 'size' => $w, 'unit' => '%' ), 'h' => array( 'size' => $h, 'unit' => '%' ), 'feather' => array( 'size' => $feather ), 'type' => $type, 'amp' => array( 'size' => $amp ), 'speed' => array( 'size' => $speed ), 'px' => array( 'size' => $px, 'unit' => '%' ), 'py' => array( 'size' => $py, 'unit' => '%' ), 'phase' => array( 'size' => $phase ), 'depth' => array( 'size' => $depth ) );
 		};
 		return array(
 			$r( 'قاصدک و ساقه', 21.5, 56, 34, 80, 55, 'sway', 28, 0.55, 13.5, 93, 0, 0.6 ),
@@ -58,13 +58,39 @@ class Hero extends Base {
 			$r( 'برگ‌های پایین راست', 81, 84, 15, 26, 60, 'sway', 20, 0.42, 86, 93, 1.5, 0.9 ),
 			$r( 'گل پایین راست', 92.5, 72, 15, 30, 60, 'sway', 24, 0.48, 93, 90, 2.2, 0.8 ),
 			$r( 'گردنبند', 62, 50, 38, 92, 35, 'sway', 9, 0.38, 63, 8, 0, 0.9 ),
+			/* the 4:3 picture (tablets, near-square frames) */
+			$r( 'تبلت · قاصدک و ساقه', 12, 58, 30, 80, 55, 'sway', 26, 0.55, 1, 77, 0, 0.6, 'tablet' ),
+			$r( 'تبلت · کرک قاصدک', 13, 42, 30, 36, 80, 'wave', 16, 1.1, 13, 42, 0, 0.3, 'tablet' ),
+			$r( 'تبلت · دانهٔ بالا', 33, 38, 9, 9, 70, 'wave', 30, 0.9, 33, 38, 2.6, 1.2, 'tablet' ),
+			$r( 'تبلت · دانهٔ پایین', 30, 59, 11, 9, 70, 'wave', 30, 0.75, 30, 59, 4, 1.2, 'tablet' ),
+			$r( 'تبلت · شاخهٔ چپ', 27, 14, 44, 26, 60, 'sway', 22, 0.45, 48, 8, 1, 0.4, 'tablet' ),
+			$r( 'تبلت · برگ‌های راست', 97, 17, 10, 26, 60, 'sway', 26, 0.5, 95, 10, 2, 0.4, 'tablet' ),
+			$r( 'تبلت · غنچه‌های راست', 97, 6, 9, 9, 70, 'wave', 15, 0.9, 97, 6, 0, 0.3, 'tablet' ),
+			$r( 'تبلت · گل پایین چپ', 14, 73, 24, 22, 60, 'sway', 24, 0.5, 11, 82, 0.6, 0.8, 'tablet' ),
+			$r( 'تبلت · برگ‌های پایین چپ', 30, 85, 34, 28, 60, 'sway', 18, 0.4, 20, 93, 3, 0.9, 'tablet' ),
+			$r( 'تبلت · برگ‌های پایین راست', 88, 85, 26, 28, 60, 'sway', 18, 0.42, 97, 92, 1.5, 0.9, 'tablet' ),
+			$r( 'تبلت · گردنبند', 63, 47, 52, 92, 35, 'sway', 8, 0.38, 63, 5, 0, 0.9, 'tablet' ),
+			/* the tall picture (phones, upright frames) */
+			$r( 'موبایل · گردنبند', 69, 37, 66, 42, 35, 'sway', 7, 0.38, 69, 19, 0, 0.9, 'mobile' ),
+			$r( 'موبایل · شاخه و برگ‌های بالا', 82, 14, 40, 13, 60, 'sway', 20, 0.45, 100, 18, 1, 0.4, 'mobile' ),
+			$r( 'موبایل · برگ‌های چپ', 34, 26, 20, 8, 60, 'sway', 22, 0.5, 45, 22, 2, 0.4, 'mobile' ),
+			$r( 'موبایل · قاصدک و ساقه', 87, 80, 22, 26, 55, 'sway', 22, 0.55, 84, 95, 0, 0.6, 'mobile' ),
+			$r( 'موبایل · کرک قاصدک', 88, 73, 24, 10, 80, 'wave', 14, 1.1, 88, 73, 0, 0.3, 'mobile' ),
+			$r( 'موبایل · دانه‌ها', 70, 75, 18, 10, 70, 'wave', 28, 0.8, 70, 75, 1.4, 1.2, 'mobile' ),
+			$r( 'موبایل · گل پایین', 68, 85, 18, 8, 60, 'sway', 22, 0.5, 70, 90, 0.6, 0.8, 'mobile' ),
+			$r( 'موبایل · برگ‌های پایین', 45, 95, 62, 10, 60, 'sway', 16, 0.4, 50, 100, 3, 0.9, 'mobile' ),
 		);
 	}
 
 	public static function night_sparks() {
 		$out = array();
 		foreach ( array( array( 1010, 585, 1.4, 4.2, 0 ), array( 892, 738, 1.1, 5, 1.7 ), array( 1000, 745, 1, 4.6, 3.1 ), array( 1190, 765, 1.3, 5.4, 0.8 ), array( 805, 470, 0.9, 6, 2.4 ), array( 1075, 735, 1.2, 4.4, 3.8 ), array( 955, 672, 0.9, 5.2, 1.1 ), array( 1188, 660, 0.8, 6.2, 4.4 ), array( 1262, 500, 0.8, 5.6, 2.9 ), array( 760, 318, 0.6, 6.6, 0.4 ), array( 1345, 318, 0.6, 7, 3.5 ) ) as $p ) {
-			$out[] = array( 'x' => array( 'size' => round( $p[0] / 16.72, 2 ), 'unit' => '%' ), 'y' => array( 'size' => round( $p[1] / 9.41, 2 ), 'unit' => '%' ), 'size' => array( 'size' => $p[2] ), 'dur' => array( 'size' => $p[3] ), 'delay' => array( 'size' => $p[4] ) );
+			$out[] = array( 'for' => 'wide', 'x' => array( 'size' => round( $p[0] / 16.72, 2 ), 'unit' => '%' ), 'y' => array( 'size' => round( $p[1] / 9.41, 2 ), 'unit' => '%' ), 'size' => array( 'size' => $p[2] ), 'dur' => array( 'size' => $p[3] ), 'delay' => array( 'size' => $p[4] ) );
+		}
+		foreach ( array( 'tablet' => array( array( 56, 69 ), array( 65, 75 ), array( 73.5, 67 ), array( 52, 52 ), array( 78, 50 ), array( 61, 60 ), array( 69, 82 ) ), 'mobile' => array( array( 60, 47 ), array( 72, 51 ), array( 83, 45 ), array( 52, 42 ), array( 88, 40 ), array( 63, 53 ), array( 77, 55 ) ) ) as $for => $pts ) {
+			foreach ( $pts as $i => $p ) {
+				$out[] = array( 'for' => $for, 'x' => array( 'size' => $p[0], 'unit' => '%' ), 'y' => array( 'size' => $p[1], 'unit' => '%' ), 'size' => array( 'size' => 'mobile' === $for ? 2.4 - ( $i % 3 ) * 0.4 : 1.3 - ( $i % 3 ) * 0.2 ), 'dur' => array( 'size' => 4.2 + ( $i % 4 ) * 0.6 ), 'delay' => array( 'size' => $i * 0.7 ) );
+			}
 		}
 		return $out;
 	}
@@ -75,6 +101,47 @@ class Hero extends Base {
 			$out[] = array( 'image' => array( 'url' => ay_asset( 'img/hero/seed-' . $f[0] . '.png' ) ), 'x' => array( 'size' => $f[1], 'unit' => '%' ), 'y' => array( 'size' => $f[2], 'unit' => '%' ), 'w' => array( 'size' => $f[3], 'unit' => '%' ), 'dx' => array( 'size' => $f[4] ), 'dy' => array( 'size' => $f[5] ), 'rot' => array( 'size' => $f[6] ), 'dur' => array( 'size' => $f[7] ), 'delay' => array( 'size' => $f[8] ), 'opacity' => array( 'size' => 0.85 ) );
 		}
 		return $out;
+	}
+
+	/** The bundled pictures come in several sizes; the right one is picked for the screen. [ family => [ [ file, width, height ] … ] ] */
+	public static function families() {
+		return array(
+			'wide'   => array( array( 'hero-lg.webp', 2560, 1440 ), array( 'hero-xl.webp', 3200, 1800 ) ),
+			'tablet' => array( array( 'hero-tablet-sm.webp', 1680, 1260 ), array( 'hero-tablet-md.webp', 2048, 1536 ), array( 'hero-tablet-lg.webp', 2560, 1920 ) ),
+			'mobile' => array( array( 'hero-mobile-xs.webp', 720, 1560 ), array( 'hero-mobile-sm.webp', 960, 2080 ), array( 'hero-mobile-md.webp', 1536, 3328 ) ),
+		);
+	}
+
+	public static function family_default( $family ) {
+		$f = array( 'wide' => 'hero-lg.webp', 'tablet' => 'hero-tablet-md.webp', 'mobile' => 'hero-mobile-sm.webp' );
+		return 'img/hero/' . $f[ $family ];
+	}
+
+	/** [ sizes, width, height ] of one picture setting; bundled pictures bring all their sizes. */
+	private function variant_source( $media ) {
+		$url = isset( $media['url'] ) ? (string) $media['url'] : '';
+		if ( '' === $url ) {
+			return null;
+		}
+		$id  = isset( $media['id'] ) ? absint( $media['id'] ) : 0;
+		$rel = $id ? (string) get_post_meta( $id, '_ay_asset', true ) : '';
+		$key = $rel ? basename( $rel ) : basename( (string) wp_parse_url( $url, PHP_URL_PATH ) );
+		if ( false !== strpos( $key, 'night-garden' ) ) {
+			$key = 'hero-lg.webp';   /* the first bundled picture: same artwork, now in full quality */
+		}
+		foreach ( self::families() as $files ) {
+			foreach ( $files as $f ) {
+				if ( $f[0] === $key ) {
+					$set = array();
+					foreach ( $files as $g ) {
+						$set[] = array( ay_asset( 'img/hero/' . $g[0] ), $g[1] );
+					}
+					return array( $set, $f[1], $f[2], true );
+				}
+			}
+		}
+		list( $w, $h ) = $this->media_dims( $media );
+		return array( array( array( esc_url_raw( $url ), $w ) ), $w, $h );
 	}
 
 	private function rs( Repeater $rep, $id, $label, $min, $max, $step, $default, $unit = '' ) {
@@ -94,7 +161,17 @@ class Hero extends Base {
 		$this->sw( 'fill', 'پر کردن کانتینر والد، پشت بقیهٔ ویجت‌ها', 'yes', array( 'prefix_class' => 'ay-fill-', 'description' => 'روشن: این ویجت پس‌زمینهٔ کانتینر می‌شود و متن و دکمه‌ها را به‌صورت ویجت‌های عادی روی آن می‌گذارید. خاموش: یک قاب مستقل با ارتفاع دلخواه.' ) );
 		$this->cssvar( 'height', 'ارتفاع قاب', '--ay-hero-h', 20, 1200, 1, 70, array( 'vh', 'px' ), array( 'condition' => array( 'fill!' => 'yes' ) ) );
 		$this->cssvar( 'fill_h', 'ارتفاع صحنه داخل کانتینر', '--ay-hero-fh', 10, 1200, 1, 100, array( '%', 'vh', 'px' ), array( 'condition' => array( 'fill' => 'yes' ), 'description' => 'در موبایل می‌توانید صحنه را فقط در بخش بالایی کانتینر نشان دهید تا متن زیر آن بیاید.' ) );
-		$this->media( 'image', 'عکس', ay_asset( 'img/hero/night-garden.jpg' ), array( 'condition' => array( 'mode' => array( 'regions', 'video' ) ), 'description' => 'در حالت ویدیو، این عکس تا بارگذاری ویدیو و وقتی حرکت خاموش است نمایش داده می‌شود. بهترین اندازه: ۳۸۴۰×۲۱۶۰ پیکسل.' ) );
+		$this->media( 'image', 'عکس', ay_asset( self::family_default( 'wide' ) ), array( 'condition' => array( 'mode' => array( 'regions', 'video' ) ), 'description' => 'در حالت ویدیو، این عکس تا بارگذاری ویدیو و وقتی حرکت خاموش است نمایش داده می‌شود. بهترین اندازه: ۳۸۴۰×۲۱۶۰ پیکسل.' ) );
+		$this->media( 'image_tablet', 'عکس برای قاب‌های نزدیک به مربع (تبلت)', ay_asset( self::family_default( 'tablet' ) ), array( 'condition' => $regions, 'description' => 'اختیاری. نسبت پیشنهادی ۴:۳. هر جا شکل قاب به این عکس نزدیک‌تر باشد، همین نمایش داده می‌شود (نه بر اساس نام دستگاه).' ) );
+		$this->media( 'image_mobile', 'عکس برای قاب‌های عمودی (موبایل)', ay_asset( self::family_default( 'mobile' ) ), array( 'condition' => $regions, 'description' => 'اختیاری. نسبت پیشنهادی حدود ۶:۱۳ (تمام‌قد گوشی).' ) );
+		$safe = function ( $id, $label, $d ) use ( $regions ) {
+			$this->add_control( $id, array( 'label' => $label, 'type' => CM::DIMENSIONS, 'size_units' => array( '%' ), 'allowed_dimensions' => 'all', 'default' => array( 'unit' => '%', 'top' => (string) $d[0], 'right' => (string) $d[1], 'bottom' => (string) $d[2], 'left' => (string) $d[3], 'isLinked' => false ), 'condition' => $regions ) );
+		};
+		$this->head( 'safe_h', 'بخشی که هرگز بریده نمی‌شود' );
+		$this->note( 'safe_n', 'برای هر عکس بنویسید از هر لبه تا چند درصد می‌تواند بریده شود. آن‌چه می‌ماند (مثلاً خودِ گردنبند) در هر اندازهٔ صفحه کامل دیده می‌شود؛ اگر جا نشود عکس کمی کوچک‌تر نمایش داده می‌شود.' );
+		$safe( 'safe', 'لبه‌های قابل برش · عکس اصلی', array( 2, 20, 8, 43 ) );
+		$safe( 'safe_t', 'لبه‌های قابل برش · عکس تبلت', array( 2, 13, 11, 39 ) );
+		$safe( 'safe_m', 'لبه‌های قابل برش · عکس موبایل', array( 10, 0, 41, 22 ) );
 		$this->txt( 'alt', 'توضیح تصویر (برای صفحه‌خوان‌ها)', '', array( 'description' => 'اگر تصویر فقط تزئینی است خالی بگذارید.' ) );
 		$this->add_responsive_control( 'focus_x', array( 'label' => 'نقطهٔ تمرکز افقی', 'type' => CM::SLIDER, 'range' => array( '%' => array( 'min' => 0, 'max' => 100 ) ), 'size_units' => array( '%' ), 'default' => array( 'unit' => '%', 'size' => 68 ), 'description' => 'وقتی قاب باریک‌تر از عکس است، این بخش از عکس در دید می‌ماند.' ) );
 		$this->add_responsive_control( 'focus_y', array( 'label' => 'نقطهٔ تمرکز عمودی', 'type' => CM::SLIDER, 'range' => array( '%' => array( 'min' => 0, 'max' => 100 ) ), 'size_units' => array( '%' ), 'default' => array( 'unit' => '%', 'size' => 50 ) ) );
@@ -116,6 +193,7 @@ class Hero extends Base {
 		$this->sw( 'outline', 'نمایش ناحیه‌ها در ویرایشگر', 'yes', array( 'description' => 'فقط هنگام ویرایش دیده می‌شود.' ) );
 		$rep = new Repeater();
 		$rep->add_control( 'label', array( 'label' => 'نام ناحیه', 'type' => CM::TEXT, 'default' => 'ناحیه' ) );
+		$rep->add_control( 'for', array( 'label' => 'برای کدام عکس', 'type' => CM::SELECT, 'default' => 'wide', 'options' => array( 'wide' => 'عکس اصلی (عریض)', 'tablet' => 'عکس تبلت', 'mobile' => 'عکس موبایل' ) ) );
 		$rep->add_control( 'on', array( 'label' => 'فعال', 'type' => CM::SWITCHER, 'label_on' => 'بله', 'label_off' => 'خیر', 'return_value' => 'yes', 'default' => 'yes' ) );
 		$rep->add_control( 'type', array( 'label' => 'نوع حرکت', 'type' => CM::SELECT, 'default' => 'sway', 'options' => array( 'sway' => 'تاب خوردن دور یک نقطه', 'wave' => 'موج ریز', 'breathe' => 'نفس کشیدن' ) ) );
 		$this->rs( $rep, 'x', 'مرکز افقی', 0, 100, 0.5, 50, '%' );
@@ -129,18 +207,19 @@ class Hero extends Base {
 		$this->rs( $rep, 'px', 'نقطهٔ ثابت افقی (محور تاب)', -20, 120, 0.5, 50, '%' );
 		$this->rs( $rep, 'py', 'نقطهٔ ثابت عمودی (محور تاب)', -20, 120, 0.5, 100, '%' );
 		$this->rs( $rep, 'depth', 'واکنش به موس', 0, 3, 0.1, 0.5 );
-		$this->add_control( 'regions', array( 'label' => 'ناحیه‌ها (حداکثر ۱۶)', 'type' => CM::REPEATER, 'fields' => $rep->get_controls(), 'default' => self::night_regions(), 'title_field' => '{{{ label }}}' ) );
+		$this->add_control( 'regions', array( 'label' => 'ناحیه‌ها (برای هر عکس حداکثر ۱۶)', 'type' => CM::REPEATER, 'fields' => $rep->get_controls(), 'default' => self::night_regions(), 'title_field' => '{{{ label }}}' ) );
 		$this->done();
 
 		$this->sec( 's_sparks', 'نقطه‌های درخشش', false, $regions );
 		$this->sw( 'sparks_on', 'نمایش درخشش‌ها', 'yes' );
 		$rep = new Repeater();
+		$rep->add_control( 'for', array( 'label' => 'برای کدام عکس', 'type' => CM::SELECT, 'default' => 'wide', 'options' => array( 'wide' => 'عکس اصلی (عریض)', 'tablet' => 'عکس تبلت', 'mobile' => 'عکس موبایل' ) ) );
 		$this->rs( $rep, 'x', 'جای افقی', 0, 100, 0.1, 50, '%' );
 		$this->rs( $rep, 'y', 'جای عمودی', 0, 100, 0.1, 50, '%' );
 		$this->rs( $rep, 'size', 'اندازه', 0.2, 5, 0.1, 1 );
 		$this->rs( $rep, 'dur', 'مدت یک چشمک (ثانیه)', 1, 20, 0.1, 5 );
 		$this->rs( $rep, 'delay', 'تأخیر (ثانیه)', 0, 20, 0.1, 0 );
-		$this->add_control( 'sparks', array( 'label' => 'درخشش‌ها', 'type' => CM::REPEATER, 'fields' => $rep->get_controls(), 'default' => self::night_sparks(), 'title_field' => 'x: {{{ x.size }}} · y: {{{ y.size }}}', 'condition' => array( 'sparks_on' => 'yes' ) ) );
+		$this->add_control( 'sparks', array( 'label' => 'درخشش‌ها', 'type' => CM::REPEATER, 'fields' => $rep->get_controls(), 'default' => self::night_sparks(), 'title_field' => '{{{ for }}} · x: {{{ x.size }}} · y: {{{ y.size }}}', 'condition' => array( 'sparks_on' => 'yes' ) ) );
 		$this->color( 'spark_color', 'رنگ درخشش', '--ay-spark', array( 'condition' => array( 'sparks_on' => 'yes' ) ) );
 		$this->done();
 
@@ -235,7 +314,14 @@ class Hero extends Base {
 				return array( (int) $meta['width'], (int) $meta['height'] );
 			}
 		}
-		if ( ! empty( $media['url'] ) && false !== strpos( $media['url'], 'night-garden.jpg' ) ) {
+		foreach ( self::families() as $files ) {
+			foreach ( $files as $f ) {
+				if ( ! empty( $media['url'] ) && false !== strpos( $media['url'], $f[0] ) ) {
+					return array( $f[1], $f[2] );
+				}
+			}
+		}
+		if ( ! empty( $media['url'] ) && false !== strpos( $media['url'], 'night-garden' ) ) {
 			return array( 1672, 941 );
 		}
 		return array( 0, 0 );
@@ -267,39 +353,55 @@ class Hero extends Base {
 				$this->empty_note( 'یک عکس برای صحنهٔ هیرو انتخاب کنید.' );
 				return;
 			}
-			list( $w, $h )  = $this->media_dims( $s['image'] );
-			$cfg['img']     = $url;
-			$cfg['w']       = $w;
-			$cfg['h']       = $h;
-			$cfg['outline'] = $edit && 'yes' === $s['outline'];
-			$cfg['regions'] = array();
-			$factor         = array( 'sway' => 0.0005, 'wave' => 0.0001, 'breathe' => 0.0005 );
-			foreach ( array_slice( (array) $s['regions'], 0, 16 ) as $r ) {
-				if ( 'yes' !== ( isset( $r['on'] ) ? $r['on'] : 'yes' ) ) {
+			$cfg['outline']  = $edit && 'yes' === $s['outline'];
+			$cfg['variants'] = array();
+			$factor          = array( 'sway' => 0.0005, 'wave' => 0.0001, 'breathe' => 0.0005 );
+			foreach ( array( 'wide' => array( 'image', 'safe' ), 'tablet' => array( 'image_tablet', 'safe_t' ), 'mobile' => array( 'image_mobile', 'safe_m' ) ) as $key => $ids ) {
+				$src = $this->variant_source( isset( $s[ $ids[0] ] ) ? $s[ $ids[0] ] : array() );
+				if ( ! $src ) {
 					continue;
 				}
-				$type             = isset( $factor[ $r['type'] ] ) ? $r['type'] : 'sway';
-				$cfg['regions'][] = array(
-					'x'     => $this->pct( $r['x'], 50 ) / 100,
-					'y'     => $this->pct( $r['y'], 50 ) / 100,
-					'rx'    => $this->pct( $r['w'], 20 ) / 200,
-					'ry'    => $this->pct( $r['h'], 20 ) / 200,
-					'f'     => $this->pct( $r['feather'], 60 ) / 100,
-					'type'  => $type,
-					'amp'   => $this->pct( $r['amp'], 20 ) * $factor[ $type ],
-					'speed' => $this->pct( $r['speed'], 0.5 ),
-					'phase' => $this->pct( $r['phase'], 0 ),
-					'px'    => $this->pct( $r['px'], 50 ) / 100,
-					'py'    => $this->pct( $r['py'], 100 ) / 100,
-					'depth' => $this->pct( $r['depth'], 0.5 ),
-				);
-			}
-			$cfg['sparks'] = array();
-			if ( 'yes' === $s['sparks_on'] ) {
-				foreach ( (array) $s['sparks'] as $p ) {
-					$cfg['sparks'][] = array( 'x' => $this->pct( $p['x'], 50 ) / 100, 'y' => $this->pct( $p['y'], 50 ) / 100, 's' => $this->pct( $p['size'], 1 ), 'dur' => $this->pct( $p['dur'], 5 ), 'dl' => $this->pct( $p['delay'], 0 ) );
+				if ( 'wide' === $key ) {
+					$own = empty( $src[3] );
+				} elseif ( ! empty( $own ) && ! empty( $src[3] ) ) {
+					continue;   /* the owner's own main picture is not mixed with the bundled tablet / phone pictures */
 				}
+				$sf   = isset( $s[ $ids[1] ] ) && is_array( $s[ $ids[1] ] ) ? $s[ $ids[1] ] : array();
+				$safe = array();
+				foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
+					$safe[] = isset( $sf[ $side ] ) && is_numeric( $sf[ $side ] ) ? max( 0, min( 49, (float) $sf[ $side ] ) ) / 100 : 0;
+				}
+				$v = array( 'k' => $key, 'set' => $src[0], 'w' => (int) $src[1], 'h' => (int) $src[2], 'safe' => $safe, 'regions' => array(), 'sparks' => array() );
+				foreach ( (array) $s['regions'] as $r ) {
+					if ( 'yes' !== ( isset( $r['on'] ) ? $r['on'] : 'yes' ) || ( isset( $r['for'] ) && '' !== $r['for'] ? $r['for'] : 'wide' ) !== $key || count( $v['regions'] ) >= 16 ) {
+						continue;
+					}
+					$type           = isset( $factor[ $r['type'] ] ) ? $r['type'] : 'sway';
+					$v['regions'][] = array(
+						'x'     => $this->pct( $r['x'], 50 ) / 100,
+						'y'     => $this->pct( $r['y'], 50 ) / 100,
+						'rx'    => $this->pct( $r['w'], 20 ) / 200,
+						'ry'    => $this->pct( $r['h'], 20 ) / 200,
+						'f'     => $this->pct( $r['feather'], 60 ) / 100,
+						'type'  => $type,
+						'amp'   => $this->pct( $r['amp'], 20 ) * $factor[ $type ],
+						'speed' => $this->pct( $r['speed'], 0.5 ),
+						'phase' => $this->pct( $r['phase'], 0 ),
+						'px'    => $this->pct( $r['px'], 50 ) / 100,
+						'py'    => $this->pct( $r['py'], 100 ) / 100,
+						'depth' => $this->pct( $r['depth'], 0.5 ),
+					);
+				}
+				if ( 'yes' === $s['sparks_on'] ) {
+					foreach ( (array) $s['sparks'] as $p ) {
+						if ( ( isset( $p['for'] ) && '' !== $p['for'] ? $p['for'] : 'wide' ) === $key ) {
+							$v['sparks'][] = array( 'x' => $this->pct( $p['x'], 50 ) / 100, 'y' => $this->pct( $p['y'], 50 ) / 100, 's' => $this->pct( $p['size'], 1 ), 'dur' => $this->pct( $p['dur'], 5 ), 'dl' => $this->pct( $p['delay'], 0 ) );
+						}
+					}
+				}
+				$cfg['variants'][] = $v;
 			}
+			$cfg['img'] = $url;
 			$cfg['floats'] = array();
 			if ( 'yes' === $s['floats_on'] ) {
 				foreach ( (array) $s['floats'] as $p ) {
@@ -356,7 +458,12 @@ class Hero extends Base {
 		}
 
 		echo '<div class="ay-hero ay-hs ay-hero-' . esc_attr( $mode ) . '" data-ay-hero="' . esc_attr( wp_json_encode( $cfg ) ) . '">';
-		if ( in_array( $mode, array( 'regions', 'video' ), true ) && $url ) {
+		if ( 'regions' === $mode && ! empty( $cfg['variants'] ) ) {
+			/* the picture that suits this frame is chosen before anything is downloaded */
+			echo '<img class="ay-hs-img ay-hero-media"' . ( $edit ? ' src="' . esc_url( $cfg['variants'][0]['set'][0][0] ) . '"' : '' ) . ' alt="' . esc_attr( $s['alt'] ) . '" decoding="async" fetchpriority="high">';
+			echo '<noscript><img class="ay-hs-img ay-hero-media" src="' . esc_url( $url ) . '" alt="' . esc_attr( $s['alt'] ) . '"></noscript>';
+			echo "<script>(function(){var s=document.currentScript,r=s&&s.parentNode;if(!r)return;try{var c=JSON.parse(r.getAttribute('data-ay-hero')),W=r.clientWidth,H=r.clientHeight||1,a=W/H,b=0,d=1e9;c.variants.forEach(function(v,i){var q=Math.abs(Math.log(a/(v.w/v.h)))+(v.k==='tablet'?.15:0);if(q<d){d=q;b=i}});var v=c.variants[b],n=Math.max(W/v.w,H/v.h)*v.w*Math.min(window.devicePixelRatio||1,2),u=v.set[v.set.length-1][0];for(var i=0;i<v.set.length;i++){if(v.set[i][1]>=n){u=v.set[i][0];break}}r.setAttribute('data-v',b);r.querySelector('img').src=u}catch(e){}})();</script>";
+		} elseif ( in_array( $mode, array( 'regions', 'video' ), true ) && $url ) {
 			echo '<img class="ay-hs-img ay-hero-media" src="' . esc_url( $url ) . '" alt="' . esc_attr( $s['alt'] ) . '" decoding="async" fetchpriority="high">';
 		}
 		echo '<span class="ay-hero-veil" aria-hidden="true"></span><span class="ay-hero-fade" aria-hidden="true"></span></div>';

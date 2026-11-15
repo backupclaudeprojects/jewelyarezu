@@ -6,7 +6,7 @@
 .ay-wrap *{box-sizing:border-box}
 .ay-wrap [hidden]{display:none!important}
 .ay-top{display:flex;align-items:center;gap:16px;margin-bottom:18px}
-.ay-top-mark{width:34px;height:54px;background:var(--ink);-webkit-mask:url(../img/logo-mask.png) center/contain no-repeat;mask:url(../img/logo-mask.png) center/contain no-repeat;flex:none}
+.ay-top-mark{width:36px;height:56px;background:var(--ink);-webkit-mask:url(../img/logo-mask.png) center/contain no-repeat;mask:url(../img/logo-mask.png) center/contain no-repeat;flex:none}
 .ay-top h1{font-size:26px;font-weight:700;margin:0;padding:0;line-height:1.5}
 .ay-top p{margin:2px 0 0;color:var(--muted);max-width:70ch}
 .ay-flash{position:sticky;top:44px;z-index:50;background:#0f5132;color:#fff;border-radius:12px;padding:10px 16px;margin-bottom:14px}

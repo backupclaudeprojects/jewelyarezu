@@ -63,7 +63,7 @@ function ay_setup_page_layout( $key ) {
 		case 'collections':
 			return array( ay_page_head( 'Portfolio', 'Collections', 'Browse every piece, or narrow the view by collection and by type.' ), ay_demo_archive( 1 ) );
 		case 'about':
-			return ay_demo_about( 1 );
+			return ay_demo_elements( 'about', 1 );
 		case 'contact':
 			return array(
 				ay_page_head( 'Contact', 'Write to me', 'Every message is read and answered personally.' ),
@@ -104,6 +104,7 @@ function ay_setup_part_layout( $slot ) {
  */
 function ay_build_site( $args = array() ) {
 	ay_ensure_types();
+	ay_set_site_icon();
 	$args = wp_parse_args( $args, array( 'samples' => true, 'force' => false ) );
 	$log  = array();
 	if ( ! ay_elementor_ready() || ! ay_load_widgets() ) {
@@ -270,3 +271,129 @@ add_action( 'admin_init', function () {
 	delete_transient( 'arezoo_building' );
 	set_transient( 'arezoo_build_log', $log, 300 );
 }, 30 );
+
+/* ------------------------------------------------------------ update to 1.2.0 */
+/** Walk every element of a layout; the callback may change the element in place. Returns true when something changed. */
+function ay_walk_layout( array &$elements, callable $fn ) {
+	$changed = false;
+	foreach ( $elements as &$el ) {
+		if ( ! is_array( $el ) ) {
+			continue;
+		}
+		if ( $fn( $el ) ) {
+			$changed = true;
+		}
+		if ( ! empty( $el['elements'] ) && is_array( $el['elements'] ) && ay_walk_layout( $el['elements'], $fn ) ) {
+			$changed = true;
+		}
+	}
+	unset( $el );
+	return $changed;
+}
+
+/**
+ * Bring a site built with an earlier version in line with 1.2.0 (each changed layout is backed up first):
+ * new hero pictures for every screen shape, no pen on the process pictures, Type-only filter,
+ * contact without Copy / Open, centred phone header, and the certificates section on the About page.
+ */
+function ay_upgrade_120() {
+	if ( ! ay_elementor_ready() || ! ay_load_widgets() ) {
+		return false;
+	}
+	global $wpdb;
+	$ids   = $wpdb->get_col( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_elementor_data' AND meta_value LIKE '%ay-%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+	$about = (int) get_option( 'arezoo_page_about' );
+	$extra = array( 'regions' => array(), 'sparks' => array() );
+	foreach ( \Arezoo\Widgets\Hero::night_regions() as $r ) {
+		if ( 'wide' !== $r['for'] ) {
+			$extra['regions'][] = array_merge( $r, array( '_id' => ay_uid() ) );
+		}
+	}
+	foreach ( \Arezoo\Widgets\Hero::night_sparks() as $r ) {
+		if ( 'wide' !== $r['for'] ) {
+			$extra['sparks'][] = array_merge( $r, array( '_id' => ay_uid() ) );
+		}
+	}
+	foreach ( array_unique( array_map( 'absint', (array) $ids ) ) as $id ) {
+		if ( ! $id || 'revision' === get_post_type( $id ) ) {
+			continue;
+		}
+		$layout  = ay_get_layout( $id );
+		$has_cr  = false;
+		$changed = $layout && ay_walk_layout( $layout, function ( &$el ) use ( $extra, &$has_cr ) {
+			$type = isset( $el['widgetType'] ) ? $el['widgetType'] : '';
+			$set  = isset( $el['settings'] ) && is_array( $el['settings'] ) ? $el['settings'] : array();
+			$was  = $set;
+			if ( 'ay-credentials' === $type ) {
+				$has_cr = true;
+			} elseif ( 'ay-process' === $type ) {
+				$set['pen'] = '';
+			} elseif ( 'ay-archive' === $type ) {
+				$set['f_col'] = '';
+			} elseif ( 'ay-contact' === $type ) {
+				$set['actions'] = '';
+			} elseif ( 'ay-hero' === $type && ( ! isset( $set['mode'] ) || 'regions' === $set['mode'] ) ) {
+				$url = isset( $set['image']['url'] ) ? (string) $set['image']['url'] : '';
+				if ( '' === $url || false !== strpos( $url, 'night-garden' ) ) {
+					$set['image']        = ay_media_url( 'img/hero/hero-lg.webp' );
+					$set['image_tablet'] = ay_media_url( 'img/hero/hero-tablet-md.webp' );
+					$set['image_mobile'] = ay_media_url( 'img/hero/hero-mobile-sm.webp' );
+					foreach ( array( 'regions', 'sparks' ) as $k ) {
+						if ( ! empty( $set[ $k ] ) && is_array( $set[ $k ] ) ) {
+							$only_wide = true;
+							foreach ( $set[ $k ] as $row ) {
+								if ( isset( $row['for'] ) && 'wide' !== $row['for'] && '' !== $row['for'] ) {
+									$only_wide = false;
+								}
+							}
+							if ( $only_wide ) {
+								$set[ $k ] = array_merge( $set[ $k ], $extra[ $k ] );
+							}
+						}
+					}
+					if ( isset( $set['fill_h_mobile'] ) ) {
+						$set['fill_h_mobile']    = ay_px( 100, '%' );
+						$set['fade_size_mobile'] = ay_px( 26, '%' );
+						$set['focus_y_mobile']   = ay_px( 30, '%' );
+					}
+				}
+			} elseif ( 'container' === ( isset( $el['elType'] ) ? $el['elType'] : '' ) ) {
+				if ( isset( $set['_element_id'] ) && 'ay-hero' === $set['_element_id'] && isset( $set['padding_mobile']['top'] ) && in_array( $set['padding_mobile']['top'], array( '64vh', '58vh' ), true ) ) {
+					$set['padding_mobile']['top']    = '126vw';   /* the text starts just under the necklace of the tall picture */
+					$set['padding_mobile']['bottom'] = '46px';
+				}
+				if ( isset( $set['ay_float'] ) && 'top' === $set['ay_float'] && empty( $set['padding_mobile'] ) ) {
+					$set['padding_mobile'] = ay_box( 8, 18, 8, 18 );
+				}
+			}
+			if ( $set !== $was ) {
+				$el['settings'] = $set;
+				return true;
+			}
+			return false;
+		} );
+		if ( $id === $about && $layout && ! $has_cr ) {
+			array_splice( $layout, max( 0, count( $layout ) - 1 ), 0, array( ay_credentials_band() ) );
+			$changed = true;
+		}
+		if ( $changed ) {
+			ay_backup_layout( $id, 'update 1.2.0' );
+			update_post_meta( $id, '_elementor_data', wp_slash( wp_json_encode( array_values( $layout ) ) ) );
+			ay_flush_layout_cache( $id );
+		}
+	}
+	ay_set_site_icon();
+	\Elementor\Plugin::$instance->files_manager->clear_cache();
+	return true;
+}
+
+/** Use the brand mark as the browser icon when the site has none yet. */
+function ay_set_site_icon() {
+	if ( get_option( 'site_icon' ) || ! function_exists( 'ay_asset_attachment' ) ) {
+		return;
+	}
+	$id = ay_asset_attachment( 'img/site-icon.png', 'Arezoo Yousefi', false );
+	if ( $id ) {
+		update_option( 'site_icon', $id );
+	}
+}

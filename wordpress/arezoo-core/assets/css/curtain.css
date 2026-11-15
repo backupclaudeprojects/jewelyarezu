@@ -69,7 +69,7 @@ html.ay-cv-arrive .ay-cv:not(.is-reveal):not([data-style="frost"]):not([data-sty
 .ay-cv.is-cover .ay-cv-c,html.ay-cv-arrive .ay-cv:not(.is-reveal) .ay-cv-c{opacity:1;transform:none;filter:none;transition-delay:calc(var(--cv-dur)*.4)}
 .ay-cv.is-reveal .ay-cv-c{transform:scale(1.05)}
 .ay-cv-logo{display:block;height:var(--cv-logo);flex:none}
-.ay-cv-mark{aspect-ratio:300/476;background:var(--cv-ink);-webkit-mask:var(--ay-logo,url(../img/logo-mask.png)) center/contain no-repeat;mask:var(--ay-logo,url(../img/logo-mask.png)) center/contain no-repeat}
+.ay-cv-mark{aspect-ratio:400/640;background:var(--cv-ink);-webkit-mask:var(--ay-logo,url(../img/logo-mask.png)) center/contain no-repeat;mask:var(--ay-logo,url(../img/logo-mask.png)) center/contain no-repeat}
 body .ay-cv-img{width:auto;max-width:70vw;height:var(--cv-logo);object-fit:contain}
 .ay-cv-name{font-family:var(--ay-display,"Cormorant Garamond",Georgia,serif);font-size:clamp(1.05rem,2vw,1.5rem);letter-spacing:.34em;text-transform:uppercase;text-indent:.34em;white-space:nowrap}
 .ay-cv-line{position:relative;display:block;width:min(160px,40vw);height:1px;background:color-mix(in srgb,var(--cv-ink) 22%,transparent);overflow:hidden}
