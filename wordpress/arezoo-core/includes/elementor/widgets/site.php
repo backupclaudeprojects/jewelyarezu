@@ -175,7 +175,13 @@ class Dock extends Base {
 		$this->done();
 
 		$this->sec( 's_behave', 'جا و رفتار' );
+		$this->sw( 'enabled', 'نوار پایین نمایش داده شود', 'yes', array( 'description' => 'با خاموش کردن، نوار در کل سایت پنهان می‌شود (این ویجت در قالب فوتر است).' ) );
 		$this->sel( 'pos', 'جایگاه', array( 'fixed' => 'ثابت پایین صفحه (شناور)', 'static' => 'معمولی، در جای خودش' ), 'fixed', array( 'prefix_class' => 'ay-dock-' ) );
+		$this->sel( 'desk', 'نمایش در دسکتاپ و تبلت', array( 'scroll' => 'فقط بعد از اسکرول (اول صفحه پنهان است)', 'always' => 'همیشه' ), 'scroll', array( 'condition' => array( 'pos' => 'fixed' ) ) );
+		$this->num( 'after', 'بعد از چند پیکسل اسکرول نمایان شود', 140, 0, 3000, 10, array( 'condition' => array( 'pos' => 'fixed', 'desk' => 'scroll' ) ) );
+		$this->sw( 'swap', 'با نمایان شدن نوار، هدر بالای صفحه پنهان شود', 'yes', array( 'condition' => array( 'pos' => 'fixed', 'desk' => 'scroll' ), 'description' => 'با برگشتن به بالای صفحه (و نزدیک فوتر) هدر دوباره برمی‌گردد.' ) );
+		$this->sel( 'in_fx', 'موشن جابه‌جایی هدر و نوار', array( 'morph' => 'جمع شدن هدر و باز شدن نوار (شیشه‌ای)', 'rise' => 'هدر بالا می‌رود، نوار از پایین می‌آید', 'blur' => 'محو شدن با تاری', 'fade' => 'محو شدن ساده' ), 'morph', array( 'prefix_class' => 'ay-dock-fx-', 'condition' => array( 'pos' => 'fixed', 'desk' => 'scroll' ) ) );
+		$this->cssvar( 'in_dur', 'مدت موشن (ثانیه)', '--ay-dk-dur', 0.2, 2, 0.05, 0.7, '', array( 'condition' => array( 'pos' => 'fixed', 'desk' => 'scroll' ) ), false );
 		$this->cssvar( 'offset', 'فاصله از پایین صفحه', '--ay-dk-offset', 0, 80, 1, 14, 'px', array( 'condition' => array( 'pos' => 'fixed' ) ) );
 		$this->sw( 'hide_footer', 'پنهان شدن نزدیک فوتر (در دسکتاپ)', 'yes' );
 		$this->sw( 'mobile_menu', 'در موبایل منوی اصلی باشد (آیکون + متن، تمام‌عرض)', 'yes', array( 'prefix_class' => 'ay-dock-mm-' ) );
@@ -201,7 +207,13 @@ class Dock extends Base {
 
 	protected function render() {
 		$s = $this->get_settings_for_display();
-		echo '<nav class="ay-dock" aria-label="Quick links" data-ay-dock="' . ( 'yes' === $s['hide_footer'] ? '1' : '0' ) . '"><div class="ay-dock-links">';
+		if ( 'yes' !== $s['enabled'] ) {
+			$this->empty_note( 'نوار پایین خاموش است. از بخش «جا و رفتار» روشنش کنید.' );
+			return;
+		}
+		$fx  = in_array( $s['in_fx'], array( 'morph', 'rise', 'blur', 'fade' ), true ) ? $s['in_fx'] : 'morph';
+		$cfg = array( 'foot' => 'yes' === $s['hide_footer'], 'desk' => 'fixed' === $s['pos'] && 'always' !== $s['desk'] ? 'scroll' : 'always', 'after' => max( 0, (int) $s['after'] ), 'swap' => 'yes' === $s['swap'], 'fx' => $fx, 'mm' => 'yes' === $s['mobile_menu'] );
+		echo '<nav class="ay-dock' . ( 'scroll' === $cfg['desk'] && ! $this->in_editor() ? ' is-pre' : '' ) . '" aria-label="Quick links" data-ay-dock="' . esc_attr( wp_json_encode( $cfg ) ) . '"><div class="ay-dock-links">';
 		$here = trailingslashit( strtok( home_url( add_query_arg( null, null ) ), '?' ) );
 		foreach ( (array) $s['items'] as $it ) {
 			$url = ! empty( $it['link']['url'] ) ? $it['link']['url'] : '#';

@@ -26,6 +26,7 @@ function ay_load_widgets() {
 	return true;
 }
 require_once AY_DIR . 'includes/elementor/extensions.php';
+require_once AY_DIR . 'includes/elementor/abilities.php';
 
 add_action( 'elementor/elements/categories_registered', function ( $manager ) {
 	$manager->add_category( 'arezoo', array( 'title' => 'آرزو', 'icon' => 'eicon-star' ) );

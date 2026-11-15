@@ -298,8 +298,16 @@
   }
   function dock(el) {
     if (!once(el, 'dock')) return;
-    if (el.getAttribute('data-ay-dock') !== '1') return;
-    onScroll(function () { var f = $('.ay-part-footer') || $('footer'); if (!f) return; el.classList.toggle('is-away', !inEditor() && f.getBoundingClientRect().top < w.innerHeight - 90); }, el);
+    var cfg = json(el, 'data-ay-dock'), body = d.body, phone = w.matchMedia('(max-width: 767px)');
+    var clear = function () { body.classList.remove('ay-swap', 'ay-swap-morph', 'ay-swap-rise', 'ay-swap-blur', 'ay-swap-fade'); };
+    onScroll(function () {
+      if (inEditor()) { el.classList.remove('is-away', 'is-pre'); clear(); return; }
+      var f = $('.ay-part-footer') || $('.elementor-location-footer') || $('footer'), away = !!(cfg.foot && f && f.getBoundingClientRect().top < w.innerHeight - 90);
+      var menu = cfg.mm && phone.matches, pre = cfg.desk === 'scroll' && !menu && w.scrollY < (cfg.after || 0);
+      el.classList.toggle('is-away', away); el.classList.toggle('is-pre', pre);
+      var swap = cfg.swap && cfg.desk === 'scroll' && !menu && !pre && !away;
+      if (swap) body.classList.add('ay-swap', 'ay-swap-' + (cfg.fx || 'morph')); else clear();
+    }, el);
   }
   function floatBar(el) {
     if (!once(el, 'float')) return;
@@ -307,6 +315,7 @@
       if (inEditor()) { el.classList.remove('is-away'); return; }
       if (el.classList.contains('ay-float-hide-yes')) { var f = $('.ay-part-footer') || $('footer'); if (f) el.classList.toggle('is-away', f.getBoundingClientRect().top < w.innerHeight - 90); }
       if (el.classList.contains('ay-float-smart-yes')) { var y = w.scrollY; el.classList.toggle('is-away', y > lastY && y > 240); lastY = y; }
+      el.classList.toggle('is-scrolled', w.scrollY > 40);
     }, el);
   }
   d.addEventListener('click', function (e) {

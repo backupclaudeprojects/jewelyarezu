@@ -135,6 +135,7 @@ final class Extensions {
 		$el->add_control( 'ay_float_z', array( 'label' => 'ترتیب لایه (z-index)', 'type' => CM::NUMBER, 'min' => 1, 'max' => 9999, 'selectors' => array( '{{WRAPPER}}' => '--ay-f-z: {{VALUE}};' ), 'condition' => $on ) );
 		$el->add_control( 'ay_float_hide', array( 'label' => 'پنهان شدن نزدیک فوتر', 'type' => CM::SWITCHER, 'label_on' => 'بله', 'label_off' => 'خیر', 'return_value' => 'yes', 'default' => '', 'prefix_class' => 'ay-float-hide-', 'condition' => array( 'ay_float' => 'bottom' ) ) );
 		$el->add_control( 'ay_float_smart', array( 'label' => 'پنهان شدن هنگام اسکرول به پایین', 'type' => CM::SWITCHER, 'label_on' => 'بله', 'label_off' => 'خیر', 'return_value' => 'yes', 'default' => '', 'prefix_class' => 'ay-float-smart-', 'condition' => array( 'ay_float' => 'top' ) ) );
+		$el->add_control( 'ay_float_gs', array( 'label' => 'شیشه فقط بعد از اسکرول (اول صفحه بدون زمینه)', 'type' => CM::SWITCHER, 'label_on' => 'بله', 'label_off' => 'خیر', 'return_value' => 'yes', 'default' => '', 'prefix_class' => 'ay-float-gs-', 'condition' => array( 'ay_float' => 'top' ) ) );
 		$el->end_controls_section();
 	}
 

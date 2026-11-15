@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Arezoo Core
  * Description:       نمونه‌کارها، ویجت‌های المنتور، ۹۶ تم رنگی، دموها و بخش‌های سایت برای قالب Arezoo.
- * Version:           1.0.1
+ * Version:           1.1.0
  * Requires at least: 6.5
  * Requires PHP:      7.4
  * Author:            Arezoo Yousefi
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'AY_VERSION', '1.0.1' );
+define( 'AY_VERSION', '1.1.0' );
 define( 'AY_FILE', __FILE__ );
 define( 'AY_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AY_URL', plugin_dir_url( __FILE__ ) );
@@ -32,6 +32,7 @@ require_once AY_DIR . 'includes/builder.php';
 require_once AY_DIR . 'includes/demos.php';
 require_once AY_DIR . 'includes/setup.php';
 require_once AY_DIR . 'includes/admin.php';
+require_once AY_DIR . 'includes/curtain.php';
 
 /**
  * Elementor integration loads only when Elementor is present and recent enough.

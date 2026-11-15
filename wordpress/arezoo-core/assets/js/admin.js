@@ -72,7 +72,47 @@
     $specs.on('click', '.ay-ed-x', function () { $(this).closest('.ay-ed-row').remove(); });
   }
 
+
+  /* ---- page curtain: single logo picker + live preview ---- */
+  $(document).on('click', '#ay_logo_add', function (e) {
+    e.preventDefault();
+    var frame = wp.media({ title: A.t.pick, button: { text: A.t.use }, multiple: false, library: { type: 'image' } });
+    frame.on('select', function () {
+      var a = frame.state().get('selection').first().toJSON(), src = (a.sizes && a.sizes.thumbnail ? a.sizes.thumbnail.url : a.url);
+      $('#ay_logo_id').val(a.id).trigger('change');
+      $('#ay_logo_list').empty().append($('<span class="ay-ed-thumb ay-ed-thumb-dark"/>').attr('data-id', a.id).append($('<img alt="">').attr('src', src)).append('<button type="button" class="ay-ed-x" aria-label="حذف">×</button>'));
+      $('#ayCvStage .ay-cv-logo').replaceWith($('<img class="ay-cv-logo ay-cv-img" alt="">').attr('src', a.url));
+    });
+    frame.open();
+  });
+  $('#ay_logo_list').on('click', '.ay-ed-x', function () { $(this).parent().remove(); $('#ay_logo_id').val(0).trigger('change'); $('#ayCvStage .ay-cv-logo').replaceWith('<span class="ay-cv-logo ay-cv-mark"></span>'); });
+  var $stage = $('#ayCvStage');
+  if ($stage.length) {
+    var cv = $stage.find('.ay-cv')[0], $form = $stage.closest('form'), timers = [], page = 1;
+    var EASE = { lux: 'cubic-bezier(.7,0,.2,1)', soft: 'cubic-bezier(.16,1,.3,1)', natural: 'cubic-bezier(.22,.61,.36,1)', linear: 'linear' };
+    var val = function (n) { return $form.find('[name="' + n + '"]').val(); };
+    var on = function (n) { return $form.find('[name="' + n + '"]').is(':checked'); };
+    var apply = function () {
+      var st = cv.style, set = function (k, v) { if (v === '' || v == null) st.removeProperty(k); else st.setProperty(k, v); };
+      cv.setAttribute('data-style', $form.find('[name="style"]:checked').val() || 'frost');
+      set('--cv-tint', val('tint')); set('--cv-op', (+val('tint_op') || 0) / 100); set('--cv-blur', (+val('blur') || 0) + 'px'); set('--cv-sat', (+val('sat') || 0) + '%'); set('--cv-bri', (+val('bright') || 100) + '%');
+      set('--cv-dur', (+val('dur') || 750) + 'ms'); set('--cv-ease', EASE[val('ease')] || EASE.lux); set('--cv-logo', (+val('logo_size') || 110) + 'px'); set('--cv-ink', val('logo_color')); set('--cv-line', val('line_color'));
+      cv.className = 'ay-cv is-idle ay-cv-fx-' + (val('logo_fx') || 'breathe') + (on('edge') ? ' ay-cv-edge' : '');
+      $(cv).find('.ay-cv-logo').toggle(on('logo')); $(cv).find('.ay-cv-name').toggle(on('name')).text(val('name_text') || 'Arezoo Yousefi'); $(cv).find('.ay-cv-line').toggle(on('line'));
+    };
+    var play = function () {
+      timers.forEach(clearTimeout); timers = []; apply();
+      var dur = +val('dur') || 750, hold = +val('hold') || 0;
+      cv.style.setProperty('--cv-x', '30%'); cv.style.setProperty('--cv-y', '75%');
+      cv.classList.remove('is-idle'); void cv.offsetWidth; cv.classList.add('is-cover');
+      timers.push(setTimeout(function () { page = page === 1 ? 2 : 1; $stage.find('.ay-cv-page').each(function () { this.hidden = +this.getAttribute('data-n') !== page; }); cv.classList.remove('is-cover'); cv.classList.add('is-reveal'); }, dur + hold + 500));
+      timers.push(setTimeout(function () { cv.classList.remove('is-reveal'); cv.classList.add('is-idle'); }, dur + hold + 500 + dur * 1.3 + 160));
+    };
+    var deb = 0; $form.on('input change ay:color', 'input,select', function () { clearTimeout(deb); deb = setTimeout(play, 350); });
+    $('#ayCvPlay').on('click', play); setTimeout(play, 700);
+  }
+
   /* ---- settings niceties ---- */
   $('.ay-range input[type=range]').on('input', function () { $(this).closest('.ay-range').find('output').text(this.value + ($(this).data('unit') || '')); });
-  if ($.fn.wpColorPicker) $('.ay-color').wpColorPicker();
+  if ($.fn.wpColorPicker) $('.ay-color').wpColorPicker({ change: function () { var el = this; setTimeout(function () { $(el).trigger('ay:color'); }, 30); }, clear: function () { $(this).closest('.wp-picker-container').find('.ay-color').trigger('ay:color'); } });
 })(jQuery);
