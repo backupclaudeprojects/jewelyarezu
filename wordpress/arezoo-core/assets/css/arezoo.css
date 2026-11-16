@@ -41,10 +41,21 @@ html body .ay-main,html body main{z-index:1}
 .ay-fill-yes>.elementor-widget-container,.ay-fill-yes .ay-hero{height:100%}
 .elementor-element.ay-fill-yes~.elementor-element{position:relative;z-index:1}
 .ay-hs{position:relative;overflow:hidden}
-/* phones held sideways: the text keeps to the left so it does not cover the jewel */
-@media (orientation:landscape) and (max-height:520px){.e-con:has(>.e-con-inner>.elementor-widget-ay-hero.ay-fill-yes)>.e-con-inner>.e-con,.e-con:has(>.elementor-widget-ay-hero.ay-fill-yes)>.e-con{max-width:42%}.e-con:has(>.e-con-inner>.elementor-widget-ay-hero.ay-fill-yes) h1.elementor-heading-title,.e-con:has(>.elementor-widget-ay-hero.ay-fill-yes) h1.elementor-heading-title{font-size:clamp(1.7rem,4.6vw,2.6rem)!important}.e-con:has(>.e-con-inner>.elementor-widget-ay-hero.ay-fill-yes),.e-con:has(>.elementor-widget-ay-hero.ay-fill-yes){--padding-top:96px!important;--padding-bottom:40px!important}}
-/* upright tablets: the hero fills the screen, so the tall picture is used and the text sits under the jewel */
-@media (orientation:portrait) and (min-width:768px) and (max-width:1100px){.e-con:has(>.elementor-widget-ay-hero.ay-fill-yes),.e-con:has(>.e-con-inner>.elementor-widget-ay-hero.ay-fill-yes){min-height:100vh!important;min-height:100svh!important}}
+/* the text never lies on the jewel */
+.e-con.ay-hz-beside>.e-con-inner>.e-con,.e-con.ay-hz-beside>.e-con,.e-con.ay-hz-beside>.e-con-inner>.elementor-element:not(.elementor-widget-ay-hero),.e-con.ay-hz-beside>.elementor-element:not(.elementor-widget-ay-hero):not(.e-con){max-width:var(--ay-hero-free,100%)!important}
+.e-con.ay-hz-beside.ay-hz-right>.e-con-inner>.e-con,.e-con.ay-hz-beside.ay-hz-right>.e-con{margin-left:auto}
+.e-con.ay-hz-beside .elementor-widget{max-width:100%}
+.e-con.ay-hz-tight h1.elementor-heading-title{font-size:clamp(24px,calc(var(--ay-hero-free)*.096),68px)!important;line-height:1.12!important}
+.e-con.ay-hz-below>.e-con-inner>.e-con,.e-con.ay-hz-below>.e-con{max-width:min(100%,max(600px,70vw))}
+.ay-hs.is-short{background-color:transparent!important}
+.ay-hs.is-short .ay-hs-stage{-webkit-mask-image:linear-gradient(to bottom,#000 72%,transparent);mask-image:linear-gradient(to bottom,#000 72%,transparent)}
+.ay-hs.is-short .ay-hero-fade{display:none}
+@media (max-width:767px) and (orientation:portrait){.e-con.ay-hz-below h1.elementor-heading-title{font-size:clamp(26px,9.2vw,44px)!important;line-height:1.14!important}}
+/* phones held sideways: compact text */
+@media (orientation:landscape) and (max-width:767px){.e-con.ay-hz-beside{--padding-top:92px!important;--padding-block-start:92px!important}}
+@media (orientation:landscape) and (max-height:520px){.e-con.ay-hz-beside h1.elementor-heading-title{font-size:clamp(22px,8.5vh,40px)!important}.e-con.ay-hz-beside{--padding-top:92px!important;--padding-bottom:36px!important;--padding-block-start:92px!important;--padding-block-end:36px!important}.e-con.ay-hz-beside .elementor-widget-text-editor{font-size:13px}}
+/* upright tablets: the hero fills the screen and the text sits in the empty lower part of the picture */
+@media (orientation:portrait) and (min-width:700px){.e-con.ay-hz-below{min-height:100vh!important;min-height:100svh!important}}
 .ay-hs>.ay-hs-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:none}
 .ay-hs-stage{position:absolute;left:0;top:0}
 .ay-hs-stage .ay-hs-img,.ay-hs-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;max-width:none;object-fit:fill}

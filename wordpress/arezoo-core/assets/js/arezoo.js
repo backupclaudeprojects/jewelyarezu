@@ -39,15 +39,30 @@
   }
 
   /* ------------------------------------------------------------------- hero */
-  function heroPick(el, vs) {   /* the picture whose shape is closest to the frame */
-    var a = el.clientWidth / (el.clientHeight || 1), best = 0, bd = 1e9;
-    vs.forEach(function (v, i) { var q = Math.abs(Math.log(a / (v.w / v.h))) + (v.k === 'tablet' ? .15 : 0); if (q < bd) { bd = q; best = i; } });
-    return best;
+  function heroPick(el, vs) {   /* landscape screens: the wide picture; upright screens: the upright picture closest to the screen's shape */
+    var a = d.documentElement.clientWidth / (w.innerHeight || 1), best = 0, bd = 1e9, i, f = -1;
+    if (a >= 1) { for (i = 0; i < vs.length; i++) if (vs[i].k === 'wide') best = i; return best; }
+    for (i = 0; i < vs.length; i++) { if (vs[i].k === 'wide') continue; var q = Math.abs(Math.log(a / (vs[i].w / vs[i].h))); if (q < bd) { bd = q; f = i; } }
+    return f >= 0 ? f : best;
   }
   function heroSrc(el, v) {
     var need = Math.max(el.clientWidth / v.w, el.clientHeight / v.h) * v.w * Math.min(w.devicePixelRatio || 1, 2), i;
     for (i = 0; i < v.set.length; i++) if (v.set[i][1] >= need) return v.set[i][0];
     return v.set[v.set.length - 1][0];
+  }
+  /* The text never lies on the jewel: beside it the text column is limited to the free width, under it the section starts the text below the jewel. */
+  function heroLayout(el, v, fit) {
+    var host = el.closest('.e-con'); if (!host) return;
+    var wrap = el.closest('.elementor-widget'), kids = $$(':scope > .e-con, :scope > .elementor-element', (wrap && wrap.parentNode) || host).filter(function (k) { return k !== wrap; });
+    var sf = v.safe || [0, 0, 0, 0], r = el.getBoundingClientRect(), gap = Math.max(14, fit.W * .03), below = v.zone === 'below', side = v.zone === 'left' || v.zone === 'right';
+    host.classList.toggle('ay-hz-below', below); host.classList.toggle('ay-hz-beside', side); host.classList.toggle('ay-hz-right', v.zone === 'right');
+    if (below) { var t = Math.round(fit.top + (1 - sf[2]) * fit.sh + gap) + 'px'; host.style.setProperty('--padding-top', t); host.style.setProperty('--padding-block-start', t); }
+    else { host.style.removeProperty('--padding-top'); host.style.removeProperty('--padding-block-start'); }
+    if (side && kids.length) {
+      var k = kids[0].getBoundingClientRect(), free = v.zone === 'left' ? (r.left + fit.left + sf[3] * fit.sw) - k.left - gap : k.right - (r.left + fit.left + (1 - sf[1]) * fit.sw) - gap;
+      free = Math.max(150, Math.round(free));
+      host.style.setProperty('--ay-hero-free', free + 'px'); host.classList.toggle('ay-hz-tight', free < 620);
+    } else { host.style.removeProperty('--ay-hero-free'); host.classList.remove('ay-hz-tight'); }
   }
   function hero(el) {
     if (!w.AYHero) return;
@@ -55,25 +70,27 @@
     if (el._ayHero) { el._ayHero.destroy(); el._ayHero = null; }
     if (!vs || !vs.length) { el._ayHero = w.AYHero.mount(el, cfg); return; }
     var cur = -1, t = 0;
-    function apply(i) {
-      var v = vs[i], img = $('img.ay-hs-img', el), preset = el.getAttribute('data-v');
-      if (el._ayHero) { el._ayHero.destroy(); el._ayHero = null; }
-      if (cur < 0 && img) {   /* first time: keep the picture element that is already in the page */
-        var want = heroSrc(el, v);
-        if (!(img.getAttribute('src') && preset !== null && +preset === i) && img.getAttribute('src') !== want) img.src = want;
-      } else {   /* the frame changed shape and another picture suits it: start from clean markup */
-        el.removeAttribute('data-v'); el._ayTone = 0; el.style.backgroundColor = ''; el.classList.remove('is-live', 'is-letter-x', 'is-letter-y');
-        el.innerHTML = '<img class="ay-hs-img ay-hero-media" alt="" decoding="async"><span class="ay-hero-veil" aria-hidden="true"></span><span class="ay-hero-fade" aria-hidden="true"></span>';
-        img = $('img.ay-hs-img', el); img.alt = cfg.alt || ''; img.src = heroSrc(el, v);
-      }
-      cur = i;
-      var c = {}, k; for (k in cfg) c[k] = cfg[k];
-      c.img = img.getAttribute('src'); c.w = v.w; c.h = v.h; c.safe = v.safe; c.regions = v.regions; c.sparks = v.sparks; c.floats = v.k === 'wide' ? cfg.floats : [];
+    function go(i, img) {
+      var v = vs[i], c = {}, k; for (k in cfg) c[k] = cfg[k];
+      c.img = img.getAttribute('src'); c.w = v.w; c.h = v.h; c.safe = v.safe; c.zone = v.zone; c.regions = v.regions; c.sparks = v.sparks; c.floats = v.k === 'wide' ? cfg.floats : [];
+      c.onFit = function (fit) { heroLayout(el, v, fit); };
       el._ayHero = w.AYHero.mount(el, c);
+    }
+    function apply(i) {
+      var v = vs[i], img = $('img.ay-hs-img', el), preset = el.getAttribute('data-v'), want = heroSrc(el, v);
+      if (el._ayHero) { el._ayHero.destroy(); el._ayHero = null; }
+      if (!(cur < 0 && img && img.getAttribute('src') && preset !== null && +preset === i)) {   /* another picture is needed: fresh markup, so nothing of the old picture is drawn */
+        el.removeAttribute('data-v'); el._ayTone = 0; el.style.backgroundColor = ''; el.classList.remove('is-live', 'is-letter-x', 'is-letter-y', 'is-short');
+        el.innerHTML = '<img class="ay-hs-img ay-hero-media" alt="" decoding="async"><span class="ay-hero-veil" aria-hidden="true"></span><span class="ay-hero-fade" aria-hidden="true"></span>';
+        img = $('img.ay-hs-img', el); img.alt = cfg.alt || ''; img.src = want;
+      }
+      cur = i; go(i, img);
     }
     apply(heroPick(el, vs));
     if (el._ayRO) el._ayRO.disconnect();
-    if ('ResizeObserver' in w) { el._ayRO = new ResizeObserver(function () { clearTimeout(t); t = setTimeout(function () { if (!el.isConnected) return; var i = heroPick(el, vs); if (i !== cur) apply(i); }, 220); }); el._ayRO.observe(el); }
+    var again = function () { clearTimeout(t); t = setTimeout(function () { if (!el.isConnected) return; var i = heroPick(el, vs); if (i !== cur) apply(i); }, 180); };
+    if ('ResizeObserver' in w) { el._ayRO = new ResizeObserver(again); el._ayRO.observe(el); }
+    if (!el._ayWin) { el._ayWin = 1; w.addEventListener('resize', again); w.addEventListener('orientationchange', again); }
   }
 
   /* --------------------------------------------------- horizontal portfolio */

@@ -68,11 +68,11 @@ function ay_demo_hero( $v = 1 ) {
 			'flex_direction'          => 'column',
 			'flex_justify_content'    => 'flex-end',
 			'padding'                 => ay_box( 150, 24, 110, 24 ),
-			'padding_mobile'          => array( 'unit' => 'custom', 'top' => '126vw', 'right' => '16px', 'bottom' => '46px', 'left' => '16px', 'isLinked' => false ),
+			'padding_mobile'          => array( 'unit' => 'custom', 'top' => '104vw', 'right' => '16px', 'bottom' => '110px', 'left' => '16px', 'isLinked' => false ),
 			'overflow'                => 'hidden',
 		), $extra ), array( $hero, $content ) );
 	};
-	$night = array( 'mode' => 'regions', 'image' => ay_media_url( 'img/hero/hero-lg.webp' ), 'image_tablet' => ay_media_url( 'img/hero/hero-tablet-md.webp' ), 'image_mobile' => ay_media_url( 'img/hero/hero-mobile-sm.webp' ), 'fill' => 'yes', 'veil' => 'left', 'fade' => 'yes', 'fill_h_mobile' => ay_px( 100, '%' ), 'veil_size_mobile' => ay_px( 8, '%' ), 'fade_size_mobile' => ay_px( 26, '%' ), 'focus_y_mobile' => ay_px( 30, '%' ) );
+	$night = array( 'mode' => 'regions', 'image' => ay_media_url( 'img/hero/hero2-wide.webp' ), 'image_tablet' => ay_media_url( 'img/hero/hero2-portrait.webp' ), 'image_mobile' => ay_media_url( 'img/hero/hero2-tall.webp' ), 'fill' => 'yes', 'veil' => 'left', 'fade' => 'yes', 'fill_h_mobile' => ay_px( 100, '%' ), 'veil_size_mobile' => ay_px( 8, '%' ), 'fade_size_mobile' => ay_px( 26, '%' ) );
 	switch ( (int) $v ) {
 		case 2:   /* separate layers */
 			$L = function ( $label, $rel, $x, $y, $w, $motion, $amt, $dur, $depth, $extra = array() ) {

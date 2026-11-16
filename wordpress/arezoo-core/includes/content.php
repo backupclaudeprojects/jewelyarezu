@@ -383,6 +383,9 @@ add_action( 'admin_init', function () {
 	if ( get_option( 'arezoo_built' ) && version_compare( (string) get_option( 'arezoo_version', '1.0.0' ), '1.2.0', '<' ) && function_exists( 'ay_upgrade_120' ) && ! ay_upgrade_120() ) {
 		return;   /* Elementor is not ready yet: try again on the next dashboard page */
 	}
+	if ( get_option( 'arezoo_built' ) && version_compare( (string) get_option( 'arezoo_version', '1.0.0' ), '1.3.0', '<' ) && function_exists( 'ay_upgrade_130' ) && ! ay_upgrade_130() ) {
+		return;
+	}
 	update_option( 'arezoo_version', AY_VERSION );
 	if ( function_exists( 'ay_elementor_ready' ) && ay_elementor_ready() ) {
 		\Elementor\Plugin::$instance->files_manager->clear_cache();

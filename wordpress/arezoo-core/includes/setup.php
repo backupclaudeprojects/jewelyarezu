@@ -335,9 +335,9 @@ function ay_upgrade_120() {
 			} elseif ( 'ay-hero' === $type && ( ! isset( $set['mode'] ) || 'regions' === $set['mode'] ) ) {
 				$url = isset( $set['image']['url'] ) ? (string) $set['image']['url'] : '';
 				if ( '' === $url || false !== strpos( $url, 'night-garden' ) ) {
-					$set['image']        = ay_media_url( 'img/hero/hero-lg.webp' );
-					$set['image_tablet'] = ay_media_url( 'img/hero/hero-tablet-md.webp' );
-					$set['image_mobile'] = ay_media_url( 'img/hero/hero-mobile-sm.webp' );
+					$set['image']        = ay_media_url( 'img/hero/hero2-wide.webp' );
+					$set['image_tablet'] = ay_media_url( 'img/hero/hero2-portrait.webp' );
+					$set['image_mobile'] = ay_media_url( 'img/hero/hero2-tall.webp' );
 					foreach ( array( 'regions', 'sparks' ) as $k ) {
 						if ( ! empty( $set[ $k ] ) && is_array( $set[ $k ] ) ) {
 							$only_wide = true;
@@ -396,4 +396,54 @@ function ay_set_site_icon() {
 	if ( $id ) {
 		update_option( 'site_icon', $id );
 	}
+}
+
+/* ------------------------------------------------------------ update to 1.3.0 */
+/** The hero takes the three new pictures, with their own moving regions, jewel boxes and text places (layouts are backed up first). */
+function ay_upgrade_130() {
+	if ( ! ay_elementor_ready() || ! ay_load_widgets() ) {
+		return false;
+	}
+	global $wpdb;
+	$ids = $wpdb->get_col( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_elementor_data' AND meta_value LIKE '%ay-hero%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+	foreach ( array_unique( array_map( 'absint', (array) $ids ) ) as $id ) {
+		if ( ! $id || 'revision' === get_post_type( $id ) ) {
+			continue;
+		}
+		$layout  = ay_get_layout( $id );
+		$changed = $layout && ay_walk_layout( $layout, function ( &$el ) {
+			$set = isset( $el['settings'] ) && is_array( $el['settings'] ) ? $el['settings'] : array();
+			$was = $set;
+			if ( 'ay-hero' === ( isset( $el['widgetType'] ) ? $el['widgetType'] : '' ) && ( ! isset( $set['mode'] ) || 'regions' === $set['mode'] ) ) {
+				$set['image']        = ay_media_url( 'img/hero/hero2-wide.webp' );
+				$set['image_tablet'] = ay_media_url( 'img/hero/hero2-portrait.webp' );
+				$set['image_mobile'] = ay_media_url( 'img/hero/hero2-tall.webp' );
+				foreach ( array( 'regions' => \Arezoo\Widgets\Hero::night_regions(), 'sparks' => \Arezoo\Widgets\Hero::night_sparks() ) as $k => $rows ) {
+					$set[ $k ] = array();
+					foreach ( $rows as $row ) {
+						$set[ $k ][] = array_merge( $row, array( '_id' => ay_uid() ) );
+					}
+				}
+				foreach ( array( 'safe', 'safe_t', 'safe_m', 'zone', 'zone_t', 'zone_m', 'floats', 'focus_x', 'focus_y', 'focus_x_tablet', 'focus_y_tablet', 'focus_x_mobile', 'focus_y_mobile', 'fill_h_tablet' ) as $k ) {
+					unset( $set[ $k ] );
+				}
+				$set['fill']          = 'yes';
+				$set['fill_h_mobile'] = ay_px( 100, '%' );
+			} elseif ( 'container' === ( isset( $el['elType'] ) ? $el['elType'] : '' ) && isset( $set['_element_id'] ) && 'ay-hero' === $set['_element_id'] ) {
+				$set['padding_mobile'] = array( 'unit' => 'custom', 'top' => '104vw', 'right' => '16px', 'bottom' => '110px', 'left' => '16px', 'isLinked' => false );
+			}
+			if ( $set !== $was ) {
+				$el['settings'] = $set;
+				return true;
+			}
+			return false;
+		} );
+		if ( $changed ) {
+			ay_backup_layout( $id, 'update 1.3.0' );
+			update_post_meta( $id, '_elementor_data', wp_slash( wp_json_encode( array_values( $layout ) ) ) );
+			ay_flush_layout_cache( $id );
+		}
+	}
+	\Elementor\Plugin::$instance->files_manager->clear_cache();
+	return true;
 }

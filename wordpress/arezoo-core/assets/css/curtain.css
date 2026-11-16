@@ -113,7 +113,7 @@ body.ay-fx-shine .elementor-button:hover::after,body.ay-fx-shine .elementor-butt
 /* ====================================================== dashboard preview + demo cards */
 .ay-cv-stage{position:relative;height:300px;border-radius:18px;overflow:hidden;background:#0B1421;color:#DFDFDF;--ay-bg:#0B1421;--ay-ink:#DFDFDF;--ay-accent:#99E1D9;--ay-display:"Cormorant Garamond",Georgia,serif;--ay-logo:url(../img/logo-mask.png);border:1px solid rgba(0,0,0,.12)}
 .ay-cv-stage .ay-cv{position:absolute;z-index:2}
-.ay-cv-page{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;padding:26px 30px;background:linear-gradient(to top,rgba(11,20,33,.92),rgba(11,20,33,.15) 70%),url(../img/hero/night-garden.jpg) center/cover}
+.ay-cv-page{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;padding:26px 30px;background:linear-gradient(to top,rgba(11,20,33,.92),rgba(11,20,33,.15) 70%),url(../img/hero/hero2-wide.webp) center/cover}
 .ay-cv-page2{background:linear-gradient(to top,rgba(11,20,33,.9),rgba(11,20,33,.2) 70%),url(../img/studio/05-final-necklace.webp) center/cover}
 .ay-cv-page[hidden]{display:none}
 .ay-cv-page b{font:500 30px/1.1 "Cormorant Garamond",Georgia,serif}
