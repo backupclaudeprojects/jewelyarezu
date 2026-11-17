@@ -165,7 +165,8 @@ class Work_Field extends Base {
 				if ( ! empty( $s['crumb_link']['url'] ) ) {
 					$root = '<a href="' . esc_url( $s['crumb_link']['url'] ) . '">' . $root . '</a>';
 				}
-				$html = $root . ( $w['collections'] ? ' / ' . $terms( $w['collections'] ) : '' );
+				/* with collections switched off the path is «Collections / name of the work» */
+				$html = $root . ( $w['collections'] ? ' / ' . $terms( $w['collections'] ) : ( ay_use_collections() ? '' : ' / ' . esc_html( $w['title'] ) ) );
 				break;
 			case 'collection':
 				$html = $terms( $w['collections'] );

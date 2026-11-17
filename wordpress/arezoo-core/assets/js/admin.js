@@ -128,6 +128,28 @@
     look();
   }
 
+  /* ---- networks list (settings → brand and contact) ---- */
+  var $socs = $('#aySocs');
+  if ($socs.length) {
+    var icons = {}; try { icons = JSON.parse($('<textarea/>').html($('#aySocIcons').html()).text()); } catch (e) { icons = {}; }
+    var nSoc = $socs.children().length + 100;
+    if ($.fn.sortable) $socs.sortable({ handle: '.ay-drag', axis: 'y' });
+    $('#aySocAdd').on('click', function () { $socs.append($('#aySocTpl').html().replace(/__i__/g, 'n' + (nSoc++))); $socs.children().last().find('.ay-soc-val').trigger('focus'); });
+    $socs.on('click', '.ay-soc-x', function () { $(this).closest('.ay-soc').remove(); });
+    $socs.on('change', '.ay-soc-net', function () {
+      var $li = $(this).closest('.ay-soc'), $o = $(this).find(':selected');
+      $li.find('.ay-soc-val').attr('placeholder', $o.data('ph') || '');
+      if (!+$li.find('.ay-soc-icon').val()) $li.find('.ay-soc-ic').html(icons[$(this).val()] || '');
+    });
+    $socs.on('click', '.ay-soc-pick', function (e) {
+      e.preventDefault();
+      var $li = $(this).closest('.ay-soc'), frame = wp.media({ title: 'آیکون دلخواه', button: { text: 'انتخاب' }, multiple: false, library: { type: 'image' } });
+      frame.on('select', function () { var a = frame.state().get('selection').first().toJSON(); $li.find('.ay-soc-icon').val(a.id); $li.find('.ay-soc-ic').html($('<img alt="">').attr('src', (a.sizes && a.sizes.thumbnail ? a.sizes.thumbnail.url : a.url))); });
+      frame.open();
+    });
+    $socs.on('dblclick', '.ay-soc-ic', function () { var $li = $(this).closest('.ay-soc'); $li.find('.ay-soc-icon').val(0); $(this).html(icons[$li.find('.ay-soc-net').val()] || ''); });
+  }
+
   /* ---- settings niceties ---- */
   $('.ay-range input[type=range]').on('input', function () { $(this).closest('.ay-range').find('output').text(this.value + ($(this).data('unit') || '')); });
   if ($.fn.wpColorPicker) $('.ay-color').wpColorPicker({ change: function () { var el = this; setTimeout(function () { $(el).trigger('ay:color'); }, 30); }, clear: function () { $(this).closest('.wp-picker-container').find('.ay-color').trigger('ay:color'); } });

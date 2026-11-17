@@ -160,17 +160,32 @@ class Dock extends Base {
 	}
 
 	protected function register_controls() {
-		$icons = array( '' => 'بدون آیکون' );
-		foreach ( array_keys( ay_icons() ) as $k ) {
-			$icons[ $k ] = $k;
-		}
 		$this->sec( 's_items', 'لینک‌ها' );
 		$rep = new Repeater();
 		$rep->add_control( 'label', array( 'label' => 'متن', 'type' => CM::TEXT, 'default' => 'Link' ) );
-		$rep->add_control( 'icon', array( 'label' => 'آیکون (در موبایل نمایش داده می‌شود)', 'type' => CM::SELECT, 'options' => $icons, 'default' => 'gem' ) );
+		$this->icon_fields( $rep, 'gem', 'آیکون (در موبایل نمایش داده می‌شود)' );
 		$rep->add_control( 'link', array( 'label' => 'لینک', 'type' => CM::URL, 'dynamic' => array( 'active' => false ) ) );
+		$rep->add_control( 'icon_desk', array( 'label' => 'آیکون در دسکتاپ هم دیده شود', 'type' => CM::SWITCHER, 'label_on' => 'بله', 'label_off' => 'خیر', 'return_value' => 'yes', 'default' => '' ) );
+		$rep->add_control( 'hide_mobile', array( 'label' => 'در موبایل پنهان باشد', 'type' => CM::SWITCHER, 'label_on' => 'بله', 'label_off' => 'خیر', 'return_value' => 'yes', 'default' => '' ) );
+		$rep->add_control( 'hide_desk', array( 'label' => 'در دسکتاپ پنهان باشد', 'type' => CM::SWITCHER, 'label_on' => 'بله', 'label_off' => 'خیر', 'return_value' => 'yes', 'default' => '' ) );
 		$this->add_control( 'items', array( 'label' => 'لینک‌ها', 'type' => CM::REPEATER, 'fields' => $rep->get_controls(), 'default' => self::default_items(), 'title_field' => '{{{ label }}}' ) );
-		$this->sw( 'social', 'آیکون‌های اینستاگرام، تلگرام و ایمیل', 'yes', array( 'description' => 'نشانی‌ها از «آرزو ← تنظیمات» خوانده می‌شوند.' ) );
+		$this->done();
+
+		$this->sec( 's_social', 'آیکون‌های شبکه‌ها و تماس' );
+		$this->sw( 'social', 'نمایش آیکون شبکه‌ها', 'yes' );
+		$this->sel( 'social_src', 'کدام شبکه‌ها', array( 'site' => 'همهٔ شبکه‌های سایت (آرزو ← تنظیمات ← برند و تماس)', 'pick' => 'فقط شبکه‌هایی که این‌جا انتخاب می‌کنم', 'custom' => 'فهرست دستی همین ویجت' ), 'site', array( 'condition' => array( 'social' => 'yes' ) ) );
+		$picks = array();
+		foreach ( ay_social_networks() as $k => $n ) {
+			$picks[ $k ] = $n[0];
+		}
+		$this->add_control( 'social_pick', array( 'label' => 'شبکه‌ها', 'type' => CM::SELECT2, 'multiple' => true, 'label_block' => true, 'options' => $picks, 'default' => array( 'email', 'instagram', 'telegram' ), 'condition' => array( 'social' => 'yes', 'social_src' => 'pick' ) ) );
+		$rep = new Repeater();
+		$rep->add_control( 'label', array( 'label' => 'عنوان (برای صفحه‌خوان و راهنمای موس)', 'type' => CM::TEXT, 'default' => 'Link' ) );
+		$this->icon_fields( $rep, 'link' );
+		$rep->add_control( 'link', array( 'label' => 'لینک', 'type' => CM::URL, 'dynamic' => array( 'active' => false ) ) );
+		$rep->add_control( 'hide_mobile', array( 'label' => 'در موبایل پنهان باشد', 'type' => CM::SWITCHER, 'label_on' => 'بله', 'label_off' => 'خیر', 'return_value' => 'yes', 'default' => '' ) );
+		$this->add_control( 'social_items', array( 'label' => 'آیکون‌ها', 'type' => CM::REPEATER, 'fields' => $rep->get_controls(), 'default' => array(), 'title_field' => '{{{ label }}}', 'condition' => array( 'social' => 'yes', 'social_src' => 'custom' ) ) );
+		$this->sw( 'social_mobile', 'آیکون‌ها در موبایل هم نمایش داده شوند', '', array( 'prefix_class' => 'ay-dock-msoc-', 'condition' => array( 'social' => 'yes' ), 'description' => 'در موبایل کنار لینک‌ها می‌آیند؛ اگر جا نشود، نوار با انگشت به چپ و راست کشیده می‌شود.' ) );
 		$this->sw( 'totop', 'دکمهٔ برگشت به بالا', 'yes' );
 		$this->done();
 
@@ -218,13 +233,30 @@ class Dock extends Base {
 		foreach ( (array) $s['items'] as $it ) {
 			$url = ! empty( $it['link']['url'] ) ? $it['link']['url'] : '#';
 			$on  = trailingslashit( $url ) === $here;
-			echo '<a href="' . esc_url( $url ) . '"' . ( $on ? ' class="is-on" aria-current="page"' : '' ) . '>' . ( ! empty( $it['icon'] ) ? ay_icon( $it['icon'], 21 ) : '' ) . '<span>' . esc_html( $it['label'] ) . '</span></a>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			$cls = trim( ( $on ? 'is-on ' : '' ) . ( ! empty( $it['hide_mobile'] ) && 'yes' === $it['hide_mobile'] ? 'ay-hm ' : '' ) . ( ! empty( $it['hide_desk'] ) && 'yes' === $it['hide_desk'] ? 'ay-hd ' : '' ) . ( ! empty( $it['icon_desk'] ) && 'yes' === $it['icon_desk'] ? 'ay-icd' : '' ) );
+			$ext = ! empty( $it['link']['is_external'] ) ? ' target="_blank" rel="noopener"' : '';
+			echo '<a href="' . esc_url( $url ) . '"' . ( $cls ? ' class="' . esc_attr( $cls ) . '"' : '' ) . ( $on ? ' aria-current="page"' : '' ) . $ext . '>' . $this->row_icon( $it, 21 ) . '<span>' . esc_html( $it['label'] ) . '</span></a>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 		echo '</div>';
 		$social = '';
 		if ( 'yes' === $s['social'] ) {
-			foreach ( ay_contact() as $key => $c ) {
-				$social .= '<a href="' . esc_url( $c['url'] ) . '"' . ( 'email' === $key ? '' : ' target="_blank" rel="noopener"' ) . ' aria-label="' . esc_attr( $c['label'] ) . '">' . ay_icon( $c['icon'], 20 ) . '</a>';
+			$src = isset( $s['social_src'] ) ? $s['social_src'] : 'site';
+			if ( 'custom' === $src ) {
+				foreach ( (array) $s['social_items'] as $it ) {
+					if ( empty( $it['link']['url'] ) ) {
+						continue;
+					}
+					$ext     = ! empty( $it['link']['is_external'] ) || 0 === strpos( $it['link']['url'], 'http' ) ? ' target="_blank" rel="noopener"' : '';
+					$social .= '<a href="' . esc_url( $it['link']['url'] ) . '"' . ( ! empty( $it['hide_mobile'] ) && 'yes' === $it['hide_mobile'] ? ' class="ay-hm"' : '' ) . $ext . ' aria-label="' . esc_attr( $it['label'] ) . '" title="' . esc_attr( $it['label'] ) . '">' . $this->row_icon( $it, 20 ) . '</a>';
+				}
+			} else {
+				$want = 'pick' === $src ? (array) $s['social_pick'] : null;
+				foreach ( ay_contact() as $c ) {
+					if ( null !== $want && ! in_array( $c['net'], $want, true ) ) {
+						continue;
+					}
+					$social .= '<a href="' . esc_url( $c['url'] ) . '"' . ( 'email' === $c['net'] ? '' : ' target="_blank" rel="noopener"' ) . ' aria-label="' . esc_attr( $c['label'] ) . '" title="' . esc_attr( $c['label'] ) . '">' . ay_social_icon( $c, 20 ) . '</a>';
+				}
 			}
 		}
 		if ( 'yes' === $s['totop'] ) {
@@ -260,6 +292,7 @@ class Contact extends Base {
 		$this->sw( 'email', 'ایمیل', 'yes' );
 		$this->sw( 'instagram', 'اینستاگرام', 'yes' );
 		$this->sw( 'telegram', 'تلگرام', 'yes' );
+		$this->sw( 'extra', 'شبکه‌های دیگر (واتس‌اپ، لینکدین، پینترست و…)', 'yes', array( 'description' => 'هر شبکه‌ای که در «آرزو ← تنظیمات ← برند و تماس» اضافه کرده‌اید.' ) );
 		$this->sel( 'layout', 'چیدمان', array( 'cols' => 'ستونی کنار هم', 'rows' => 'ردیفی زیر هم', 'inline' => 'یک خط فشرده (برای فوتر)' ), 'cols', array( 'prefix_class' => 'ay-ctl-' ) );
 		$this->sw( 'icons', 'نمایش آیکون', 'yes' );
 		$this->sw( 'kinds', 'نمایش عنوان هر راه (Email, Instagram…)', 'yes' );
@@ -283,7 +316,8 @@ class Contact extends Base {
 		$s     = $this->get_settings_for_display();
 		$items = array();
 		foreach ( ay_contact() as $key => $c ) {
-			if ( 'yes' === $s[ $key ] ) {
+			$sw = in_array( $key, array( 'email', 'instagram', 'telegram' ), true ) ? $key : 'extra';
+			if ( ! isset( $s[ $sw ] ) || 'yes' === $s[ $sw ] ) {
 				$items[ $key ] = $c;
 			}
 		}
@@ -296,7 +330,7 @@ class Contact extends Base {
 			echo '<li class="ay-ct-item">';
 			$attr = ' href="' . esc_url( $c['url'] ) . '"' . ( 'email' === $key ? '' : ' target="_blank" rel="noopener"' );
 			if ( 'yes' === $s['icons'] ) {
-				echo '<a class="ay-ct-ic"' . $attr . ' aria-label="' . esc_attr( $c['label'] ) . '">' . ay_icon( $c['icon'], 30 ) . '</a>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo '<a class="ay-ct-ic"' . $attr . ' aria-label="' . esc_attr( $c['label'] ) . '">' . ay_social_icon( $c, 30 ) . '</a>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 			echo '<span class="ay-ct-txt">';
 			if ( 'yes' === $s['kinds'] ) {

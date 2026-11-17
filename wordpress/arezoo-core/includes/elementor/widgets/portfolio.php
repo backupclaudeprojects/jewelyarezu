@@ -146,27 +146,92 @@ class Stack extends Base {
 
 	protected function register_controls() {
 		$this->sec( 's_source', 'کارت‌ها' );
-		$this->sel( 'source', 'منبع کارت‌ها', array( 'collections' => 'هر کالکشن یک کارت (خودکار)', 'manual' => 'کارت‌های دستی' ), 'collections' );
-		$terms = array();
-		foreach ( ay_terms_ordered( 'ay_collection' ) as $t ) {
-			$terms[ $t->term_id ] = $t->name;
+		$this->sel( 'card_mode', 'حالت کارت', array( 'gallery' => 'حالت ۱: سه تصویر (کالکشن یا اثر)', 'feature' => 'حالت ۲: یک تصویر + توضیحات' ), 'gallery', array( 'prefix_class' => 'ay-stm-', 'description' => 'حالت ۲ برای هر کارت یک تصویر و کنارش متن کوتاه یا بلند، مشخصات و دکمه نشان می‌دهد. تنظیماتش در بخش «حالت ۲» است.' ) );
+		$this->sel( 'source', 'منبع کارت‌ها', array( 'collections' => 'هر کالکشن یک کارت (خودکار)', 'types' => 'هر نوع یک کارت (انگشتر، گردنبند…)', 'works' => 'آثاری که انتخاب می‌کنم (هر اثر یک کارت)', 'query' => 'آثار با فیلتر (کالکشن، نوع، ویژه، تعداد، ترتیب)', 'manual' => 'کارت‌های دستی' ), 'collections', array( 'description' => 'اگر کالکشن‌ها در تنظیمات خاموش باشند، «هر کالکشن یک کارت» خودکار «هر نوع یک کارت» می‌شود.' ) );
+		$terms = function ( $tax ) {
+			$out = array();
+			foreach ( ay_terms_ordered( $tax ) as $t ) {
+				$out[ $t->term_id ] = $t->name;
+			}
+			return $out;
+		};
+		$works = array();
+		foreach ( get_posts( array( 'post_type' => 'ay_work', 'post_status' => 'publish', 'numberposts' => 300, 'orderby' => array( 'menu_order' => 'ASC', 'date' => 'DESC' ) ) ) as $wp ) {
+			$works[ $wp->ID ] = $wp->post_title;
 		}
-		$this->add_control( 'cols', array( 'label' => 'فقط این کالکشن‌ها', 'type' => CM::SELECT2, 'multiple' => true, 'label_block' => true, 'options' => $terms, 'description' => 'خالی = همه، به ترتیب صفحهٔ «دسته‌بندی‌ها»', 'condition' => array( 'source' => 'collections' ) ) );
-		$this->num( 'max', 'حداکثر تعداد کارت', 6, 1, 20, 1, array( 'condition' => array( 'source' => 'collections' ) ) );
+		$this->add_control( 'cols', array( 'label' => 'فقط این کالکشن‌ها', 'type' => CM::SELECT2, 'multiple' => true, 'label_block' => true, 'options' => $terms( 'ay_collection' ), 'description' => 'خالی = همه، به ترتیب صفحهٔ «دسته‌بندی‌ها»', 'condition' => array( 'source' => 'collections' ) ) );
+		$this->add_control( 'pick_types', array( 'label' => 'فقط این نوع‌ها', 'type' => CM::SELECT2, 'multiple' => true, 'label_block' => true, 'options' => $terms( 'ay_type' ), 'description' => 'خالی = همه', 'condition' => array( 'source' => 'types' ) ) );
+		$this->add_control( 'pick_works', array( 'label' => 'آثار (به همین ترتیب)', 'type' => CM::SELECT2, 'multiple' => true, 'label_block' => true, 'options' => $works, 'condition' => array( 'source' => 'works' ) ) );
+		$this->add_control( 'sq_col', array( 'label' => 'فقط این کالکشن‌ها', 'type' => CM::SELECT2, 'multiple' => true, 'label_block' => true, 'options' => $terms( 'ay_collection' ), 'condition' => array( 'source' => 'query' ) ) );
+		$this->add_control( 'sq_type', array( 'label' => 'فقط این نوع‌ها', 'type' => CM::SELECT2, 'multiple' => true, 'label_block' => true, 'options' => $terms( 'ay_type' ), 'condition' => array( 'source' => 'query' ) ) );
+		$this->sw( 'sq_featured', 'فقط آثار ویژه', '', array( 'condition' => array( 'source' => 'query' ) ) );
+		$this->add_control( 'sq_exclude', array( 'label' => 'این آثار نمایش داده نشوند', 'type' => CM::SELECT2, 'multiple' => true, 'label_block' => true, 'options' => $works, 'condition' => array( 'source' => 'query' ) ) );
+		$this->sel( 'sq_order', 'ترتیب', array( 'menu' => 'ترتیب دستی (عدد «ترتیب» هر اثر)', 'new' => 'تازه‌ترین اول', 'old' => 'قدیمی‌ترین اول', 'title' => 'الفبایی', 'rand' => 'تصادفی' ), 'menu', array( 'condition' => array( 'source' => 'query' ) ) );
+		$this->num( 'max', 'حداکثر تعداد کارت', 6, 1, 30, 1, array( 'condition' => array( 'source' => array( 'collections', 'types', 'query' ) ) ) );
+		$this->sel( 'term_pic', 'تصویر کارت‌های کالکشن / نوع در حالت ۲', array( 'first' => 'تصویر اولین اثر', 'featured' => 'تصویر اولین اثر ویژه', 'rand' => 'تصویر یک اثر تصادفی' ), 'first', array( 'condition' => array( 'card_mode' => 'feature', 'source' => array( 'collections', 'types' ) ) ) );
 		$rep = new Repeater();
 		$rep->add_control( 'title', array( 'label' => 'عنوان', 'type' => CM::TEXT, 'default' => 'Collection', 'label_block' => true ) );
 		$rep->add_control( 'meta', array( 'label' => 'متن کوچک کنار عنوان', 'type' => CM::TEXT, 'default' => '', 'label_block' => true ) );
+		$rep->add_control( 'text', array( 'label' => 'توضیح (حالت ۲)', 'type' => CM::TEXTAREA, 'rows' => 4, 'default' => '' ) );
 		$rep->add_control( 'btn', array( 'label' => 'متن دکمه', 'type' => CM::TEXT, 'default' => 'View collection' ) );
 		$rep->add_control( 'link', array( 'label' => 'لینک', 'type' => CM::URL, 'dynamic' => array( 'active' => false ) ) );
-		$rep->add_control( 'tall', array( 'label' => 'تصویر بلند', 'type' => CM::MEDIA ) );
+		$rep->add_control( 'tall', array( 'label' => 'تصویر بلند (حالت ۲: تنها تصویر کارت)', 'type' => CM::MEDIA ) );
 		$rep->add_control( 'small1', array( 'label' => 'تصویر کوچک ۱', 'type' => CM::MEDIA ) );
 		$rep->add_control( 'small2', array( 'label' => 'تصویر کوچک ۲', 'type' => CM::MEDIA ) );
 		$this->add_control( 'cards', array( 'label' => 'کارت‌ها', 'type' => CM::REPEATER, 'fields' => $rep->get_controls(), 'default' => array(), 'title_field' => '{{{ title }}}', 'condition' => array( 'source' => 'manual' ) ) );
 		$this->sw( 'number', 'شماره‌گذاری کارت‌ها', 'yes', array( 'separator' => 'before' ) );
 		$this->sw( 'meta_on', 'نمایش متن کوچک («Collection · n pieces»)', 'yes' );
-		$this->txt( 'meta_word', 'واژهٔ «Collection»', 'Collection', array( 'condition' => array( 'meta_on' => 'yes', 'source' => 'collections' ) ) );
-		$this->txt( 'btn_text', 'متن دکمه', 'View collection', array( 'description' => 'خالی = بدون دکمه', 'condition' => array( 'source' => 'collections' ) ) );
+		$this->txt( 'meta_word', 'واژهٔ «Collection»', 'Collection', array( 'condition' => array( 'meta_on' => 'yes', 'source' => array( 'collections', 'types' ) ) ) );
+		$this->txt( 'btn_text', 'متن دکمه', 'View collection', array( 'description' => 'خالی = بدون دکمه', 'condition' => array( 'source' => array( 'collections', 'types' ) ) ) );
+		$this->txt( 'btn_work', 'متن دکمهٔ کارت‌های اثر', 'View piece', array( 'description' => 'خالی = بدون دکمه', 'condition' => array( 'source' => array( 'works', 'query' ) ) ) );
 		$this->sel( 'tag', 'تگ عنوان', array( 'h2' => 'H2', 'h3' => 'H3', 'h4' => 'H4', 'div' => 'div' ), 'h3' );
+		$this->done();
+
+		$this->sec( 's_feature', 'حالت ۲: یک تصویر + توضیحات', false, array( 'card_mode' => 'feature' ) );
+		$this->sel( 'f_side', 'جای تصویر', array( 'left' => 'چپ', 'right' => 'راست', 'alt' => 'یکی‌درمیان چپ و راست' ), 'left', array( 'prefix_class' => 'ay-stf-side-' ) );
+		$this->cssvar( 'f_iw', 'سهم ستون تصویر', '--ay-stf-iw', 25, 75, 1, 46, '%' );
+		$this->sel( 'f_fit', 'جا شدن تصویر', array( 'contain' => 'کامل (برای عکس بدون پس‌زمینه)', 'cover' => 'پر کردن قاب (برای عکس‌های عکاسی)' ), 'contain', array( 'prefix_class' => 'ay-stf-fit-' ) );
+		$this->cssvar( 'f_ipad', 'فاصلهٔ تصویر از لبهٔ قاب', '--ay-stf-ipad', 0, 30, 1, 8, '%', array( 'condition' => array( 'f_fit' => 'contain' ) ) );
+		$this->sel( 'f_img', 'کدام تصویر اثر', array( 'cover' => 'تصویر اصلی', 'second' => 'دومین تصویر گالری (اگر باشد)' ), 'cover' );
+		$this->halo_switch();
+		$this->sel( 'f_eyebrow', 'برچسب بالای عنوان', array( 'none' => 'بدون برچسب', 'type' => 'نوع اثر', 'collection' => 'کالکشن اثر', 'both' => 'کالکشن · نوع', 'year' => 'سال', 'custom' => 'متن دلخواه' ), 'type' );
+		$this->txt( 'f_eyebrow_txt', 'متن برچسب', 'Selected piece', array( 'condition' => array( 'f_eyebrow' => 'custom' ) ) );
+		$this->sel( 'f_text', 'متن توضیح', array( 'short' => 'توضیح کوتاه (خلاصهٔ اثر یا چند واژهٔ اول)', 'long' => 'توضیح کامل', 'none' => 'بدون توضیح' ), 'short', array( 'description' => 'خلاصهٔ هر اثر را در صفحهٔ ویرایش همان اثر، کادر «توضیح کوتاه» بنویسید. برای کالکشن و نوع، توضیح خودِ کالکشن یا نوع استفاده می‌شود. متن هر کارت را می‌توانید پایین‌تر در «ویرایش دستی کارت‌ها» عوض کنید.' ) );
+		$this->num( 'f_words', 'بیشترین تعداد واژه‌ها (توضیح کوتاه)', 32, 5, 200, 1, array( 'condition' => array( 'f_text' => 'short' ) ) );
+		$this->add_control( 'f_specs', array( 'label' => 'مشخصات زیر توضیح', 'type' => CM::SELECT2, 'multiple' => true, 'label_block' => true, 'options' => array( 'collection' => 'کالکشن', 'type' => 'نوع', 'materials' => 'متریال', 'gemstones' => 'سنگ‌ها', 'technique' => 'تکنیک', 'year' => 'سال', 'extra' => 'جزئیات دلخواه اثر', 'count' => 'تعداد آثار (کارت کالکشن / نوع)' ), 'default' => array( 'materials', 'gemstones' ) ) );
+		$this->sel( 'f_specs_style', 'نمایش مشخصات', array( 'rows' => 'ردیف‌های عنوان و مقدار', 'chips' => 'برچسب‌های کوچک کنار هم', 'grid' => 'شبکهٔ دو ستونه' ), 'rows', array( 'prefix_class' => 'ay-stf-specs-' ) );
+		$this->sel( 'f_btn_pos', 'جای دکمه', array( 'body' => 'زیر متن', 'head' => 'کنار عنوان', 'none' => 'بدون دکمه' ), 'body' );
+		$this->sel( 'f_valign', 'جای عمودی متن', array( 'flex-start' => 'بالا', 'center' => 'وسط', 'flex-end' => 'پایین', 'space-between' => 'پخش در ارتفاع' ), 'center', array( 'selectors' => array( '{{WRAPPER}} .ay-stf-body' => 'justify-content: {{VALUE}};' ) ) );
+		$this->align( 'f_align', '.ay-stf-body' );
+		$this->cssvar( 'f_tmax', 'بیشترین عرض متن', '--ay-stf-tmax', 20, 90, 1, 46, 'ch' );
+		$this->num( 'f_clamp', 'بیشترین سطر توضیح در موبایل (۰ = همه)', 4, 0, 30, 1 );
+		$this->num( 'f_specs_m', 'بیشترین ردیف مشخصات در موبایل', 2, 0, 20, 1, array( 'description' => 'تا کارت روی‌هم در صفحهٔ گوشی کامل جا شود.' ) );
+		$this->sw( 'f_link_pic', 'تصویر هم لینک باشد', 'yes' );
+		$this->done();
+
+		$this->sec( 's_over', 'ویرایش دستی کارت‌ها' );
+		$this->note( 'over_n', 'برای هر اثر، کالکشن یا نوعی که کارتش نمایش داده می‌شود می‌توانید عنوان، برچسب، متن، تصویر، دکمه و لینک را دستی عوض کنید یا کارت را پنهان کنید. هر چه خالی بماند از خودِ اثر خوانده می‌شود.' );
+		$targets = array( '' => '— انتخاب —' );
+		foreach ( $works as $wid => $wt ) {
+			$targets[ 'w:' . $wid ] = 'اثر: ' . $wt;
+		}
+		foreach ( $terms( 'ay_collection' ) as $tid => $tn ) {
+			$targets[ 'c:' . $tid ] = 'کالکشن: ' . $tn;
+		}
+		foreach ( $terms( 'ay_type' ) as $tid => $tn ) {
+			$targets[ 't:' . $tid ] = 'نوع: ' . $tn;
+		}
+		$rep = new Repeater();
+		$rep->add_control( 'target', array( 'label' => 'کارتِ', 'type' => CM::SELECT, 'options' => $targets, 'default' => '' ) );
+		$rep->add_control( 'hide', array( 'label' => 'این کارت نمایش داده نشود', 'type' => CM::SWITCHER, 'label_on' => 'بله', 'label_off' => 'خیر', 'return_value' => 'yes', 'default' => '' ) );
+		$rep->add_control( 'title', array( 'label' => 'عنوان', 'type' => CM::TEXT, 'label_block' => true ) );
+		$rep->add_control( 'eyebrow', array( 'label' => 'برچسب بالای عنوان / متن کوچک', 'type' => CM::TEXT, 'label_block' => true ) );
+		$rep->add_control( 'text', array( 'label' => 'متن توضیح', 'type' => CM::TEXTAREA, 'rows' => 5 ) );
+		$rep->add_control( 'specs', array( 'label' => 'مشخصات دلخواه (هر سطر: عنوان | مقدار)', 'type' => CM::TEXTAREA, 'rows' => 3, 'placeholder' => "Metal | White gold\nStones | Emerald" ) );
+		$rep->add_control( 'image', array( 'label' => 'تصویر', 'type' => CM::MEDIA ) );
+		$rep->add_control( 'btn', array( 'label' => 'متن دکمه', 'type' => CM::TEXT ) );
+		$rep->add_control( 'link', array( 'label' => 'لینک', 'type' => CM::URL, 'dynamic' => array( 'active' => false ) ) );
+		$this->add_control( 'over', array( 'label' => 'کارت‌ها', 'type' => CM::REPEATER, 'fields' => $rep->get_controls(), 'default' => array(), 'title_field' => '{{{ target }}}' ) );
 		$this->done();
 
 		$this->sec( 's_stack', 'روی‌هم افتادن' );
@@ -194,6 +259,17 @@ class Stack extends Base {
 		$this->box_style( 'card', 'قاب کارت', '.ay-st-card' );
 		$this->box_style( 'pic', 'قاب تصاویر', '.ay-st-pic', false );
 		$this->done();
+		$this->sec( 'st_feature', 'حالت ۲', true, array( 'card_mode' => 'feature' ) );
+		$this->box_style( 'f_pic', 'قاب تصویر', '.ay-stf-pic', false );
+		$this->cssvar( 'f_gap', 'فاصلهٔ تصویر و متن', '--ay-stf-gap', 0, 120, 1, 40 );
+		$this->add_responsive_control( 'f_pad', array( 'label' => 'فاصلهٔ داخلی ستون متن', 'type' => CM::DIMENSIONS, 'size_units' => array( 'px', 'em' ), 'selectors' => array( '{{WRAPPER}} .ay-stf-body' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};' ) ) );
+		$this->text_style( 'f_eye', 'برچسب بالای عنوان', '.ay-stf-eye' );
+		$this->text_style( 'f_txt', 'متن توضیح', '.ay-stf-text' );
+		$this->text_style( 'f_sk', 'عنوان مشخصات', '.ay-stf-specs dt' );
+		$this->text_style( 'f_sv', 'مقدار مشخصات', '.ay-stf-specs dd' );
+		$this->color( 'f_line', 'رنگ خط‌های مشخصات', '--ay-stf-line' );
+		$this->color( 'f_chip', 'رنگ زمینهٔ برچسب‌های مشخصات', '--ay-stf-chip' );
+		$this->done();
 		$this->sec( 'st_text', 'متن‌ها', true );
 		$this->text_style( 'num', 'شماره', '.ay-st-num' );
 		$this->text_style( 'title', 'عنوان', '.ay-st-title' );
@@ -206,24 +282,131 @@ class Stack extends Base {
 		return '<a class="ay-st-pic ' . esc_attr( $class ) . '" href="' . esc_url( $url ) . '">' . $html . '</a>';
 	}
 
+	/** Manual changes for one card (key like w:12, c:3, t:5). */
+	private function override( $s, $key ) {
+		foreach ( (array) ( isset( $s['over'] ) ? $s['over'] : array() ) as $o ) {
+			if ( ! empty( $o['target'] ) && $o['target'] === $key ) {
+				return $o;
+			}
+		}
+		return array();
+	}
+
+	private function words( $html, $n ) {
+		return wp_trim_words( wp_strip_all_tags( strip_shortcodes( (string) $html ) ), max( 1, (int) $n ), '…' );
+	}
+
+	/** Spec rows of a work, a term card or manual lines. */
+	private function spec_rows( $s, $id, $count = 0, $term = null ) {
+		$rows   = array();
+		$labels = array( 'collection' => 'Collection', 'type' => 'Type', 'materials' => 'Materials', 'gemstones' => 'Gemstones', 'technique' => 'Technique', 'year' => 'Year', 'count' => 'Pieces' );
+		$w      = $id ? ay_work( $id ) : null;
+		foreach ( (array) $s['f_specs'] as $f ) {
+			if ( 'count' === $f ) {
+				if ( $count ) {
+					$rows[] = array( $labels['count'], (string) $count );
+				}
+			} elseif ( ! $w ) {
+				continue;
+			} elseif ( 'extra' === $f ) {
+				$rows = array_merge( $rows, ay_work_extra( $id ) );
+			} elseif ( 'collection' === $f || 'type' === $f ) {
+				$v = implode( ', ', wp_list_pluck( 'collection' === $f ? $w['collections'] : $w['types'], 'name' ) );
+				if ( '' !== $v ) {
+					$rows[] = array( $labels[ $f ], $v );
+				}
+			} elseif ( '' !== trim( (string) $w[ $f ] ) ) {
+				$rows[] = array( $labels[ $f ], $w[ $f ] );
+			}
+		}
+		return $rows;
+	}
+
+	private function eyebrow( $s, $id ) {
+		$w = ay_work( $id );
+		if ( ! $w ) {
+			return '';
+		}
+		$col = implode( ', ', wp_list_pluck( $w['collections'], 'name' ) );
+		$typ = implode( ', ', wp_list_pluck( $w['types'], 'name' ) );
+		switch ( $s['f_eyebrow'] ) {
+			case 'type':
+				return $typ;
+			case 'collection':
+				return $col;
+			case 'both':
+				return trim( $col . ( $col && $typ ? ' · ' : '' ) . $typ );
+			case 'year':
+				return $w['year'];
+			case 'custom':
+				return (string) $s['f_eyebrow_txt'];
+		}
+		return '';
+	}
+
+	/** Picture of a work for mode 2. */
+	private function work_pic( $s, $id ) {
+		if ( 'second' === $s['f_img'] ) {
+			$ids = ay_work_gallery_ids( $id );
+			if ( isset( $ids[1] ) ) {
+				$alt = get_post_meta( $ids[1], '_wp_attachment_image_alt', true );
+				return wp_get_attachment_image( $ids[1], 'large', false, array( 'alt' => $alt ? $alt : get_the_title( $id ), 'loading' => 'lazy' ) );
+			}
+		}
+		return ay_work_img( $id, 'large' );
+	}
+
 	protected function render() {
-		$s     = $this->get_settings_for_display();
+		$s       = $this->get_settings_for_display();
+		$feature = 'feature' === $s['card_mode'];
+		$src     = $s['source'];
+		if ( 'collections' === $src && ! ay_use_collections() ) {
+			$src = 'types';
+		}
 		$cards = array();
-		if ( 'manual' === $s['source'] ) {
+		$img   = function ( $m, $alt ) {
+			return ! empty( $m['url'] ) ? '<img src="' . esc_url( $m['url'] ) . '" alt="' . esc_attr( $alt ) . '" loading="lazy">' : '';
+		};
+		if ( 'manual' === $src ) {
 			foreach ( (array) $s['cards'] as $c ) {
-				$img = function ( $m ) use ( $c ) {
-					return ! empty( $m['url'] ) ? '<img src="' . esc_url( $m['url'] ) . '" alt="' . esc_attr( $c['title'] ) . '" loading="lazy">' : '';
-				};
 				$url     = ! empty( $c['link']['url'] ) ? $c['link']['url'] : '#';
-				$cards[] = array( 'title' => $c['title'], 'meta' => $c['meta'], 'btn' => $c['btn'], 'url' => $url, 'pics' => array( array( $img( $c['small1'] ), $url ), array( $img( $c['small2'] ), $url ), array( $img( $c['tall'] ), $url ) ) );
+				$cards[] = array( 'key' => '', 'id' => 0, 'title' => $c['title'], 'meta' => $c['meta'], 'eye' => $c['meta'], 'text' => isset( $c['text'] ) ? $c['text'] : '', 'btn' => $c['btn'], 'url' => $url, 'specs' => array(), 'vars' => '', 'halo' => '', 'pic' => $img( $c['tall'], $c['title'] ), 'pics' => array( array( $img( $c['small1'], $c['title'] ), $url ), array( $img( $c['small2'], $c['title'] ), $url ), array( $img( $c['tall'], $c['title'] ), $url ) ) );
+			}
+		} elseif ( 'works' === $src || 'query' === $src ) {
+			if ( 'works' === $src ) {
+				$ids = array_values( array_filter( array_map( 'absint', (array) $s['pick_works'] ) ) );
+				$ids = $ids ? ay_query_works( array( 'include' => $ids ) ) : array();
+			} else {
+				$ids = ay_query_works( array( 'collection' => (array) $s['sq_col'], 'type' => (array) $s['sq_type'], 'featured' => 'yes' === $s['sq_featured'], 'exclude' => (array) $s['sq_exclude'], 'order' => $s['sq_order'], 'count' => max( 1, (int) $s['max'] ) ) );
+			}
+			foreach ( $ids as $id ) {
+				$w = ay_work( $id );
+				if ( ! $w ) {
+					continue;
+				}
+				$gal  = ay_work_gallery_ids( $id );
+				$pics = array();
+				foreach ( array( isset( $gal[1] ) ? $gal[1] : 0, isset( $gal[2] ) ? $gal[2] : 0, isset( $gal[0] ) ? $gal[0] : 0 ) as $k => $att ) {
+					$pics[] = array( $att ? wp_get_attachment_image( $att, 'large', false, array( 'alt' => $w['title'], 'loading' => 'lazy' ) ) : ( 2 === $k ? ay_work_img( $id, 'large' ) : '' ), $w['url'] );
+				}
+				if ( '' === $pics[0][0] ) {
+					$pics[0][0] = $pics[2][0];
+				}
+				if ( '' === $pics[1][0] ) {
+					$pics[1][0] = $pics[0][0];
+				}
+				$typ     = implode( ' · ', wp_list_pluck( $w['types'], 'name' ) );
+				$text    = 'long' === $s['f_text'] ? $w['desc'] : ( 'short' === $s['f_text'] ? ( has_excerpt( $id ) ? get_the_excerpt( $id ) : $this->words( $w['desc'], $s['f_words'] ) ) : '' );
+				$cards[] = array( 'key' => 'w:' . $id, 'id' => $id, 'title' => $w['title'], 'meta' => trim( implode( ' · ', wp_list_pluck( $w['collections'], 'name' ) ) . ( $w['collections'] && $typ ? ' · ' : '' ) . $typ ), 'eye' => $this->eyebrow( $s, $id ), 'text' => $text, 'btn' => $s['btn_work'], 'url' => $w['url'], 'specs' => $this->spec_rows( $s, $id ), 'vars' => ay_work_vars( $id ), 'halo' => ay_work_halo( $id ), 'pic' => $this->work_pic( $s, $id ), 'pics' => $pics );
 			}
 		} else {
-			$want = array_filter( array_map( 'absint', (array) $s['cols'] ) );
-			foreach ( ay_terms_ordered( 'ay_collection', true ) as $t ) {
+			$tax  = 'types' === $src ? 'ay_type' : 'ay_collection';
+			$want = array_filter( array_map( 'absint', (array) ( 'types' === $src ? $s['pick_types'] : $s['cols'] ) ) );
+			foreach ( ay_terms_ordered( $tax, true ) as $t ) {
 				if ( $want && ! in_array( (int) $t->term_id, $want, true ) ) {
 					continue;
 				}
-				$ids = ay_query_works( array( 'collection' => array( $t->term_id ) ) );
+				$ids = ay_query_works( array( 'types' === $src ? 'type' : 'collection' => array( $t->term_id ) ) );
 				if ( ! $ids ) {
 					continue;
 				}
@@ -233,39 +416,108 @@ class Stack extends Base {
 				foreach ( array( $small[0], $small[1], $tall ) as $pid ) {
 					$pics[] = array( ay_work_img( $pid, 'large' ), get_permalink( $pid ) );
 				}
-				$cards[] = array(
-					'title' => $t->name,
-					'meta'  => trim( $s['meta_word'] . ' · ' . count( $ids ) . ( 1 === count( $ids ) ? ' piece' : ' pieces' ), ' ·' ),
-					'btn'   => $s['btn_text'],
-					'url'   => get_term_link( $t ),
-					'pics'  => $pics,
-				);
+				$lead = $ids[0];
+				if ( 'rand' === $s['term_pic'] ) {
+					$lead = $ids[ array_rand( $ids ) ];
+				} elseif ( 'featured' === $s['term_pic'] ) {
+					foreach ( $ids as $pid ) {
+						if ( '1' === (string) get_post_meta( $pid, '_ay_featured', true ) ) {
+							$lead = $pid;
+							break;
+						}
+					}
+				}
+				$desc    = term_description( $t );
+				$text    = 'long' === $s['f_text'] ? $desc : ( 'short' === $s['f_text'] ? $this->words( $desc, $s['f_words'] ) : '' );
+				$meta    = trim( $s['meta_word'] . ' · ' . count( $ids ) . ( 1 === count( $ids ) ? ' piece' : ' pieces' ), ' ·' );
+				$cards[] = array( 'key' => ( 'types' === $src ? 't:' : 'c:' ) . $t->term_id, 'id' => 0, 'title' => $t->name, 'meta' => $meta, 'eye' => $meta, 'text' => $text, 'btn' => $s['btn_text'], 'url' => get_term_link( $t ), 'specs' => $this->spec_rows( $s, 0, count( $ids ) ), 'vars' => ay_work_vars( $lead ), 'halo' => ay_work_halo( $lead ), 'pic' => ay_work_img( $lead, 'large' ), 'pics' => $pics );
 				if ( count( $cards ) >= (int) $s['max'] ) {
 					break;
 				}
 			}
 		}
+		/* manual changes per card */
+		$out = array();
+		foreach ( $cards as $c ) {
+			$o = $c['key'] ? $this->override( $s, $c['key'] ) : array();
+			if ( ! empty( $o['hide'] ) && 'yes' === $o['hide'] ) {
+				continue;
+			}
+			foreach ( array( 'title' => 'title', 'eyebrow' => 'eye', 'btn' => 'btn' ) as $from => $to ) {
+				if ( isset( $o[ $from ] ) && '' !== trim( (string) $o[ $from ] ) ) {
+					$c[ $to ] = $o[ $from ];
+					if ( 'eye' === $to ) {
+						$c['meta'] = $o[ $from ];
+					}
+				}
+			}
+			if ( isset( $o['text'] ) && '' !== trim( (string) $o['text'] ) ) {
+				$c['text'] = wpautop( esc_html( $o['text'] ) );
+			}
+			if ( ! empty( $o['link']['url'] ) ) {
+				$c['url'] = $o['link']['url'];
+				foreach ( $c['pics'] as $k => $p ) {
+					$c['pics'][ $k ][1] = $o['link']['url'];
+				}
+			}
+			if ( ! empty( $o['image']['url'] ) ) {
+				$c['pic']        = $img( $o['image'], $c['title'] );
+				$c['pics'][2][0] = $c['pic'];
+			}
+			if ( isset( $o['specs'] ) && '' !== trim( (string) $o['specs'] ) ) {
+				foreach ( preg_split( '/\r?\n/', $o['specs'] ) as $line ) {
+					$parts = array_map( 'trim', explode( '|', $line, 2 ) );
+					if ( '' !== $parts[0] ) {
+						$c['specs'][] = array( $parts[0], isset( $parts[1] ) ? $parts[1] : '' );
+					}
+				}
+			}
+			$out[] = $c;
+		}
+		$cards = $out;
 		if ( ! $cards ) {
-			$this->empty_note( 'کارتی برای نمایش نیست. برای حالت خودکار، دست‌کم یک کالکشن با اثر لازم است.' );
+			$this->empty_note( 'کارتی برای نمایش نیست. منبع کارت‌ها را بررسی کنید (مثلاً برای «آثاری که انتخاب می‌کنم» دست‌کم یک اثر انتخاب کنید).' );
 			return;
 		}
 		$tag = in_array( $s['tag'], array( 'h2', 'h3', 'h4', 'div' ), true ) ? $s['tag'] : 'h3';
 		$cfg = array( 'step' => $this->size( $s['step'], 0.03 ), 'min' => $this->size( $s['min'], 0.8 ), 'range' => $this->size( $s['range'], 85 ) / 100 );
 		echo '<div class="ay-st" data-ay-stack="' . esc_attr( wp_json_encode( $cfg ) ) . '">';
 		foreach ( $cards as $i => $c ) {
-			$url = is_wp_error( $c['url'] ) ? '#' : $c['url'];
-			echo '<article class="ay-st-card" style="--i:' . (int) $i . '"><header class="ay-st-head">';
-			if ( 'yes' === $s['number'] ) {
-				echo '<span class="ay-st-num">' . esc_html( sprintf( '%02d', $i + 1 ) ) . '</span>';
+			$url  = is_wp_error( $c['url'] ) ? '#' : $c['url'];
+			$btn  = '' !== trim( (string) $c['btn'] ) ? '<a class="ay-st-btn" href="' . esc_url( $url ) . '">' . esc_html( $c['btn'] ) . '<span class="ay-arr" aria-hidden="true"></span></a>' : '';
+			$head = '<header class="ay-st-head">' . ( 'yes' === $s['number'] ? '<span class="ay-st-num">' . esc_html( sprintf( '%02d', $i + 1 ) ) . '</span>' : '' ) . '<' . $tag . ' class="ay-st-title">' . esc_html( $c['title'] ) . '</' . $tag . '>';
+			if ( ! $feature ) {
+				if ( 'yes' === $s['meta_on'] && '' !== trim( (string) $c['meta'] ) ) {
+					$head .= '<span class="ay-st-meta">' . esc_html( $c['meta'] ) . '</span>';
+				}
+				echo '<article class="ay-st-card" style="--i:' . (int) $i . '">' . $head . $btn . '</header><div class="ay-st-media"><div class="ay-st-small">' . $this->pic( $c['pics'][0][0], $c['pics'][0][1] ) . $this->pic( $c['pics'][1][0], $c['pics'][1][1] ) . '</div>' . $this->pic( $c['pics'][2][0], $c['pics'][2][1], 'ay-st-tall' ) . '</div></article>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				continue;
 			}
-			echo '<' . $tag . ' class="ay-st-title">' . esc_html( $c['title'] ) . '</' . $tag . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			if ( 'yes' === $s['meta_on'] && '' !== trim( (string) $c['meta'] ) ) {
-				echo '<span class="ay-st-meta">' . esc_html( $c['meta'] ) . '</span>';
+			/* mode 2: one picture and text */
+			$clamp = (int) $s['f_clamp'];
+			$pic   = $c['halo'] . $c['pic'];
+			echo '<article class="ay-st-card ay-st-feat" style="--i:' . (int) $i . ';' . esc_attr( $c['vars'] ) . ( $clamp ? '--ay-stf-clamp:' . $clamp . ';' : '' ) . '">';
+			echo 'yes' === $s['f_link_pic'] ? '<a class="ay-st-pic ay-stf-pic" href="' . esc_url( $url ) . '" tabindex="-1" aria-hidden="true">' . $pic . '</a>' : '<span class="ay-st-pic ay-stf-pic">' . $pic . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '<div class="ay-stf-body">';
+			if ( 'none' !== $s['f_eyebrow'] && '' !== trim( (string) $c['eye'] ) && 'yes' === $s['meta_on'] ) {
+				echo '<span class="ay-stf-eye">' . esc_html( $c['eye'] ) . '</span>';
 			}
-			if ( '' !== trim( (string) $c['btn'] ) ) {
-				echo '<a class="ay-st-btn" href="' . esc_url( $url ) . '">' . esc_html( $c['btn'] ) . '<span class="ay-arr" aria-hidden="true"></span></a>';
+			echo $head . ( 'head' === $s['f_btn_pos'] ? $btn : '' ) . '</header>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			if ( '' !== trim( wp_strip_all_tags( (string) $c['text'] ) ) ) {
+				echo '<div class="ay-stf-text' . ( $clamp ? ' is-clamp' : '' ) . '">' . wp_kses_post( false === strpos( (string) $c['text'], '<p' ) ? wpautop( $c['text'] ) : $c['text'] ) . '</div>';
 			}
-			echo '</header><div class="ay-st-media"><div class="ay-st-small">' . $this->pic( $c['pics'][0][0], $c['pics'][0][1] ) . $this->pic( $c['pics'][1][0], $c['pics'][1][1] ) . '</div>' . $this->pic( $c['pics'][2][0], $c['pics'][2][1], 'ay-st-tall' ) . '</div></article>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			if ( $c['specs'] ) {
+				echo '<dl class="ay-stf-specs">';
+				$max_m = isset( $s['f_specs_m'] ) && '' !== (string) $s['f_specs_m'] ? (int) $s['f_specs_m'] : 2;
+				foreach ( $c['specs'] as $k => $r ) {
+					echo '<div' . ( $k >= $max_m ? ' class="ay-stf-mh"' : '' ) . '><dt>' . esc_html( $r[0] ) . '</dt><dd>' . esc_html( $r[1] ) . '</dd></div>';
+				}
+				echo '</dl>';
+			}
+			if ( 'body' === $s['f_btn_pos'] ) {
+				echo $btn; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			}
+			echo '</div></article>';
 		}
 		echo '</div>';
 	}
@@ -380,7 +632,7 @@ class Archive extends Base {
 		};
 		$cfg = array( 'one' => $s['count_one'], 'many' => $s['count_many'] );
 		echo '<div class="ay-ar" data-ay-archive="' . esc_attr( wp_json_encode( $cfg ) ) . '">';
-		$filters = ( 'yes' === $s['f_col'] ? $row( 'col', $s['f_col_label'], 'ay_collection', $pre['collection'] ? $pre['collection'] : 'all' ) : '' ) . ( 'yes' === $s['f_type'] ? $row( 'type', $s['f_type_label'], 'ay_type', $pre['type'] ? $pre['type'] : 'all' ) : '' );
+		$filters = ( 'yes' === $s['f_col'] && ay_use_collections() ? $row( 'col', $s['f_col_label'], 'ay_collection', $pre['collection'] ? $pre['collection'] : 'all' ) : '' ) . ( 'yes' === $s['f_type'] ? $row( 'type', $s['f_type_label'], 'ay_type', $pre['type'] ? $pre['type'] : 'all' ) : '' );
 		if ( $filters ) {
 			$fs = in_array( $s['f_style'], array( 'capsule', 'box' ), true ) ? $s['f_style'] : 'text';
 			echo '<div class="ay-fl ay-fls-' . esc_attr( $fs ) . ( 'text' === $fs ? ' ay-fx-' . esc_attr( $fx ) : '' ) . '">' . $filters . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -444,9 +696,10 @@ class Related extends Base {
 		}
 		$args = array( 'count' => (int) $s['count'], 'exclude' => array( $cur ) );
 		$w    = ay_work( $cur );
-		if ( 'collection' === $s['by'] && $w['collections'] ) {
+		$by = 'collection' === $s['by'] && ! ay_use_collections() ? 'type' : $s['by'];
+		if ( 'collection' === $by && $w['collections'] ) {
 			$args['collection'] = wp_list_pluck( $w['collections'], 'term_id' );
-		} elseif ( 'type' === $s['by'] && $w['types'] ) {
+		} elseif ( 'type' === $by && $w['types'] ) {
 			$args['type'] = wp_list_pluck( $w['types'], 'term_id' );
 		}
 		$ids = ay_query_works( $args );

@@ -279,7 +279,8 @@ function ay_page_terms() {
 	ay_admin_head( 'دسته‌بندی‌ها', 'کالکشن‌ها و نوع‌ها را اضافه، حذف و تغییر نام دهید و با کشیدن، ترتیبشان را عوض کنید. همین ترتیب در فیلترهای سایت نمایش داده می‌شود.' );
 	echo '<div class="ay-grid">';
 	foreach ( array( 'ay_collection' => array( 'کالکشن‌ها', 'gem', 'مثلاً Ribbon' ), 'ay_type' => array( 'نوع‌ها', 'ring', 'مثلاً Earrings' ) ) as $tax => $info ) {
-		echo '<section class="ay-card"><h2>' . ay_icon( $info[1], 22 ) . '<span>' . esc_html( $info[0] ) . '</span></h2><ul class="ay-terms" data-tax="' . esc_attr( $tax ) . '">'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		$off = 'ay_collection' === $tax && ! ay_use_collections();
+		echo '<section class="ay-card' . ( $off ? ' ay-off' : '' ) . '">' . ( $off ? '<p class="ay-help ay-off-note">کالکشن‌ها خاموش‌اند و در سایت نمایش داده نمی‌شوند. <a href="' . esc_url( admin_url( 'admin.php?page=arezoo-settings&tab=works' ) ) . '">روشن کردن</a></p>' : '' ) . '<h2>' . ay_icon( $info[1], 22 ) . '<span>' . esc_html( $info[0] ) . '</span></h2><ul class="ay-terms" data-tax="' . esc_attr( $tax ) . '">'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		foreach ( ay_terms_ordered( $tax ) as $t ) {
 			echo '<li class="ay-term" data-id="' . (int) $t->term_id . '"><span class="ay-drag" title="بکشید">⋮⋮</span><input type="text" value="' . esc_attr( $t->name ) . '" dir="ltr" aria-label="نام"><span class="ay-count">' . (int) $t->count . ' اثر</span><button type="button" class="ay-x" aria-label="حذف">×</button></li>';
 		}
@@ -295,11 +296,32 @@ function ay_page_settings() {
 	if ( isset( $_POST['ay_settings_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ay_settings_nonce'] ) ), 'ay_settings' ) && current_user_can( 'manage_options' ) ) {
 		if ( 'contact' === $tab ) {
 			$cur = wp_parse_args( (array) get_option( 'arezoo_settings', array() ), ay_default_settings() );
-			foreach ( array( 'brand', 'instagram', 'telegram' ) as $k ) {
-				$cur[ $k ] = isset( $_POST[ $k ] ) ? sanitize_text_field( wp_unslash( $_POST[ $k ] ) ) : '';
+			$cur['brand']   = isset( $_POST['brand'] ) ? sanitize_text_field( wp_unslash( $_POST['brand'] ) ) : '';
+			$cur['site_en'] = empty( $_POST['site_en'] ) ? 0 : 1;
+			/* list of networks (any number, any order) */
+			$rows = array();
+			$nets = ay_social_networks();
+			if ( isset( $_POST['soc'] ) && is_array( $_POST['soc'] ) ) {
+				foreach ( wp_unslash( $_POST['soc'] ) as $r ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+					$net = isset( $r['net'] ) && isset( $nets[ $r['net'] ] ) ? sanitize_key( $r['net'] ) : 'custom';
+					$val = isset( $r['value'] ) ? trim( sanitize_text_field( $r['value'] ) ) : '';
+					if ( '' === $val ) {
+						continue;
+					}
+					$rows[] = array( 'net' => $net, 'value' => $val, 'label' => isset( $r['label'] ) ? sanitize_text_field( $r['label'] ) : '', 'icon' => isset( $r['icon'] ) ? absint( $r['icon'] ) : 0, 'on' => empty( $r['on'] ) ? 0 : 1 );
+				}
 			}
-			$cur['email']      = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
-			$cur['site_en']    = empty( $_POST['site_en'] ) ? 0 : 1;
+			update_option( 'arezoo_socials', array_slice( $rows, 0, 40 ) );
+			/* the first e-mail / Instagram / Telegram are also kept in the old fields */
+			foreach ( array( 'email', 'instagram', 'telegram' ) as $k ) {
+				$cur[ $k ] = '';
+				foreach ( $rows as $r ) {
+					if ( $k === $r['net'] ) {
+						$cur[ $k ] = $r['value'];
+						break;
+					}
+				}
+			}
 			update_option( 'arezoo_settings', $cur );
 		} elseif ( 'works' === $tab ) {
 			$d = ay_halo_defaults();
@@ -310,6 +332,9 @@ function ay_page_settings() {
 			}
 			$h['anim'] = isset( $_POST['halo_anim'] ) && in_array( $_POST['halo_anim'], array( 'breathe', 'pulse', 'none' ), true ) ? sanitize_key( $_POST['halo_anim'] ) : 'breathe';
 			update_option( 'arezoo_halo', $h );
+			$cur                    = wp_parse_args( (array) get_option( 'arezoo_settings', array() ), ay_default_settings() );
+			$cur['use_collections'] = empty( $_POST['use_collections'] ) ? 0 : 1;
+			update_option( 'arezoo_settings', $cur );
 		} else {
 			$d = ay_wallpaper_defaults();
 			$w = array( 'on' => empty( $_POST['on'] ) ? 0 : 1, 'mobile' => empty( $_POST['mobile'] ) ? 0 : 1 );
@@ -348,15 +373,36 @@ function ay_page_settings() {
 	if ( 'contact' === $tab ) {
 		echo '<section class="ay-card"><h2>' . ay_icon( 'user', 22 ) . '<span>برند</span></h2>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		$field( 'brand', 'نام برند', ay_opt( 'brand' ), 'کنار لوگو در هدر و فوتر نمایش داده می‌شود.' );
-		echo '</section><section class="ay-card"><h2>' . ay_icon( 'mail', 22 ) . '<span>راه‌های تماس</span></h2><p class="ay-help">این نشانی‌ها یک بار این‌جا وارد می‌شوند و در صفحهٔ تماس، فوتر و نوار پایین استفاده می‌شوند. شماره تلفن عمداً وجود ندارد.</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		$field( 'email', 'ایمیل', ay_opt( 'email' ), '', 'email' );
-		$field( 'instagram', 'اینستاگرام', ay_opt( 'instagram' ), 'شناسه بدون @ یا نشانی کامل صفحه' );
-		$field( 'telegram', 'تلگرام', ay_opt( 'telegram' ), 'شناسه بدون @ یا نشانی کامل' );
+		echo '</section><section class="ay-card"><h2>' . ay_icon( 'mail', 22 ) . '<span>شبکه‌های اجتماعی و راه‌های تماس</span></h2><p class="ay-help ay-help-old" hidden>این نشانی‌ها یک بار این‌جا وارد می‌شوند و در صفحهٔ تماس، فوتر و نوار پایین استفاده می‌شوند. شماره تلفن عمداً وجود ندارد.</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		$nets = ay_social_networks();
+		$row  = function ( $i, $r ) use ( $nets ) {
+			$r   = wp_parse_args( $r, array( 'net' => 'instagram', 'value' => '', 'label' => '', 'icon' => 0, 'on' => 1 ) );
+			$img = $r['icon'] ? wp_get_attachment_image_url( absint( $r['icon'] ), 'thumbnail' ) : '';
+			$o   = '<li class="ay-soc" data-i="' . esc_attr( $i ) . '"><span class="ay-drag" title="بکشید">⋮⋮</span>';
+			$o  .= '<span class="ay-soc-ic" data-icon="' . esc_attr( $nets[ $r['net'] ][1] ?? 'link' ) . '">' . ( $img ? '<img src="' . esc_url( $img ) . '" alt="">' : ay_icon( $nets[ $r['net'] ][1] ?? 'link', 20 ) ) . '</span>';
+			$o  .= '<select name="soc[' . esc_attr( $i ) . '][net]" class="ay-soc-net" aria-label="شبکه">';
+			foreach ( $nets as $k => $n ) {
+				$o .= '<option value="' . esc_attr( $k ) . '" data-icon="' . esc_attr( $n[1] ) . '" data-ph="' . esc_attr( $n[3] ) . '" ' . selected( $r['net'], $k, false ) . '>' . esc_html( $n[0] ) . '</option>';
+			}
+			$o .= '</select><input type="text" dir="ltr" class="ay-soc-val" name="soc[' . esc_attr( $i ) . '][value]" value="' . esc_attr( $r['value'] ) . '" placeholder="' . esc_attr( $nets[ $r['net'] ][3] ?? '' ) . '" aria-label="نشانی یا شناسه">';
+			$o .= '<input type="text" dir="ltr" name="soc[' . esc_attr( $i ) . '][label]" value="' . esc_attr( $r['label'] ) . '" placeholder="عنوان (اختیاری)" aria-label="عنوان">';
+			$o .= '<input type="hidden" class="ay-soc-icon" name="soc[' . esc_attr( $i ) . '][icon]" value="' . (int) $r['icon'] . '"><button type="button" class="button ay-soc-pick" title="آیکون دلخواه (PNG یا SVG بدون پس‌زمینه)">آیکون</button>';
+			$o .= '<label class="ay-soc-on"><input type="checkbox" name="soc[' . esc_attr( $i ) . '][on]" value="1" ' . checked( ! empty( $r['on'] ), true, false ) . '> نمایش</label><button type="button" class="ay-x ay-soc-x" aria-label="حذف">×</button></li>';
+			return $o;
+		};
+		echo '<p class="ay-help">هر تعداد شبکه که بخواهید اضافه کنید، با کشیدن ترتیبشان را عوض کنید یا حذفشان کنید. همین فهرست در صفحهٔ تماس، فوتر و نوار پایین (هر جا «شبکه‌های سایت» انتخاب شده باشد) استفاده می‌شود. برای هر کدام می‌توانید آیکون دلخواه بگذارید؛ رنگ آیکون خودکار هم‌رنگ سایت می‌شود.</p><ul class="ay-socs" id="aySocs">';
+		foreach ( ay_social_rows() as $i => $r ) {
+			echo $row( (int) $i, $r ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+		echo '</ul><p><button type="button" class="button button-primary" id="aySocAdd">+ افزودن شبکه</button></p><script type="text/template" id="aySocTpl">' . $row( '__i__', array() ) . '</script>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo '<script type="text/template" id="aySocIcons">' . esc_html( wp_json_encode( array_map( function ( $n ) { return ay_icon( $n[1], 20 ); }, $nets ) ) ) . '</script>';
 		echo '</section><section class="ay-card"><h2>' . ay_icon( 'tool', 22 ) . '<span>زبان و پیشخوان</span></h2>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo '<label class="ay-check"><input type="checkbox" name="site_en" value="1" ' . checked( (bool) ay_opt( 'site_en' ), true, false ) . '> <span><strong>سایت همیشه انگلیسی و چپ‌چین باشد</strong><br>حتی اگر زبان وردپرس فارسی باشد. پیشخوان آرزو همیشه فارسی است.</span></label>';
 		echo '</section>';
 	} elseif ( 'works' === $tab ) {
 		$h     = ay_halo_settings();
+		echo '<section class="ay-card"><h2>' . ay_icon( 'list', 22 ) . '<span>کالکشن‌ها</span></h2>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo '<label class="ay-check"><input type="checkbox" name="use_collections" value="1" ' . checked( ay_use_collections(), true, false ) . '> <span><strong>آثار در کالکشن دسته‌بندی شوند</strong><br>خاموش: در هیچ جای سایت کالکشن نمایش داده نمی‌شود (فیلتر صفحهٔ کالکشن، زیر کارت‌ها، مشخصات و مسیر بالای صفحهٔ هر اثر که می‌شود «Collections / نام اثر»)، و در صفحهٔ افزودن اثر گزینهٔ کالکشن غیرفعال می‌شود. «نوع» (انگشتر، گردنبند، ست، گوشواره…) همچنان کار می‌کند. کالکشن‌ها و آثار پاک نمی‌شوند؛ با روشن کردن دوباره همه برمی‌گردند.</span></label></section>';
 		$range = function ( $id, $label, $value, $min, $max, $step, $unit, $help = '' ) {
 			echo '<label class="ay-f ay-range" for="ay_' . esc_attr( $id ) . '"><span>' . esc_html( $label ) . ' <output>' . esc_html( $value . $unit ) . '</output></span><input type="range" id="ay_' . esc_attr( $id ) . '" name="' . esc_attr( $id ) . '" value="' . esc_attr( $value ) . '" min="' . esc_attr( $min ) . '" max="' . esc_attr( $max ) . '" step="' . esc_attr( $step ) . '" data-unit="' . esc_attr( $unit ) . '">' . ( $help ? '<em>' . esc_html( $help ) . '</em>' : '' ) . '</label>';
 		};

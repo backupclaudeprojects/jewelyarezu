@@ -186,3 +186,18 @@ div.ay-motif>label{width:100%;align-items:center}
 @keyframes ayLookB{from{transform:scale(.92)}to{transform:scale(1.06)}}
 @keyframes ayLookL{0%{background-position:120% 0}60%,100%{background-position:-60% 0}}
 @media (max-width:900px){.ay-look-grid{grid-template-columns:minmax(0,1fr)}.ay-look-prev{position:static;max-width:280px}}
+
+/* networks list */
+.ay-socs{list-style:none;margin:10px 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.ay-soc{display:grid;grid-template-columns:22px 34px 130px minmax(160px,1fr) 150px auto auto 28px;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.ay-soc input[type=text]{width:100%;min-width:0}
+.ay-soc-ic{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#0B1421;color:#DFDFDF;cursor:default}
+.ay-soc-ic img{width:20px;height:20px;object-fit:contain;filter:invert(1) brightness(1.4)}
+.ay-soc-on{display:flex;align-items:center;gap:4px;white-space:nowrap;font-size:12px}
+@media (max-width:1100px){.ay-soc{grid-template-columns:22px 34px 1fr 1fr;}.ay-soc>input[name$="[label]"],.ay-soc-pick,.ay-soc-on,.ay-soc-x{grid-column:auto}}
+
+/* collections switched off */
+.ay-card.ay-off>*:not(.ay-off-note){opacity:.4;pointer-events:none}
+.ay-off-note{color:#b32d2e!important}
+body.ay-no-collections #ay_collectiondiv .inside{opacity:.4;pointer-events:none;user-select:none}
+body.ay-no-collections #ay_collectiondiv h2::after{content:" (خاموش)";font-weight:400;color:#b32d2e}

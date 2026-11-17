@@ -13,6 +13,7 @@ use Elementor\Group_Control_Typography;
 use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Css_Filter;
+use Elementor\Repeater;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -222,6 +223,35 @@ abstract class Base extends \Elementor\Widget_Base {
 	/** Static halo behind each piece; colour per work in its edit screen, site-wide default in «آرزو ← تنظیمات ← ظاهر آثار». */
 	protected function halo_switch() {
 		$this->sw( 'w_halo', 'هالهٔ ثابت پشت هر اثر', 'yes', array( 'prefix_class' => 'ay-wh-', 'separator' => 'before', 'description' => 'رنگ و شدت هر اثر در صفحهٔ ویرایش همان اثر؛ پیش‌فرض و خاموش کردن برای کل سایت در «آرزو ← تنظیمات ← ظاهر آثار».' ) );
+	}
+
+	/** Choices for an icon picker: every line icon of the plugin. */
+	protected function icon_options( $none = true ) {
+		$out = $none ? array( '' => 'بدون آیکون' ) : array();
+		foreach ( array_keys( ay_icons() ) as $k ) {
+			$out[ $k ] = $k;
+		}
+		return $out;
+	}
+
+	/** Icon of a repeater row: Elementor icon library, else an uploaded picture, else a line icon. */
+	protected function row_icon( $row, $size = 20 ) {
+		if ( ! empty( $row['icon_lib']['value'] ) && class_exists( '\\Elementor\\Icons_Manager' ) ) {
+			ob_start();
+			\Elementor\Icons_Manager::render_icon( $row['icon_lib'], array( 'aria-hidden' => 'true', 'class' => 'ay-ic ay-ic-lib' ) );
+			return '<span class="ay-ic-wrap" style="--s:' . (int) $size . 'px">' . ob_get_clean() . '</span>';
+		}
+		if ( ! empty( $row['icon_img']['url'] ) ) {
+			return ay_social_icon( array( 'img' => $row['icon_img']['url'] ), $size );
+		}
+		return ! empty( $row['icon'] ) ? ay_icon( $row['icon'], $size ) : '';
+	}
+
+	/** Repeater fields for an icon: line icon, icon library or own picture. */
+	protected function icon_fields( Repeater $rep, $default = 'link', $label = 'آیکون' ) {
+		$rep->add_control( 'icon', array( 'label' => $label . ' (از آیکون‌های آرزو)', 'type' => CM::SELECT, 'options' => $this->icon_options(), 'default' => $default ) );
+		$rep->add_control( 'icon_lib', array( 'label' => 'یا آیکون از کتابخانهٔ المنتور / فایل SVG', 'type' => CM::ICONS, 'skin' => 'inline', 'label_block' => false ) );
+		$rep->add_control( 'icon_img', array( 'label' => 'یا تصویر دلخواه (PNG/SVG بدون پس‌زمینه، هم‌رنگ سایت می‌شود)', 'type' => CM::MEDIA ) );
 	}
 
 	protected function in_editor() {

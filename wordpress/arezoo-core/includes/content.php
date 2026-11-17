@@ -35,7 +35,7 @@ function ay_register_content() {
 		'show_in_rest'  => false,
 		'has_archive'   => false,
 		'menu_icon'     => 'dashicons-star-filled',
-		'supports'      => array( 'title', 'editor', 'thumbnail', 'page-attributes' ),
+		'supports'      => array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes' ),
 		'rewrite'       => array( 'slug' => 'work', 'with_front' => false ),
 	) );
 
@@ -451,3 +451,37 @@ add_filter( 'body_class', function ( $classes ) {
 	}
 	return $classes;
 } );
+
+/* Collections switched off: the box in the work editor is greyed out and its column leaves the list. */
+add_filter( 'admin_body_class', function ( $classes ) {
+	return ay_use_collections() ? $classes : $classes . ' ay-no-collections';
+} );
+add_action( 'add_meta_boxes_ay_work', function () {
+	if ( ! ay_use_collections() ) {
+		add_action( 'admin_footer', function () {
+			echo '<script>(function(){var b=document.querySelector("#ay_collectiondiv .inside");if(!b)return;b.querySelectorAll("input").forEach(function(i){i.disabled=true});var p=document.createElement("p");p.className="description";p.style.cssText="opacity:1;color:#b32d2e;margin:8px 0 0";p.textContent="کالکشن‌ها خاموش‌اند (آرزو ← تنظیمات ← ظاهر آثار).";b.parentNode.appendChild(p)})();</script>';
+		} );
+	}
+}, 20 );
+add_filter( 'manage_edit-ay_work_columns', function ( $cols ) {
+	if ( ! ay_use_collections() ) {
+		unset( $cols['taxonomy-ay_collection'] );
+	}
+	return $cols;
+}, 20 );
+
+/* When collections are off, saving a work never clears the collections it already had. */
+add_filter( 'wp_insert_post_data', function ( $data, $postarr ) {
+	if ( ! ay_use_collections() && isset( $postarr['post_type'] ) && 'ay_work' === $postarr['post_type'] && isset( $_POST['tax_input'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		unset( $_POST['tax_input']['ay_collection'] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+	}
+	return $data;
+}, 10, 2 );
+
+/* The WordPress excerpt box is this work's short description (used by the stacked cards and other short texts). */
+add_action( 'add_meta_boxes_ay_work', function () {
+	global $wp_meta_boxes;
+	if ( isset( $wp_meta_boxes['ay_work']['normal']['core']['postexcerpt'] ) ) {
+		$wp_meta_boxes['ay_work']['normal']['core']['postexcerpt']['title'] = 'توضیح کوتاه (اختیاری، به انگلیسی)';
+	}
+}, 99 );

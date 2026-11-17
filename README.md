@@ -7,7 +7,7 @@
 
 ## قالب و افزونه
 
-- `dist/arezoo-core-1.4.0.zip` افزونهٔ همراه و `dist/arezoo-theme-1.4.0.zip` قالب.
+- `dist/arezoo-core-1.5.0.zip` افزونهٔ همراه و `dist/arezoo-theme-1.5.0.zip` قالب.
 - راهنمای نصب: `wordpress/arezoo-core/docs/01-install-fa.md`
 - راهنمای ویرایش: `wordpress/arezoo-core/docs/02-editing-fa.md`
 - گزارش تست: `wordpress/arezoo-core/docs/03-test-report-fa.md`
