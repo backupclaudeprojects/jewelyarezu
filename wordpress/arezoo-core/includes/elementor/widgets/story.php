@@ -45,8 +45,8 @@ class Story extends Base {
 		$this->media( 'image', 'عکس شما', ay_asset( 'img/studio/11-at-work.webp' ) );
 		$this->sel( 'style', 'سبک', array( 'arch' => 'کلاسیک: قاب طاقی با خط‌های ظریف', 'gallery' => 'گالری: قاب موزه‌ای با پاسپارتو' ), 'arch', array( 'prefix_class' => 'ay-sy-' ) );
 		$this->sel( 'side', 'جای پرتره', array( 'left' => 'چپ', 'right' => 'راست' ), 'left', array( 'prefix_class' => 'ay-sy-side-' ) );
-		$this->sw( 'sticky', 'پرتره هنگام اسکرول چسبان بماند', 'yes' );
-		$this->cssvar( 'top', 'فاصلهٔ پرتره از بالای صفحه', '--ay-sy-top', 0, 300, 1, 110, 'px', array( 'condition' => array( 'sticky' => 'yes' ) ) );
+		$this->sw( 'sy_pin', 'پرتره هنگام اسکرول چسبان بماند', 'yes' );
+		$this->cssvar( 'top', 'فاصلهٔ پرتره از بالای صفحه', '--ay-sy-top', 0, 300, 1, 110, 'px', array( 'condition' => array( 'sy_pin' => 'yes' ) ) );
 		$this->cssvar( 'photo_w', 'سهم ستون پرتره', '--ay-sy-mw', 25, 60, 1, 40, '%' );
 		$this->cssvar( 'gap', 'فاصلهٔ دو ستون', '--ay-sy-gap', 0, 180, 2, 96 );
 		$this->add_control( 'aspect', array( 'label' => 'نسبت قاب (عرض ÷ ارتفاع)', 'type' => CM::SLIDER, 'range' => array( 'px' => array( 'min' => 0.5, 'max' => 1.4, 'step' => 0.01 ) ), 'default' => array( 'size' => 0.76 ), 'selectors' => array( '{{WRAPPER}}' => '--ay-sy-aspect: {{SIZE}};' ) ) );
@@ -114,7 +114,7 @@ class Story extends Base {
 		} ) );
 		$tag = in_array( $s['tag'], array( 'h2', 'h3', 'h4', 'div' ), true ) ? $s['tag'] : 'h2';
 		$n   = count( $ch );
-		echo '<div class="ay-sy' . ( 'yes' === $s['sticky'] ? ' ay-sy-sticky' : '' ) . '" data-ay-story="1"><div class="ay-sy-media"><div class="ay-sy-stick">';
+		echo '<div class="ay-sy' . ( 'yes' === $s['sy_pin'] ? ' ay-sy-sticky' : '' ) . '" data-ay-story="1"><div class="ay-sy-media"><div class="ay-sy-stick">';
 		if ( 'yes' === $s['ornament'] ) {
 			echo '<svg class="ay-sy-orn" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><circle cx="100" cy="100" r="96" fill="none" stroke="currentColor" stroke-width=".4" stroke-dasharray="1 4"/><circle cx="100" cy="100" r="88" fill="none" stroke="currentColor" stroke-width=".3"/><g fill="none" stroke="currentColor" stroke-width=".4">';
 			for ( $i = 0; $i < 24; $i++ ) {

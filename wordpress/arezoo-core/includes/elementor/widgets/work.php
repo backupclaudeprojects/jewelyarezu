@@ -40,8 +40,8 @@ class Work_Gallery extends Base {
 		$this->cssvar( 'gap', 'فاصله‌ها', '--ay-wg-gap', 0, 40, 1, 12 );
 		$this->add_responsive_control( 'columns', array( 'label' => 'تعداد ستون شبکه', 'type' => CM::NUMBER, 'min' => 1, 'max' => 5, 'default' => 2, 'selectors' => array( '{{WRAPPER}}' => '--ay-wg-cols: {{VALUE}};' ), 'condition' => array( 'layout' => 'grid' ) ) );
 		$this->sw( 'lightbox', 'بزرگ‌نمایی با کلیک (لایت‌باکس المنتور)', 'yes' );
-		$this->sw( 'sticky', 'ثابت ماندن هنگام اسکرول (در دسکتاپ)', 'yes', array( 'prefix_class' => 'ay-wg-sticky-' ) );
-		$this->cssvar( 'sticky_top', 'فاصله از بالای صفحه هنگام ثابت ماندن', '--ay-wg-top', 0, 300, 1, 104, 'px', array( 'condition' => array( 'sticky' => 'yes' ) ) );
+		$this->sw( 'wg_pin', 'ثابت ماندن هنگام اسکرول (در دسکتاپ)', 'yes', array( 'prefix_class' => 'ay-wg-sticky-' ) );
+		$this->cssvar( 'sticky_top', 'فاصله از بالای صفحه هنگام ثابت ماندن', '--ay-wg-top', 0, 300, 1, 104, 'px', array( 'condition' => array( 'wg_pin' => 'yes' ) ) );
 		$this->halo_switch();
 		$this->done();
 		$this->sec( 'st_main', 'قاب‌ها', true );

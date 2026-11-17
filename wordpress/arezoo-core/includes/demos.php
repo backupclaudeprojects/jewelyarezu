@@ -145,16 +145,16 @@ function ay_demo_single( $v = 1 ) {
 			$main = ay_band( array( ay_row( array( $half( $info(), 48 ), $half( array( $gallery( 'side' ) ), 52 ) ), array( 'flex_gap' => ay_gap( 72 ), 'flex_direction_mobile' => 'column-reverse' ) ) ), $top );
 			break;
 		case 3:
-			$main = ay_band( array( ay_col( array( $crumbs, $title, $desc ), array( 'flex_align_items' => 'center', 'flex_gap' => ay_gap( 16 ) ) ), $gallery( 'strip', array( 'sticky' => '' ) ), $specs( 3 ), $nav ), array_merge( $top, array( 'flex_gap' => ay_gap( 40 ) ) ) );
+			$main = ay_band( array( ay_col( array( $crumbs, $title, $desc ), array( 'flex_align_items' => 'center', 'flex_gap' => ay_gap( 16 ) ) ), $gallery( 'strip', array( 'wg_pin' => '' ) ), $specs( 3 ), $nav ), array_merge( $top, array( 'flex_gap' => ay_gap( 40 ) ) ) );
 			$main['elements'][0]['elements'][1]['settings']['align'] = 'center';
 			$main['elements'][0]['elements'][0]['settings']['align'] = 'center';
 			$main['elements'][0]['elements'][2]['settings']['align'] = 'center';
 			break;
 		case 4:
-			$main = ay_band( array( ay_row( array( $half( array( $gallery( 'grid', array( 'sticky' => '', 'columns' => 2 ) ) ), 58 ), $half( $info( 1 ), 42 ) ), array( 'flex_gap' => ay_gap( 64 ) ) ) ), $top );
+			$main = ay_band( array( ay_row( array( $half( array( $gallery( 'grid', array( 'wg_pin' => '', 'columns' => 2 ) ) ), 58 ), $half( $info( 1 ), 42 ) ), array( 'flex_gap' => ay_gap( 64 ) ) ) ), $top );
 			break;
 		case 5:
-			$main = ay_band( array( ay_col( array( $crumbs, $title ), array( 'flex_gap' => ay_gap( 12 ) ) ), $gallery( 'stage', array( 'sticky' => '', 'aspect' => ay_px( 1.9 ) ) ), ay_row( array( $half( array( $desc, $nav ), 46 ), $half( array( $specs( 2 ) ), 54 ) ), array( 'flex_gap' => ay_gap( 64 ) ) ) ), array_merge( $top, array( 'flex_gap' => ay_gap( 36 ) ) ) );
+			$main = ay_band( array( ay_col( array( $crumbs, $title ), array( 'flex_gap' => ay_gap( 12 ) ) ), $gallery( 'stage', array( 'wg_pin' => '', 'aspect' => ay_px( 1.9 ) ) ), ay_row( array( $half( array( $desc, $nav ), 46 ), $half( array( $specs( 2 ) ), 54 ) ), array( 'flex_gap' => ay_gap( 64 ) ) ) ), array_merge( $top, array( 'flex_gap' => ay_gap( 36 ) ) ) );
 			break;
 		default:
 			$main = ay_band( array( ay_row( array( $half( array( $gallery( 'stage' ) ), 52 ), $half( $info(), 48 ) ), array( 'flex_gap' => ay_gap( 72 ) ) ) ), $top );

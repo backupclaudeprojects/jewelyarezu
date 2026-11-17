@@ -121,8 +121,8 @@ class Process extends Base {
 		$this->cssvar( 'media_w', 'سهم ستون عکس', '--ay-pr-mw', 25, 70, 1, 46, '%' );
 		$this->cssvar( 'gap', 'فاصلهٔ دو ستون', '--ay-pr-gap', 0, 160, 2, 80 );
 		$this->cssvar( 'step_h', 'ارتفاع هر مرحله هنگام اسکرول', '--ay-pr-step', 30, 120, 1, 70, 'vh' );
-		$this->sw( 'sticky', 'قاب عکس هنگام اسکرول ثابت بماند', 'yes', array( 'prefix_class' => 'ay-pr-sticky-' ) );
-		$this->cssvar( 'top', 'فاصلهٔ قاب از بالای صفحه', '--ay-pr-top', 0, 300, 1, 110, 'px', array( 'condition' => array( 'sticky' => 'yes' ) ) );
+		$this->sw( 'pr_pin', 'قاب عکس هنگام اسکرول چسبان بماند', 'yes', array( 'prefix_class' => 'ay-pr-sticky-', 'description' => 'قاب تا پایان مرحلهٔ آخر روی صفحه می‌ماند (در عرض ۷۶۸ پیکسل و بیشتر).' ) );
+		$this->cssvar( 'top', 'فاصلهٔ قاب از بالای صفحه', '--ay-pr-top', 0, 300, 1, 110, 'px', array( 'condition' => array( 'pr_pin' => 'yes' ) ) );
 		$this->done();
 
 		$this->sec( 's_extras', 'جزئیات متحرک' );
