@@ -682,9 +682,23 @@ body .ay-cd-yes .ay-card-pic.is-live img{transition:translate .1s linear,transfo
 .ay-cg-yes .ay-card-pic::before{content:"";position:absolute;inset:-12%;z-index:0;pointer-events:none;opacity:0;transition:opacity .6s;translate:calc(var(--mx,0)*var(--ay-cd-k,12)*.8px) calc(var(--my,0)*var(--ay-cd-k,12)*.8px);
   background:radial-gradient(circle at var(--gx,50%) var(--gy,50%),color-mix(in srgb,var(--ay-cg-c,var(--ay-accent)) calc(var(--ay-cg-op,.55)*100%),transparent) 0%,transparent var(--ay-cg-size,58%));filter:blur(var(--ay-cg-blur,14px))}
 .ay-cg-yes .ay-card-pic.is-live::before,.ay-cg-always-yes .ay-card-pic::before{opacity:1}
-.ay-cgl-yes .ay-card-pic::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;transition:opacity .5s;border-radius:inherit;mix-blend-mode:soft-light;
-  background:radial-gradient(circle at var(--gx,30%) var(--gy,20%),rgba(255,255,255,var(--ay-cgl-op,.6)),transparent 42%),linear-gradient(calc(110deg + var(--mx,0)*40deg),transparent 40%,rgba(255,255,255,calc(var(--ay-cgl-op,.6)*.5)) 50%,transparent 60%)}
+.ay-cgl-yes .ay-card-pic::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;transition:opacity .5s;border-radius:inherit;mix-blend-mode:var(--ay-cgl-blend,soft-light);
+  background:radial-gradient(circle at var(--gx,30%) var(--gy,20%),color-mix(in srgb,var(--ay-cgl-c,#fff) calc(var(--ay-cgl-op,.6)*100%),transparent),transparent 42%),linear-gradient(calc(110deg + var(--mx,0)*40deg),transparent 40%,color-mix(in srgb,var(--ay-cgl-c,#fff) calc(var(--ay-cgl-op,.6)*50%),transparent) 50%,transparent 60%)}
 .ay-cgl-yes .ay-card-pic.is-live::after{opacity:1}
+
+/* ======================================================= halo behind each piece */
+.ay-wh-l{position:absolute;z-index:0;inset:var(--ay-wh-in,15%);border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--ay-wh,var(--ay-wh-g,var(--ay-accent))) calc(var(--ay-wh-op,var(--ay-wh-gop,.38))*100%),transparent),color-mix(in srgb,var(--ay-wh,var(--ay-wh-g,var(--ay-accent))) calc(var(--ay-wh-op,var(--ay-wh-gop,.38))*35%),transparent) 55%,transparent);
+  filter:blur(var(--ay-wh-blur,26px));transition:transform .9s var(--ay-ease),opacity .6s}
+[class*="elementor-widget-ay-"]:not(.ay-wh-yes) .ay-wh-l{display:none}
+body .ay-card-pic img,body .ay-hz-tile img,body .ay-wg-stage .ay-wg-zoom{z-index:1}
+.ay-wg-stage .ay-wg-slide{z-index:1}.ay-wg-stage .ay-wg-slide.is-on{z-index:2}
+.ay-hz-cap{z-index:2}
+.ay-card:hover .ay-wh-l,.ay-hz-tile:hover .ay-wh-l{transform:scale(1.1)}
+body.ay-wh-breathe .ay-wh-l{animation:ayWhBreathe 7s ease-in-out infinite alternate}
+body.ay-wh-pulse .ay-wh-l{animation:ayWhPulse 3.6s ease-in-out infinite alternate}
+@keyframes ayWhBreathe{from{scale:.92}to{scale:1.06}}
+@keyframes ayWhPulse{from{opacity:.55}to{opacity:1}}
 
 /* ====================================== filters inside a glass capsule / glass box with a sliding marker */
 .ay-fls-capsule,.ay-fls-box{border:0;padding-block:6px;gap:14px;align-items:var(--ay-fl-align,flex-start)}
@@ -913,7 +927,7 @@ html.ay-lock{overflow:hidden}
 @media (prefers-reduced-motion:reduce){
   .ay-hz{overflow-x:auto}
   .ay-st-card{transform:none!important}
-  .ay-mo *,.ay-wash-move-yes .ay-sp::before,[class*="ay-loop-"],.ay-halo-l,.ay-shine-l::before,.ay-strip-track,.ay-sk-wrap,[class*="ay-skbg-"]::after,.ay-pr-pen .ay-pen,.ay-hs-layer,.ay-card,.ay-pr-shot,body .ay-pr-shot img{animation:none!important}
+  .ay-mo *,.ay-wh-l,.ay-wash-move-yes .ay-sp::before,[class*="ay-loop-"],.ay-halo-l,.ay-shine-l::before,.ay-strip-track,.ay-sk-wrap,[class*="ay-skbg-"]::after,.ay-pr-pen .ay-pen,.ay-hs-layer,.ay-card,.ay-pr-shot,body .ay-pr-shot img{animation:none!important}
   .ay-mo .d{stroke-dashoffset:0}.ay-mo .wash{opacity:.4}.ay-mo .dim,.ay-mo .sw,.ay-mo .tile,.ay-mo .facet-in{opacity:1}.ay-mo .bar{stroke-dashoffset:0}.ay-mo .scan,.ay-mo .sweep{display:none}.ay-mo .pen-path{display:none}
   .ay-strip{overflow-x:auto}
   html.ay-js [class*="ay-rv-"]{opacity:1!important;transform:none!important;clip-path:none!important;filter:none!important}

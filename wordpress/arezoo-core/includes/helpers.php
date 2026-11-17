@@ -270,9 +270,15 @@ function ay_query_works( $args = array() ) {
 	return get_posts( $q );
 }
 
+/** The picture that stands for a work: its main image, or else the first picture of its gallery. */
+function ay_work_cover_id( $id ) {
+	$ids = ay_work_gallery_ids( $id );
+	return $ids ? (int) $ids[0] : 0;
+}
+
 /** <img> for a work (whole piece visible, never cropped). */
 function ay_work_img( $id, $size = 'large', $attr = array() ) {
-	$thumb = (int) get_post_thumbnail_id( $id );
+	$thumb = ay_work_cover_id( $id );
 	if ( ! $thumb ) {
 		return '';
 	}
@@ -386,4 +392,60 @@ function ay_wallpaper_config() {
 		'color'    => $w['color'] ? ay_hex( $w['color'] ) : '',
 		'mobile'   => ! empty( $w['mobile'] ),
 	);
+}
+
+/* --------------------------------------------- how each work looks on the site */
+/** Site-wide halo behind the pieces (آرزو ← تنظیمات ← ظاهر آثار). */
+function ay_halo_defaults() {
+	return array(
+		'on'    => 1,
+		'color' => '',    // empty = accent colour of the colour theme
+		'op'    => 38,    // percent
+		'size'  => 70,    // percent of the picture frame
+		'blur'  => 26,    // px
+		'anim'  => 'breathe',
+	);
+}
+
+function ay_halo_settings() {
+	return wp_parse_args( (array) get_option( 'arezoo_halo', array() ), ay_halo_defaults() );
+}
+
+/** Colours chosen for one work in its edit screen (empty = the widget's or the site's colour). */
+function ay_work_look( $id ) {
+	$raw = json_decode( (string) get_post_meta( $id, '_ay_look', true ), true );
+	return wp_parse_args( is_array( $raw ) ? $raw : array(), array( 'halo' => '', 'halo_op' => '', 'halo_off' => 0, 'glow' => '', 'line' => '', 'wash' => '', 'wash2' => '' ) );
+}
+
+/** Should the halo be drawn behind this work? */
+function ay_work_halo_on( $id ) {
+	$g = ay_halo_settings();
+	if ( empty( $g['on'] ) ) {
+		return false;
+	}
+	$l = ay_work_look( $id );
+	return empty( $l['halo_off'] );
+}
+
+/** The work's colours as CSS variables, for a style attribute. */
+function ay_work_vars( $id ) {
+	$l   = ay_work_look( $id );
+	$css = '';
+	foreach ( array( 'halo' => '--ay-wh', 'glow' => '--ay-cg-c', 'wash' => '--ay-wash', 'wash2' => '--ay-wash2' ) as $k => $var ) {
+		if ( '' !== $l[ $k ] ) {
+			$css .= $var . ':' . ay_hex( $l[ $k ] ) . ';';
+		}
+	}
+	if ( '' !== $l['line'] ) {
+		$css .= '--ay-cgl-c:' . ay_hex( $l['line'] ) . ';--ay-cgl-blend:screen;';
+	}
+	if ( '' !== (string) $l['halo_op'] && is_numeric( $l['halo_op'] ) ) {
+		$css .= '--ay-wh-op:' . ( max( 0, min( 100, (float) $l['halo_op'] ) ) / 100 ) . ';';
+	}
+	return $css;
+}
+
+/** The halo layer placed behind a piece. */
+function ay_work_halo( $id, $class = 'ay-wh-l' ) {
+	return ay_work_halo_on( $id ) ? '<span class="' . esc_attr( $class ) . '" aria-hidden="true"></span>' : '';
 }

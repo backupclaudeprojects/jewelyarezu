@@ -35,6 +35,7 @@ class Hscroll extends Base {
 	protected function register_controls() {
 		$this->sec( 's_query', 'آثار' );
 		$this->query_controls( -1 );
+		$this->halo_switch();
 		$this->done();
 
 		$this->sec( 's_rows', 'ردیف‌ها و حرکت' );
@@ -105,11 +106,11 @@ class Hscroll extends Base {
 				foreach ( $set as $id ) {
 					$w    = ay_work( $id );
 					$tag  = 'yes' === $s['link'] ? 'a' : 'div';
-					$attr = 'yes' === $s['link'] ? ' href="' . esc_url( $w['url'] ) . '"' : '';
+					$attr = ( 'yes' === $s['link'] ? ' href="' . esc_url( $w['url'] ) . '"' : '' ) . ' style="' . esc_attr( ay_work_vars( $id ) ) . '"';
 					if ( $c ) {
 						$attr .= ' tabindex="-1" aria-hidden="true"';
 					}
-					echo '<' . $tag . ' class="ay-hz-tile"' . $attr . '>' . ay_work_img( $id, 'ay-card' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					echo '<' . $tag . ' class="ay-hz-tile"' . $attr . '>' . ay_work_halo( $id ) . ay_work_img( $id, 'ay-card' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					if ( 'yes' === $s['caption'] ) {
 						echo '<span class="ay-hz-cap"><strong>' . esc_html( $w['title'] ) . '</strong>';
 						if ( 'yes' === $s['caption_col'] && $w['collections'] ) {

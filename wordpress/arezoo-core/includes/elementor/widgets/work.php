@@ -42,6 +42,7 @@ class Work_Gallery extends Base {
 		$this->sw( 'lightbox', 'بزرگ‌نمایی با کلیک (لایت‌باکس المنتور)', 'yes' );
 		$this->sw( 'sticky', 'ثابت ماندن هنگام اسکرول (در دسکتاپ)', 'yes', array( 'prefix_class' => 'ay-wg-sticky-' ) );
 		$this->cssvar( 'sticky_top', 'فاصله از بالای صفحه هنگام ثابت ماندن', '--ay-wg-top', 0, 300, 1, 104, 'px', array( 'condition' => array( 'sticky' => 'yes' ) ) );
+		$this->halo_switch();
 		$this->done();
 		$this->sec( 'st_main', 'قاب‌ها', true );
 		$this->box_style( 'stage', 'قاب تصویر بزرگ', '.ay-wg-stage', false );
@@ -75,15 +76,16 @@ class Work_Gallery extends Base {
 			$alt = get_post_meta( $att, '_wp_attachment_image_alt', true );
 			return wp_get_attachment_image( $att, $size, false, array( 'alt' => $alt ? $alt : $title ) );
 		};
-		echo '<div class="ay-wg" data-ay-gallery>';
+		$halo = ay_work_halo( $id );
+		echo '<div class="ay-wg" data-ay-gallery style="' . esc_attr( ay_work_vars( $id ) ) . '">';
 		if ( in_array( $s['layout'], array( 'grid', 'strip' ), true ) ) {
 			echo '<div class="ay-wg-all">';
 			foreach ( $ids as $att ) {
-				echo '<div class="ay-wg-stage">' . $open( $att ) . $img( $att, 'large' ) . $close . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo '<div class="ay-wg-stage">' . $halo . $open( $att ) . $img( $att, 'large' ) . $close . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 			echo '</div>';
 		} else {
-			echo '<div class="ay-wg-stage">';
+			echo '<div class="ay-wg-stage">' . $halo; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			foreach ( $ids as $k => $att ) {
 				echo '<div class="ay-wg-slide' . ( $k ? '' : ' is-on' ) . '" data-k="' . (int) $k . '">' . $open( $att ) . $img( $att, 'large' ) . $close . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
@@ -218,7 +220,7 @@ class Work_Specs extends Base {
 		$this->sw( 'wash', 'پترن آبرنگی کمرنگ روی باکس‌ها', 'yes', array( 'prefix_class' => 'ay-wash-' ) );
 		$this->sel( 'wash_style', 'طرح پس‌زمینهٔ آبرنگی', array( 'blots' => 'لکه‌های آبرنگ', 'wash' => 'شستهٔ پهن و نرم', 'bloom' => 'شکفتن از گوشه', 'stroke' => 'ضربه‌های قلم‌مو', 'grain' => 'بافت ریز کاغذ', 'veil' => 'مه یکنواخت', 'image' => 'تصویر دلخواه شما' ), 'blots', array( 'prefix_class' => 'ay-washs-', 'condition' => array( 'wash' => 'yes' ) ) );
 		$this->add_control( 'wash_img', array( 'label' => 'تصویر پس‌زمینه', 'type' => CM::MEDIA, 'selectors' => array( '{{WRAPPER}}' => '--ay-wash-img: url({{URL}});' ), 'condition' => array( 'wash' => 'yes', 'wash_style' => 'image' ), 'description' => 'مثلاً اسکن یک لکهٔ آبرنگ واقعی. روی همهٔ باکس‌ها می‌نشیند.' ) );
-		$this->color( 'wash_color', 'رنگ پترن', '--ay-wash', array( 'condition' => array( 'wash' => 'yes', 'wash_style!' => 'image' ) ) );
+		$this->color( 'wash_color', 'رنگ پترن', '--ay-wash', array( 'condition' => array( 'wash' => 'yes', 'wash_style!' => 'image' ), 'description' => 'رنگ پیش‌فرض. هر اثر می‌تواند در صفحهٔ ویرایش خودش («رنگ‌های این اثر در سایت») رنگ جدا داشته باشد.' ) );
 		$this->color( 'wash_color2', 'رنگ دوم (گرادیان)', '--ay-wash2', array( 'condition' => array( 'wash' => 'yes', 'wash_style!' => 'image' ) ) );
 		$this->add_control( 'wash_blend', array( 'label' => 'حالت ترکیب', 'type' => CM::SELECT, 'default' => '', 'options' => array( '' => 'معمولی', 'multiply' => 'Multiply', 'screen' => 'Screen', 'overlay' => 'Overlay', 'soft-light' => 'Soft light' ), 'selectors' => array( '{{WRAPPER}}' => '--ay-wash-blend: {{VALUE}};' ), 'condition' => array( 'wash' => 'yes' ) ) );
 		$this->sw( 'wash_move', 'حرکت خیلی آرام پترن', '', array( 'prefix_class' => 'ay-wash-move-', 'condition' => array( 'wash' => 'yes' ) ) );
@@ -261,7 +263,7 @@ class Work_Specs extends Base {
 			$this->empty_note( 'این اثر هنوز مشخصاتی ندارد.' );
 			return;
 		}
-		echo '<ul class="ay-sps">';
+		echo '<ul class="ay-sps" style="' . esc_attr( ay_work_vars( $id ) ) . '">';
 		foreach ( $rows as $r ) {
 			echo '<li class="ay-sp"><span class="ay-sp-k">' . esc_html( $r[0] ) . '</span><span class="ay-sp-v">' . esc_html( $r[1] ) . '</span></li>';
 		}

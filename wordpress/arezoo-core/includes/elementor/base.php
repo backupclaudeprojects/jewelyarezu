@@ -211,10 +211,17 @@ abstract class Base extends \Elementor\Widget_Base {
 		$this->cssvar( 'c_glow_size', 'اندازهٔ هاله', '--ay-cg-size', 15, 120, 1, 58, '%', array( 'condition' => array( 'c_glow' => 'yes' ) ), false );
 		$this->cssvar( 'c_glow_blur', 'نرمی هاله', '--ay-cg-blur', 0, 60, 1, 14, 'px', array( 'condition' => array( 'c_glow' => 'yes' ) ), false );
 		$this->sw( 'c_glow_always', 'هاله همیشه دیده شود (نه فقط هنگام هاور)', '', array( 'prefix_class' => 'ay-cg-always-', 'condition' => array( 'c_glow' => 'yes' ) ) );
-		$this->sw( 'c_glare', 'برق نور روی طرح', $default, array( 'prefix_class' => 'ay-cgl-' ) );
+		$this->sw( 'c_glare', 'برق نور روی طرح (خط نقره‌ای)', $default, array( 'prefix_class' => 'ay-cgl-' ) );
 		$this->cssvar( 'c_glare_op', 'شدت برق', '--ay-cgl-op', 0, 1, 0.05, 0.6, '', array( 'condition' => array( 'c_glare' => 'yes' ) ), false );
+		$this->add_control( 'c_glare_c', array( 'label' => 'رنگ خط نور', 'type' => CM::COLOR, 'selectors' => array( '{{WRAPPER}}' => '--ay-cgl-c: {{VALUE}}; --ay-cgl-blend: screen;' ), 'condition' => array( 'c_glare' => 'yes' ), 'description' => 'خالی = نقره‌ای. رنگ هر اثر را می‌توانید در صفحهٔ ویرایش همان اثر جدا بگذارید.' ) );
+		$this->halo_switch();
 		$this->sw( 'c_touch', 'روی صفحه‌های لمسی هم فعال باشد', '', array( 'prefix_class' => 'ay-ct-touch-' ) );
 		$this->done();
+	}
+
+	/** Static halo behind each piece; colour per work in its edit screen, site-wide default in «آرزو ← تنظیمات ← ظاهر آثار». */
+	protected function halo_switch() {
+		$this->sw( 'w_halo', 'هالهٔ ثابت پشت هر اثر', 'yes', array( 'prefix_class' => 'ay-wh-', 'separator' => 'before', 'description' => 'رنگ و شدت هر اثر در صفحهٔ ویرایش همان اثر؛ پیش‌فرض و خاموش کردن برای کل سایت در «آرزو ← تنظیمات ← ظاهر آثار».' ) );
 	}
 
 	protected function in_editor() {
@@ -249,8 +256,8 @@ abstract class Base extends \Elementor\Widget_Base {
 			$meta[] = $t->name;
 			$typs[] = $t->term_id;
 		}
-		return '<a class="ay-card" style="--n:' . (int) $n . '" href="' . esc_url( $w['url'] ) . '" data-col="' . esc_attr( implode( ' ', $cols ) ) . '" data-type="' . esc_attr( implode( ' ', $typs ) ) . '">'
-			. '<span class="ay-card-pic">' . ay_work_img( $id, 'ay-card' ) . '</span>'
+		return '<a class="ay-card" style="--n:' . (int) $n . ';' . esc_attr( ay_work_vars( $id ) ) . '" href="' . esc_url( $w['url'] ) . '" data-col="' . esc_attr( implode( ' ', $cols ) ) . '" data-type="' . esc_attr( implode( ' ', $typs ) ) . '">'
+			. '<span class="ay-card-pic">' . ay_work_halo( $id ) . ay_work_img( $id, 'ay-card' ) . '</span>'
 			. '<span class="ay-card-txt"><span class="ay-card-name">' . esc_html( $w['title'] ) . '</span><span class="ay-card-meta">' . esc_html( implode( ' · ', $meta ) ) . '</span></span></a>';
 	}
 }

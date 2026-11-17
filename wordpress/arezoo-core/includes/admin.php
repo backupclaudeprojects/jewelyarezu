@@ -291,7 +291,7 @@ function ay_page_terms() {
 
 /* ==================================================================== تنظیمات */
 function ay_page_settings() {
-	$tab = isset( $_GET['tab'] ) && in_array( $_GET['tab'], array( 'contact', 'wallpaper' ), true ) ? sanitize_key( $_GET['tab'] ) : 'contact'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$tab = isset( $_GET['tab'] ) && in_array( $_GET['tab'], array( 'contact', 'wallpaper', 'works' ), true ) ? sanitize_key( $_GET['tab'] ) : 'contact'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	if ( isset( $_POST['ay_settings_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['ay_settings_nonce'] ) ), 'ay_settings' ) && current_user_can( 'manage_options' ) ) {
 		if ( 'contact' === $tab ) {
 			$cur = wp_parse_args( (array) get_option( 'arezoo_settings', array() ), ay_default_settings() );
@@ -300,8 +300,16 @@ function ay_page_settings() {
 			}
 			$cur['email']      = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
 			$cur['site_en']    = empty( $_POST['site_en'] ) ? 0 : 1;
-			$cur['admin_wash'] = isset( $_POST['admin_wash'] ) ? ay_hex( sanitize_text_field( wp_unslash( $_POST['admin_wash'] ) ), '#99E1D9' ) : '#99E1D9';
 			update_option( 'arezoo_settings', $cur );
+		} elseif ( 'works' === $tab ) {
+			$d = ay_halo_defaults();
+			$h = array( 'on' => empty( $_POST['halo_on'] ) ? 0 : 1 );
+			$h['color'] = ! empty( $_POST['halo_color'] ) ? ay_hex( sanitize_text_field( wp_unslash( $_POST['halo_color'] ) ), '' ) : '';
+			foreach ( array( 'op' => array( 0, 100 ), 'size' => array( 20, 140 ), 'blur' => array( 0, 80 ) ) as $k => $range ) {
+				$h[ $k ] = isset( $_POST[ 'halo_' . $k ] ) ? max( $range[0], min( $range[1], (float) $_POST[ 'halo_' . $k ] ) ) : $d[ $k ];
+			}
+			$h['anim'] = isset( $_POST['halo_anim'] ) && in_array( $_POST['halo_anim'], array( 'breathe', 'pulse', 'none' ), true ) ? sanitize_key( $_POST['halo_anim'] ) : 'breathe';
+			update_option( 'arezoo_halo', $h );
 		} else {
 			$d = ay_wallpaper_defaults();
 			$w = array( 'on' => empty( $_POST['on'] ) ? 0 : 1, 'mobile' => empty( $_POST['mobile'] ) ? 0 : 1 );
@@ -327,10 +335,14 @@ function ay_page_settings() {
 		echo '<div class="notice notice-success is-dismissible" dir="rtl"><p>تنظیمات ذخیره شد.</p></div>';
 	}
 	ay_admin_head( 'تنظیمات آرزو' );
-	ay_admin_tabs( array( 'contact' => 'برند و تماس', 'wallpaper' => 'پس‌زمینهٔ اسکچ' ), $tab, 'arezoo-settings' );
+	ay_admin_tabs( array( 'contact' => 'برند و تماس', 'wallpaper' => 'پس‌زمینهٔ اسکچ', 'works' => 'ظاهر آثار' ), $tab, 'arezoo-settings' );
 	echo '<form method="post" class="ay-form" action="' . esc_url( admin_url( 'admin.php?page=arezoo-settings&tab=' . $tab ) ) . '">';
 	wp_nonce_field( 'ay_settings', 'ay_settings_nonce' );
 	$field = function ( $id, $label, $value, $help = '', $type = 'text', $attr = '' ) {
+		if ( false !== strpos( $attr, 'ay-color' ) ) {   /* the WordPress colour picker hides a wrapping <label>, so colour fields use a <div> */
+			echo '<div class="ay-f"><label for="ay_' . esc_attr( $id ) . '"><span>' . esc_html( $label ) . '</span></label><input type="' . esc_attr( $type ) . '" id="ay_' . esc_attr( $id ) . '" name="' . esc_attr( $id ) . '" value="' . esc_attr( $value ) . '" dir="ltr" ' . $attr . '>' . ( $help ? '<em>' . esc_html( $help ) . '</em>' : '' ) . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			return;
+		}
 		echo '<label class="ay-f" for="ay_' . esc_attr( $id ) . '"><span>' . esc_html( $label ) . '</span><input type="' . esc_attr( $type ) . '" id="ay_' . esc_attr( $id ) . '" name="' . esc_attr( $id ) . '" value="' . esc_attr( $value ) . '" dir="ltr" ' . $attr . '>' . ( $help ? '<em>' . esc_html( $help ) . '</em>' : '' ) . '</label>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	};
 	if ( 'contact' === $tab ) {
@@ -342,8 +354,24 @@ function ay_page_settings() {
 		$field( 'telegram', 'تلگرام', ay_opt( 'telegram' ), 'شناسه بدون @ یا نشانی کامل' );
 		echo '</section><section class="ay-card"><h2>' . ay_icon( 'tool', 22 ) . '<span>زبان و پیشخوان</span></h2>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo '<label class="ay-check"><input type="checkbox" name="site_en" value="1" ' . checked( (bool) ay_opt( 'site_en' ), true, false ) . '> <span><strong>سایت همیشه انگلیسی و چپ‌چین باشد</strong><br>حتی اگر زبان وردپرس فارسی باشد. پیشخوان آرزو همیشه فارسی است.</span></label>';
-		$field( 'admin_wash', 'رنگ پترن آبرنگی فرم ویرایش اثر', ay_opt( 'admin_wash' ), '', 'text', 'class="ay-color"' );
 		echo '</section>';
+	} elseif ( 'works' === $tab ) {
+		$h     = ay_halo_settings();
+		$range = function ( $id, $label, $value, $min, $max, $step, $unit, $help = '' ) {
+			echo '<label class="ay-f ay-range" for="ay_' . esc_attr( $id ) . '"><span>' . esc_html( $label ) . ' <output>' . esc_html( $value . $unit ) . '</output></span><input type="range" id="ay_' . esc_attr( $id ) . '" name="' . esc_attr( $id ) . '" value="' . esc_attr( $value ) . '" min="' . esc_attr( $min ) . '" max="' . esc_attr( $max ) . '" step="' . esc_attr( $step ) . '" data-unit="' . esc_attr( $unit ) . '">' . ( $help ? '<em>' . esc_html( $help ) . '</em>' : '' ) . '</label>';
+		};
+		echo '<section class="ay-card"><h2>' . ay_icon( 'gem', 22 ) . '<span>هالهٔ نور پشت آثار</span></h2><p class="ay-help">یک نور نرم پشت تصویر هر اثر، در کارت‌های صفحهٔ کالکشن، نوار افقی صفحهٔ اصلی، آثار مرتبط و تصویر بزرگ صفحهٔ هر اثر. رنگ و شدت هر اثر را می‌توانید در صفحهٔ ویرایش همان اثر («رنگ‌های این اثر در سایت») جدا تعیین کنید؛ این‌جا مقدار پیش‌فرض و روشن/خاموش کل سایت است.</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo '<label class="ay-check"><input type="checkbox" name="halo_on" value="1" ' . checked( ! empty( $h['on'] ), true, false ) . '> <span><strong>هالهٔ پشت آثار نمایش داده شود</strong><br>با خاموش کردن، هاله پشت هیچ اثری نمایش داده نمی‌شود.</span></label>';
+		$field( 'halo_color', 'رنگ پیش‌فرض هاله', $h['color'], 'خالی = رنگ تأکید تم رنگی فعال', 'text', 'class="ay-color"' );
+		$range( 'halo_op', 'شدت', $h['op'], 0, 100, 1, '٪' );
+		$range( 'halo_size', 'اندازه نسبت به قاب تصویر', $h['size'], 20, 140, 1, '٪' );
+		$range( 'halo_blur', 'نرمی لبه', $h['blur'], 0, 80, 1, 'px' );
+		echo '<label class="ay-f" for="ay_halo_anim"><span>حرکت هاله</span><select id="ay_halo_anim" name="halo_anim">';
+		foreach ( array( 'breathe' => 'نفس کشیدن آرام', 'pulse' => 'تپش نور', 'none' => 'ثابت' ) as $k => $v ) {
+			echo '<option value="' . esc_attr( $k ) . '" ' . selected( $h['anim'], $k, false ) . '>' . esc_html( $v ) . '</option>';
+		}
+		echo '</select></label></section>';
+		echo '<section class="ay-card"><h2>' . ay_icon( 'tool', 22 ) . '<span>جاهای دیگر</span></h2><p class="ay-help">در المنتور، ویجت‌های «آرشیو کالکشن‌ها» و «آثار مرتبط» بخشی به نام «سه‌بعدی و نور کارت‌ها» دارند: کج شدن با موس، عمق لایه‌ها، نور هاور، خط نقره‌ای و هالهٔ ثابت، هر کدام با کلید روشن/خاموش جدا. ویجت‌های «نوار افقی آثار» و «گالری اثر» هم کلید «هالهٔ پشت اثر» دارند.</p></section>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	} else {
 		$w = ay_wallpaper_settings();
 		echo '<section class="ay-card"><h2>' . ay_icon( 'image', 22 ) . '<span>پس‌زمینهٔ اسکچ کل سایت</span></h2><p class="ay-help">طرح‌های اسکچ با شفافیت کم پشت همهٔ صفحه‌ها پخش می‌شوند. رنگ خط‌ها خودکار است: در تم تیره روشن و در تم روشن تیره. بخش‌هایی که خودشان رنگ زمینه دارند اسکچ را می‌پوشانند.</p>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

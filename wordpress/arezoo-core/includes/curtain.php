@@ -316,7 +316,7 @@ function ay_page_curtain() {
 		echo '<label class="ay-f ay-range" for="ay_' . esc_attr( $id ) . '"><span>' . esc_html( $label ) . ' <output>' . esc_html( $value . $unit ) . '</output></span><input type="range" id="ay_' . esc_attr( $id ) . '" name="' . esc_attr( $id ) . '" value="' . esc_attr( $value ) . '" min="' . esc_attr( $min ) . '" max="' . esc_attr( $max ) . '" step="' . esc_attr( $step ) . '" data-unit="' . esc_attr( $unit ) . '">' . ( $help ? '<em>' . esc_html( $help ) . '</em>' : '' ) . '</label>';
 	};
 	$color = function ( $id, $label, $value, $help = '' ) {
-		echo '<label class="ay-f" for="ay_' . esc_attr( $id ) . '"><span>' . esc_html( $label ) . '</span><input type="text" id="ay_' . esc_attr( $id ) . '" name="' . esc_attr( $id ) . '" value="' . esc_attr( $value ) . '" dir="ltr" class="ay-color">' . ( $help ? '<em>' . esc_html( $help ) . '</em>' : '' ) . '</label>';
+		echo '<div class="ay-f"><label for="ay_' . esc_attr( $id ) . '"><span>' . esc_html( $label ) . '</span></label><input type="text" id="ay_' . esc_attr( $id ) . '" name="' . esc_attr( $id ) . '" value="' . esc_attr( $value ) . '" dir="ltr" class="ay-color">' . ( $help ? '<em>' . esc_html( $help ) . '</em>' : '' ) . '</div>';
 	};
 	$select = function ( $id, $label, $value, $options ) {
 		echo '<label class="ay-f" for="ay_' . esc_attr( $id ) . '"><span>' . esc_html( $label ) . '</span><select id="ay_' . esc_attr( $id ) . '" name="' . esc_attr( $id ) . '">';

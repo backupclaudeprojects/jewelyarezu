@@ -112,6 +112,22 @@
     $('#ayCvPlay').on('click', play); setTimeout(play, 700);
   }
 
+  /* ---- work editor: live preview of this work's colours ---- */
+  var $lp = $('#ayLookPrev');
+  if ($lp.length) {
+    var $box = $lp.closest('.ay-look');
+    var look = function () {
+      var p = $lp[0].style, v = function (k) { return $.trim($box.find('[data-var="' + k + '"]').val() || ''); };
+      [['halo', '--p-halo'], ['glow', '--p-glow'], ['line', '--p-line'], ['wash', '--p-wash'], ['wash2', '--p-wash2']].forEach(function (m) { var c = v(m[0]); if (c) p.setProperty(m[1], c); else p.removeProperty(m[1]); });
+      var op = v('halo_op'); if (op !== '' && !isNaN(op)) p.setProperty('--p-op', Math.max(0, Math.min(100, +op)) / 100); else p.removeProperty('--p-op');
+      if (v('line')) p.setProperty('--p-blend', 'screen'); else p.removeProperty('--p-blend');
+      $lp.toggleClass('no-halo', $box.find('[data-var="halo_off"]').is(':checked'));
+    };
+    $box.on('input change ay:color', 'input', function () { setTimeout(look, 40); });
+    $lp.on('pointermove', '.ay-look-card', function (e) { var r = this.getBoundingClientRect(); this.style.setProperty('--gx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%'); this.style.setProperty('--gy', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%'); });
+    look();
+  }
+
   /* ---- settings niceties ---- */
   $('.ay-range input[type=range]').on('input', function () { $(this).closest('.ay-range').find('output').text(this.value + ($(this).data('unit') || '')); });
   if ($.fn.wpColorPicker) $('.ay-color').wpColorPicker({ change: function () { var el = this; setTimeout(function () { $(el).trigger('ay:color'); }, 30); }, clear: function () { $(this).closest('.wp-picker-container').find('.ay-color').trigger('ay:color'); } });

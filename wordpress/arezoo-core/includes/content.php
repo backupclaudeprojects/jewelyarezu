@@ -111,7 +111,7 @@ function ay_work_box( $post ) {
 	wp_nonce_field( 'ay_work_save', 'ay_work_nonce' );
 	$gallery  = array_filter( array_map( 'absint', explode( ',', (string) get_post_meta( $post->ID, '_ay_gallery', true ) ) ) );
 	$featured = '1' === (string) get_post_meta( $post->ID, '_ay_featured', true );
-	echo '<div class="ay-ed" dir="rtl" style="--ay-wash:' . esc_attr( ay_hex( ay_opt( 'admin_wash' ), '#99E1D9' ) ) . '">';
+	echo '<div class="ay-ed" dir="rtl">';
 
 	/* gallery */
 	echo '<section class="ay-ed-card ay-ed-wide"><h3>' . ay_icon( 'image', 22 ) . '<span>گالری تصاویر</span></h3>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -156,6 +156,35 @@ function ay_work_box( $post ) {
 	echo '<label class="ay-ed-check"><input type="checkbox" name="ay_featured" value="1" ' . checked( $featured, true, false ) . '><span><strong>اثر ویژه</strong><br>در بخش‌هایی که فقط آثار ویژه را نشان می‌دهند، این اثر نمایش داده شود.</span></label>';
 	echo '<label class="ay-ed-field" for="ay_order">' . ay_icon( 'list', 18 ) . '<span>ترتیب</span><input type="number" id="ay_order" name="ay_order" value="' . (int) $post->menu_order . '" min="0" step="1" dir="ltr"></label>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	echo '<p class="ay-ed-help">عدد کوچک‌تر زودتر نمایش داده می‌شود. آثار با عدد یکسان، از تازه به قدیم مرتب می‌شوند.</p></section>';
+
+	/* look of this work on the site */
+	$look  = ay_work_look( $post->ID );
+	$halo  = ay_halo_settings();
+	$cover = ay_work_cover_id( $post->ID );
+	$pic   = $cover ? wp_get_attachment_image_url( $cover, 'medium' ) : '';
+	$color = function ( $key, $label, $help ) use ( $look ) {
+		/* not wrapped in a <label>: the WordPress colour picker hides a wrapping label */
+		echo '<div class="ay-ed-field ay-ed-color"><label for="ay_look_' . esc_attr( $key ) . '">' . esc_html( $label ) . '</label><div><input type="text" class="ay-color" id="ay_look_' . esc_attr( $key ) . '" name="ay_look[' . esc_attr( $key ) . ']" value="' . esc_attr( $look[ $key ] ) . '" data-var="' . esc_attr( $key ) . '"></div><em>' . esc_html( $help ) . '</em></div>';
+	};
+	echo '<section class="ay-ed-card ay-ed-wide ay-look"><h3>' . ay_icon( 'image', 22 ) . '<span>رنگ‌های این اثر در سایت</span></h3>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo '<p class="ay-ed-help">هر رنگی خالی بماند، رنگ پیش‌فرض (از تنظیمات ویجت در المنتور یا «آرزو ← تنظیمات ← ظاهر آثار») استفاده می‌شود. پیش‌نمایش کنار همین فرم با هر تغییر به‌روز می‌شود.</p>';
+	if ( empty( $halo['on'] ) ) {
+		echo '<p class="ay-ed-help ay-ed-warn">هالهٔ پشت آثار الان برای کل سایت خاموش است (آرزو ← تنظیمات ← ظاهر آثار).</p>';
+	}
+	echo '<div class="ay-look-grid"><div class="ay-look-fields">';
+	echo '<h4>هالهٔ نور پشت اثر</h4><p class="ay-ed-help">پشت تصویر در کارت‌های صفحهٔ کالکشن، نوار افقی صفحهٔ اصلی، آثار مرتبط و تصویر بزرگ صفحهٔ همین اثر.</p>';
+	echo '<label class="ay-ed-check"><input type="checkbox" name="ay_look[halo_off]" value="1" ' . checked( ! empty( $look['halo_off'] ), true, false ) . ' data-var="halo_off"><span><strong>برای این اثر هاله نمایش داده نشود</strong></span></label>';
+	$color( 'halo', 'رنگ هاله', 'خالی = رنگ هالهٔ کل سایت' );
+	echo '<label class="ay-ed-field" for="ay_look_halo_op"><span>شدت هاله (۰ تا ۱۰۰)</span><input type="number" id="ay_look_halo_op" name="ay_look[halo_op]" value="' . esc_attr( $look['halo_op'] ) . '" min="0" max="100" step="1" placeholder="' . esc_attr( (string) $halo['op'] ) . '" dir="ltr" data-var="halo_op"><em>خالی = شدت پیش‌فرض کل سایت</em></label>';
+	echo '<h4>کارت این اثر در صفحهٔ کالکشن</h4>';
+	$color( 'glow', 'رنگ نور هاور پشت طرح', 'نوری که هنگام حرکت موس روی کارت، پشت طرح همراه موس حرکت می‌کند.' );
+	$color( 'line', 'رنگ خط نقره‌ای (برق روی کارت)', 'خطِ نوری که هنگام هاور روی کارت عبور می‌کند. خالی = نقره‌ای.' );
+	echo '<h4>صفحهٔ همین اثر</h4>';
+	$color( 'wash', 'رنگ آبرنگ باکس‌های مشخصات', 'لکه‌های آبرنگی پشت باکس‌های Collection، Type، Materials و…' );
+	$color( 'wash2', 'رنگ دوم آبرنگ (اختیاری)', 'برای ترکیب دو رنگ در لکه‌ها.' );
+	echo '</div><div class="ay-look-prev" id="ayLookPrev" style="--g-halo:' . esc_attr( $halo['color'] ? ay_hex( $halo['color'] ) : '#99E1D9' ) . ';--g-op:' . esc_attr( (float) $halo['op'] / 100 ) . '">';
+	echo '<span class="ay-look-label">پیش‌نمایش کارت</span><div class="ay-look-card"><i class="ay-look-halo"></i><i class="ay-look-glow"></i>' . ( $pic ? '<img src="' . esc_url( $pic ) . '" alt="">' : '<b>بعد از انتخاب تصویر، این‌جا دیده می‌شود</b>' ) . '<i class="ay-look-line"></i></div>';
+	echo '<span class="ay-look-label">پیش‌نمایش باکس مشخصات</span><div class="ay-look-spec"><i class="ay-look-wash"></i><small>COLLECTION</small><strong>Kite</strong></div></div></div></section>';
 	echo '</div>';
 }
 
@@ -172,6 +201,21 @@ add_action( 'save_post_ay_work', function ( $post_id ) {
 	update_post_meta( $post_id, '_ay_featured', empty( $_POST['ay_featured'] ) ? '' : '1' );
 	$gallery = isset( $_POST['ay_gallery'] ) ? implode( ',', array_filter( array_map( 'absint', explode( ',', sanitize_text_field( wp_unslash( $_POST['ay_gallery'] ) ) ) ) ) ) : '';
 	update_post_meta( $post_id, '_ay_gallery', $gallery );
+	/* a work with gallery pictures but no main image takes the first gallery picture as its main image */
+	if ( ! get_post_thumbnail_id( $post_id ) && $gallery ) {
+		$first = absint( strtok( $gallery, ',' ) );
+		if ( $first && wp_attachment_is_image( $first ) ) {
+			set_post_thumbnail( $post_id, $first );
+		}
+	}
+	$look = array( 'halo' => '', 'halo_op' => '', 'halo_off' => 0, 'glow' => '', 'line' => '', 'wash' => '', 'wash2' => '' );
+	$in   = isset( $_POST['ay_look'] ) && is_array( $_POST['ay_look'] ) ? wp_unslash( $_POST['ay_look'] ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+	foreach ( array( 'halo', 'glow', 'line', 'wash', 'wash2' ) as $k ) {
+		$look[ $k ] = ! empty( $in[ $k ] ) ? ay_hex( sanitize_text_field( $in[ $k ] ), '' ) : '';
+	}
+	$look['halo_off'] = empty( $in['halo_off'] ) ? 0 : 1;
+	$look['halo_op']  = isset( $in['halo_op'] ) && '' !== trim( (string) $in['halo_op'] ) && is_numeric( $in['halo_op'] ) ? max( 0, min( 100, (int) $in['halo_op'] ) ) : '';
+	update_post_meta( $post_id, '_ay_look', wp_slash( wp_json_encode( $look ) ) );
 	$specs = array();
 	if ( isset( $_POST['ay_specs'] ) && is_array( $_POST['ay_specs'] ) ) {
 		foreach ( wp_unslash( $_POST['ay_specs'] ) as $sp ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
@@ -380,14 +424,30 @@ add_action( 'admin_init', function () {
 	if ( get_option( 'arezoo_built' ) && version_compare( (string) get_option( 'arezoo_version', '1.0.0' ), '1.1.0', '<' ) ) {
 		ay_ensure_types();
 	}
-	if ( get_option( 'arezoo_built' ) && version_compare( (string) get_option( 'arezoo_version', '1.0.0' ), '1.2.0', '<' ) && function_exists( 'ay_upgrade_120' ) && ! ay_upgrade_120() ) {
-		return;   /* Elementor is not ready yet: try again on the next dashboard page */
-	}
-	if ( get_option( 'arezoo_built' ) && version_compare( (string) get_option( 'arezoo_version', '1.0.0' ), '1.3.0', '<' ) && function_exists( 'ay_upgrade_130' ) && ! ay_upgrade_130() ) {
-		return;
+	/* Updates never rewrite the owner's pages, header, footer or templates: whatever was edited in Elementor stays as it is.
+	   New abilities arrive as new widget options that keep today's look until they are switched on. */
+	if ( function_exists( 'ay_set_site_icon' ) ) {
+		ay_set_site_icon();
 	}
 	update_option( 'arezoo_version', AY_VERSION );
 	if ( function_exists( 'ay_elementor_ready' ) && ay_elementor_ready() ) {
 		\Elementor\Plugin::$instance->files_manager->clear_cache();
 	}
 }, 30 );
+
+/* Site-wide halo values as CSS variables (each work can override them in its edit screen). */
+add_action( 'wp_enqueue_scripts', function () {
+	$h   = ay_halo_settings();
+	$css = 'body{--ay-wh-gop:' . ( max( 0, min( 100, (float) $h['op'] ) ) / 100 ) . ';--ay-wh-in:' . round( ( 100 - max( 20, min( 140, (float) $h['size'] ) ) ) / 2, 2 ) . '%;--ay-wh-blur:' . max( 0, min( 80, (float) $h['blur'] ) ) . 'px' . ( $h['color'] ? ';--ay-wh-g:' . ay_hex( $h['color'] ) : '' ) . '}';
+	wp_register_style( 'arezoo-halo', false, array(), AY_VERSION );
+	wp_enqueue_style( 'arezoo-halo' );
+	wp_add_inline_style( 'arezoo-halo', $css );
+}, 7 );
+
+add_filter( 'body_class', function ( $classes ) {
+	$h = ay_halo_settings();
+	if ( ! empty( $h['on'] ) && in_array( $h['anim'], array( 'breathe', 'pulse' ), true ) ) {
+		$classes[] = 'ay-wh-' . $h['anim'];
+	}
+	return $classes;
+} );

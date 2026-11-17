@@ -313,11 +313,15 @@
 
   /* Keep a block pinned while its column scrolls. CSS sticky does the work; if an ancestor blocks it
      (overflow hidden from another plugin or theme) the block is moved with a transform instead. */
-  function pin(stick, media, on, varName, fallback) {
+  function pin(stick, media, on, varName, fallback, col) {
     if (!stick || !media) return;
-    if (!on) { stick.classList.remove('is-js'); stick.style.transform = ''; return; }
-    var top = parseFloat(getComputedStyle(stick).getPropertyValue(varName)) || fallback, mr = media.getBoundingClientRect(), want = clamp(top - mr.top, 0, Math.max(mr.height - stick.offsetHeight, 0));
-    if (!stick.classList.contains('is-js') && want > 2 && Math.abs((stick.getBoundingClientRect().top - mr.top) - want) > 3) stick.classList.add('is-js');
+    if (!on) { stick.classList.remove('is-js'); stick.style.transform = ''; media.style.minHeight = ''; return; }
+    /* the picture column is always as tall as the text column, so the frame has the whole section to travel through */
+    if (col) { var need = col.offsetHeight; if (Math.abs((parseFloat(media.style.minHeight) || 0) - need) > 1) media.style.minHeight = need + 'px'; }
+    var top = parseFloat(getComputedStyle(stick).getPropertyValue(varName)), mr = media.getBoundingClientRect(), range = Math.max(mr.height - stick.offsetHeight, 0);
+    if (isNaN(top)) top = fallback;
+    var want = clamp(top - mr.top, 0, range);
+    if (!stick.classList.contains('is-js') && Math.abs((stick.getBoundingClientRect().top - mr.top) - want) > 3) stick.classList.add('is-js');   /* CSS sticky is blocked here: move it ourselves */
     if (stick.classList.contains('is-js')) stick.style.transform = 'translate3d(0,' + want.toFixed(1) + 'px,0)';
   }
 
@@ -347,7 +351,7 @@
         steps.forEach(function (s, k) { var r = s.getBoundingClientRect(), c = r.top + r.height / 2, dist = Math.abs(c - mid); if (dist < bd) { bd = dist; best = k; } });
       }
       go(best);
-      pin($('.ay-pr-stick', el), media, !stacked && (el.closest('.elementor-widget') || el).classList.contains('ay-pr-sticky-yes'), '--ay-pr-top', 110);
+      pin($('.ay-pr-stick', el), media, !stacked && (el.closest('.elementor-widget') || el).classList.contains('ay-pr-sticky-yes'), '--ay-pr-top', 110, $('.ay-pr-steps', el));
       if (cfg.tilt && frame && !reduced()) { var r = el.getBoundingClientRect(), p = clamp((w.innerHeight / 2 - r.top) / Math.max(r.height, 1), 0, 1); frame.style.setProperty('--ay-pr-ry', ((p - .5) * -9).toFixed(2) + 'deg'); frame.style.setProperty('--ay-pr-rx', ((.5 - p) * 3).toFixed(2) + 'deg'); }
     }, el);
   }
@@ -609,7 +613,7 @@
       chapters.forEach(function (c, k) { if (c.getBoundingClientRect().top < vh * .6) best = k; });
       el.style.setProperty('--sy-p', p.toFixed(4));
       if (best !== cur) { cur = best; chapters.forEach(function (c, k) { c.classList.toggle('is-on', k === best); }); var n = $('.ay-sy-cur', el); if (n) n.textContent = ('0' + (best + 1)).slice(-2); $$('.ay-sy-dot', el).forEach(function (dt, k) { dt.classList.toggle('is-on', k <= best); }); }
-      pin(stick, media, !stacked && el.classList.contains('ay-sy-sticky'), '--ay-sy-top', 110);
+      pin(stick, media, !stacked && el.classList.contains('ay-sy-sticky'), '--ay-sy-top', 110, $('.ay-sy-chs', el));
     }, el);
   }
 
