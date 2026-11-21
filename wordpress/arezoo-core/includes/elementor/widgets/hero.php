@@ -112,8 +112,16 @@ class Hero extends Base {
 
 	public static function night_floats() {
 		$out = array();
-		foreach ( array( array( 'a', 36, 44, 4.5, 34, -24, 50, 34, 0 ), array( 'c', 40, 52, 4, 40, -10, -40, 42, 12 ), array( 'd', 34, 58, 5, 46, 6, 70, 38, 22 ), array( 'b', 32, 40, 5, 28, -30, -60, 46, 30 ), array( 'c', 38, 48, 3.5, 50, -18, 90, 52, 40 ) ) as $f ) {
-			$out[] = array( 'image' => array( 'url' => ay_asset( 'img/hero/seed-' . $f[0] . '.png' ) ), 'x' => array( 'size' => $f[1], 'unit' => '%' ), 'y' => array( 'size' => $f[2], 'unit' => '%' ), 'w' => array( 'size' => $f[3], 'unit' => '%' ), 'dx' => array( 'size' => $f[4] ), 'dy' => array( 'size' => $f[5] ), 'rot' => array( 'size' => $f[6] ), 'dur' => array( 'size' => $f[7] ), 'delay' => array( 'size' => $f[8] ), 'opacity' => array( 'size' => 0.85 ) );
+		/* [ seed, x, y, width, path x, path y, turn, seconds, delay ] in percent of each picture; one set per picture */
+		$sets = array(
+			'wide'   => array( array( 'a', 36, 44, 4.5, 34, -24, 50, 34, 0 ), array( 'c', 40, 52, 4, 40, -10, -40, 42, 12 ), array( 'd', 34, 58, 5, 46, 6, 70, 38, 22 ), array( 'b', 32, 40, 5, 28, -30, -60, 46, 30 ), array( 'c', 38, 48, 3.5, 50, -18, 90, 52, 40 ) ),
+			'tablet' => array( array( 'a', 30, 26, 7, 40, -22, 50, 30, 0 ), array( 'c', 33, 30, 6, 50, -8, -40, 38, 10 ), array( 'd', 26, 33, 8, 56, 10, 70, 34, 19 ), array( 'b', 82, 62, 6.5, -40, -30, -60, 40, 26 ), array( 'c', 24, 22, 5.5, 60, -14, 90, 46, 34 ) ),
+			'mobile' => array( array( 'a', 12, 38, 10, 60, -18, 50, 26, 0 ), array( 'c', 16, 42, 8, 70, -6, -40, 32, 9 ), array( 'd', 90, 35, 10, -70, -16, 70, 30, 16 ), array( 'b', 22, 53, 9, 64, -24, -60, 36, 23 ), array( 'c', 86, 40, 7, -60, 8, 90, 40, 30 ) ),
+		);
+		foreach ( $sets as $for => $list ) {
+			foreach ( $list as $f ) {
+				$out[] = array( 'for' => $for, 'image' => array( 'url' => ay_asset( 'img/hero/seed-' . $f[0] . '.png' ) ), 'x' => array( 'size' => $f[1], 'unit' => '%' ), 'y' => array( 'size' => $f[2], 'unit' => '%' ), 'w' => array( 'size' => $f[3], 'unit' => '%' ), 'dx' => array( 'size' => $f[4] ), 'dy' => array( 'size' => $f[5] ), 'rot' => array( 'size' => $f[6] ), 'dur' => array( 'size' => $f[7] ), 'delay' => array( 'size' => $f[8] ), 'opacity' => array( 'size' => 0.85 ) );
+			}
 		}
 		return $out;
 	}
@@ -259,6 +267,7 @@ class Hero extends Base {
 		$this->sec( 's_floats', 'عناصر شناور', false, $regions );
 		$this->sw( 'floats_on', 'نمایش عناصر شناور', 'yes' );
 		$rep = new Repeater();
+		$rep->add_control( 'for', array( 'label' => 'برای کدام عکس', 'type' => CM::SELECT, 'default' => 'all', 'options' => array( 'all' => 'همهٔ عکس‌ها (دسکتاپ، تبلت و موبایل)', 'wide' => 'فقط عکس اصلی (عریض)', 'tablet' => 'فقط عکس تبلت', 'mobile' => 'فقط عکس موبایل' ) ) );
 		$rep->add_control( 'image', array( 'label' => 'تصویر (PNG بدون پس‌زمینه)', 'type' => CM::MEDIA ) );
 		$this->rs( $rep, 'x', 'شروع افقی', -20, 120, 0.5, 20, '%' );
 		$this->rs( $rep, 'y', 'شروع عمودی', -20, 120, 0.5, 40, '%' );
@@ -269,7 +278,7 @@ class Hero extends Base {
 		$this->rs( $rep, 'dur', 'مدت (ثانیه)', 4, 120, 1, 36 );
 		$this->rs( $rep, 'delay', 'تأخیر (ثانیه)', 0, 120, 1, 0 );
 		$this->rs( $rep, 'opacity', 'شفافیت', 0, 1, 0.05, 0.85 );
-		$this->add_control( 'floats', array( 'label' => 'عناصر شناور', 'type' => CM::REPEATER, 'fields' => $rep->get_controls(), 'default' => self::night_floats(), 'title_field' => 'عنصر شناور', 'condition' => array( 'floats_on' => 'yes' ) ) );
+		$this->add_control( 'floats', array( 'label' => 'عناصر شناور', 'type' => CM::REPEATER, 'fields' => $rep->get_controls(), 'default' => self::night_floats(), 'title_field' => '{{{ for }}} · عنصر شناور', 'condition' => array( 'floats_on' => 'yes' ) ) );
 		$this->done();
 
 		/* ---- layers ---- */
@@ -431,6 +440,27 @@ class Hero extends Base {
 						}
 					}
 				}
+				/* the bundled tablet / phone pictures always move, even when no region was set up for them */
+				if ( 'wide' !== $key && ! empty( $src[3] ) && ( ! $v['regions'] || ( 'yes' === $s['sparks_on'] && ! $v['sparks'] ) ) ) {
+					$fallback = array( 'regions' => array(), 'sparks' => array() );
+					foreach ( self::night_regions() as $r ) {
+						if ( $key === $r['for'] ) {
+							$type                    = $r['type'];
+							$fallback['regions'][] = array( 'x' => $r['x']['size'] / 100, 'y' => $r['y']['size'] / 100, 'rx' => $r['w']['size'] / 200, 'ry' => $r['h']['size'] / 200, 'f' => $r['feather']['size'] / 100, 'type' => $type, 'amp' => $r['amp']['size'] * $factor[ $type ], 'speed' => $r['speed']['size'], 'phase' => $r['phase']['size'], 'px' => $r['px']['size'] / 100, 'py' => $r['py']['size'] / 100, 'depth' => $r['depth']['size'] );
+						}
+					}
+					foreach ( self::night_sparks() as $p ) {
+						if ( $key === $p['for'] ) {
+							$fallback['sparks'][] = array( 'x' => $p['x']['size'] / 100, 'y' => $p['y']['size'] / 100, 's' => $p['size']['size'], 'dur' => $p['dur']['size'], 'dl' => $p['delay']['size'] );
+						}
+					}
+					if ( ! $v['regions'] ) {
+						$v['regions'] = array_slice( $fallback['regions'], 0, 16 );
+					}
+					if ( 'yes' === $s['sparks_on'] && ! $v['sparks'] ) {
+						$v['sparks'] = $fallback['sparks'];
+					}
+				}
 				$cfg['variants'][] = $v;
 			}
 			$cfg['img'] = $url;
@@ -440,7 +470,7 @@ class Hero extends Base {
 					if ( empty( $p['image']['url'] ) ) {
 						continue;
 					}
-					$cfg['floats'][] = array( 'src' => esc_url_raw( $p['image']['url'] ), 'x' => $this->pct( $p['x'], 20 ), 'y' => $this->pct( $p['y'], 40 ), 'w' => $this->pct( $p['w'], 6 ), 'dx' => $this->pct( $p['dx'], 40 ), 'dy' => $this->pct( $p['dy'], -20 ), 'rot' => $this->pct( $p['rot'], 45 ), 'dur' => $this->pct( $p['dur'], 36 ), 'dl' => $this->pct( $p['delay'], 0 ), 'o' => $this->pct( $p['opacity'], 0.85 ) );
+					$cfg['floats'][] = array( 'for' => isset( $p['for'] ) && in_array( $p['for'], array( 'wide', 'tablet', 'mobile' ), true ) ? $p['for'] : 'all', 'src' => esc_url_raw( $p['image']['url'] ), 'x' => $this->pct( $p['x'], 20 ), 'y' => $this->pct( $p['y'], 40 ), 'w' => $this->pct( $p['w'], 6 ), 'dx' => $this->pct( $p['dx'], 40 ), 'dy' => $this->pct( $p['dy'], -20 ), 'rot' => $this->pct( $p['rot'], 45 ), 'dur' => $this->pct( $p['dur'], 36 ), 'dl' => $this->pct( $p['delay'], 0 ), 'o' => $this->pct( $p['opacity'], 0.85 ) );
 				}
 			}
 		} elseif ( 'layers' === $mode ) {

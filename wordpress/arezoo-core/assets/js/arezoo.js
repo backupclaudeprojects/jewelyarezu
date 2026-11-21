@@ -64,21 +64,30 @@
       host.style.setProperty('--ay-hero-free', free + 'px'); host.classList.toggle('ay-hz-tight', free < 620);
     } else { host.style.removeProperty('--ay-hero-free'); host.classList.remove('ay-hz-tight'); }
   }
+  function heroClean(el) {   /* take away what an earlier start left behind (stage, canvas, floating elements), keeping the picture */
+    var img = $('img.ay-hs-img', el);
+    $$(':scope > .ay-hs-stage', el).forEach(function (st) { if (img && st.contains(img)) el.insertBefore(img, el.firstChild); el.removeChild(st); });
+  }
   function hero(el) {
     if (!w.AYHero) return;
+    var sig = el.getAttribute('data-ay-hero') || '';
+    if (el._ayHero && el._aySig === sig) return;   /* already running with this set-up: never start a second copy */
+    el._aySig = sig;
     var cfg = json(el, 'data-ay-hero'), vs = cfg.variants;
     if (el._ayHero) { el._ayHero.destroy(); el._ayHero = null; }
+    heroClean(el);
     if (!vs || !vs.length) { el._ayHero = w.AYHero.mount(el, cfg); return; }
     var cur = -1, t = 0;
     function go(i, img) {
       var v = vs[i], c = {}, k; for (k in cfg) c[k] = cfg[k];
-      c.img = img.getAttribute('src'); c.w = v.w; c.h = v.h; c.safe = v.safe; c.zone = v.zone; c.regions = v.regions; c.sparks = v.sparks; c.floats = v.k === 'wide' ? cfg.floats : [];
+      c.img = img.getAttribute('src'); c.w = v.w; c.h = v.h; c.safe = v.safe; c.zone = v.zone; c.regions = v.regions; c.sparks = v.sparks; c.floats = (cfg.floats || []).filter(function (f) { return !f.for || f.for === 'all' || f.for === v.k; });
       c.onFit = function (fit) { heroLayout(el, v, fit); };
       el._ayHero = w.AYHero.mount(el, c);
     }
     function apply(i) {
       var v = vs[i], img = $('img.ay-hs-img', el), preset = el.getAttribute('data-v'), want = heroSrc(el, v);
       if (el._ayHero) { el._ayHero.destroy(); el._ayHero = null; }
+      heroClean(el); img = $('img.ay-hs-img', el);
       if (!(cur < 0 && img && img.getAttribute('src') && preset !== null && +preset === i)) {   /* another picture is needed: fresh markup, so nothing of the old picture is drawn */
         el.removeAttribute('data-v'); el._ayTone = 0; el.style.backgroundColor = ''; el.classList.remove('is-live', 'is-letter-x', 'is-letter-y', 'is-short');
         el.innerHTML = '<img class="ay-hs-img ay-hero-media" alt="" decoding="async"><span class="ay-hero-veil" aria-hidden="true"></span><span class="ay-hero-fade" aria-hidden="true"></span>';
@@ -128,7 +137,7 @@
     if (!once(el, 'stack')) return;
     var cfg = json(el, 'data-ay-stack'), cards = $$('.ay-st-card', el), wrap = el.closest('.elementor-widget') || el.parentNode;
     onScroll(function () {
-      var on = wrap.classList.contains('ay-stack-on-yes') && !reduced();
+      var on = wrap.classList.contains('ay-stack-on-yes') && !reduced() && !(wrap.classList.contains('ay-stack-m-off') && w.matchMedia('(max-width: 767px)').matches);
       if (!on) { cards.forEach(function (c) { c.style.transform = ''; }); return; }
       var cs = getComputedStyle(wrap), base = parseFloat(cs.getPropertyValue('--ay-st-top')) || 128, gap = parseFloat(cs.getPropertyValue('--ay-st-gap')); if (isNaN(gap)) gap = 28;
       var span = w.innerHeight * (cfg.range || .85), tops = cards.map(function (c) { return c.getBoundingClientRect().top; });

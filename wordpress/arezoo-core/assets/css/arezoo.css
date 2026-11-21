@@ -955,6 +955,19 @@ html.ay-lock{overflow:hidden}
   .ay-stf-body .ay-st-btn{margin:0;width:auto;align-self:flex-start;padding-bottom:2px}
   .ay-stf-body .ay-st-head{gap:2px 10px}
   .ay-stf-mh{display:none!important}
+  .ay-stf-m-wide .ay-stf-pic{height:var(--ay-stf-mh,min(var(--ay-st-h,460px),34vh))}
+  .ay-stack-on-yes.ay-stf-m-wide .ay-stf-pic{height:var(--ay-stf-mh,min(var(--ay-st-h,460px),22vh))}
+  .elementor-widget.ay-stf-m-tall .ay-stf-pic,.elementor-widget.ay-stf-m-square .ay-stf-pic,.elementor-widget.ay-stf-m-auto .ay-stf-pic{height:auto;width:var(--ay-stf-mw,62%);max-width:100%;align-self:center}
+  .elementor-widget.ay-stf-m-tall .ay-stf-pic{aspect-ratio:var(--ay-stf-mr,.75)}
+  .elementor-widget.ay-stf-m-square .ay-stf-pic{aspect-ratio:1}
+  /* stacked on a phone: the text keeps its size and the picture box gives way, so the whole card always fits on the screen */
+  .ay-stack-on-yes .ay-st-feat .ay-stf-body{flex:0 0 auto}
+  .ay-stack-on-yes .ay-st-feat .ay-stf-pic{flex:0 1 auto;min-height:110px}
+  .ay-stack-on-yes.ay-stf-m-tall .ay-st-feat .ay-stf-pic,.ay-stack-on-yes.ay-stf-m-square .ay-st-feat .ay-stf-pic{aspect-ratio:auto;height:calc((100vw - 64px) * var(--ay-stf-mwn,.62) / var(--ay-stf-mr,.75))}
+  .ay-stack-on-yes.ay-stf-m-square .ay-st-feat .ay-stf-pic{height:calc((100vw - 64px) * var(--ay-stf-mwn,.62))}
+  body .ay-stack-on-yes.ay-stf-m-auto .ay-st-feat .ay-stf-pic img{position:absolute;inset:0;left:0;top:0;width:100%;height:100%}
+  .ay-stack-on-yes.ay-stf-m-auto .ay-st-feat .ay-stf-pic{height:calc((100vw - 64px) * var(--ay-stf-mwn,.62) * 1.3)}
+  body .elementor-widget.ay-stf-m-auto .ay-stf-pic img{position:relative;left:auto;top:auto;width:100%;height:auto;max-height:none;display:block;object-fit:contain;padding:var(--ay-stf-ipad,8%);box-sizing:border-box}
   .ay-stf-specs-rows .ay-stf-specs>div:nth-last-child(1 of :not(.ay-stf-mh)){border-bottom:1px solid var(--ay-stf-line,var(--ay-line))}
   .ay-st-feat .ay-st-title{font-size:1.55rem}
   .ay-stf-eye{font-size:11px}
@@ -982,6 +995,14 @@ html.ay-lock{overflow:hidden}
   .ay-sy-body{flex-direction:column;gap:18px}
   .ay-fls-capsule .ay-fi,.ay-fls-box .ay-fi{font-size:13px;padding:9px 15px}
   .ay-hs.ay-no-mobile-motion .ay-hs-spark,.ay-hs.ay-no-mobile-motion .ay-hs-float{display:none}
+  /* stacking switched off for phones: cards one under another, pictures at full size */
+  .ay-stack-m-off.ay-stack-on-yes .ay-st-card{position:relative;top:auto;max-height:none;overflow:visible;transform:none!important}
+  .ay-stack-m-off.ay-stack-on-yes .ay-st-feat .ay-stf-pic{flex:none;min-height:0}
+  .ay-stack-m-off.ay-stack-on-yes.ay-stf-m-tall .ay-st-feat .ay-stf-pic{height:auto;aspect-ratio:var(--ay-stf-mr,.75)}
+  .ay-stack-m-off.ay-stack-on-yes.ay-stf-m-square .ay-st-feat .ay-stf-pic{height:auto;aspect-ratio:1}
+  .ay-stack-m-off.ay-stack-on-yes.ay-stf-m-wide .ay-st-feat .ay-stf-pic{height:var(--ay-stf-mh,min(var(--ay-st-h,460px),34vh))}
+  .ay-stack-m-off.ay-stack-on-yes.ay-stf-m-auto .ay-st-feat .ay-stf-pic{height:auto}
+  body .ay-stack-m-off.ay-stack-on-yes.ay-stf-m-auto .ay-st-feat .ay-stf-pic img{position:relative;inset:auto;width:100%;height:auto}
 }
 @media (hover:none){.ay-depth-tilt:not(.ay-depth-touch-yes){transform:none}.ay-cg-yes .ay-card-pic::before{opacity:1}}
 @media (prefers-reduced-motion:reduce){

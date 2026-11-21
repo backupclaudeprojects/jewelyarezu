@@ -192,6 +192,10 @@ class Stack extends Base {
 		$this->cssvar( 'f_iw', 'سهم ستون تصویر', '--ay-stf-iw', 25, 75, 1, 46, '%' );
 		$this->sel( 'f_fit', 'جا شدن تصویر', array( 'contain' => 'کامل (برای عکس بدون پس‌زمینه)', 'cover' => 'پر کردن قاب (برای عکس‌های عکاسی)' ), 'contain', array( 'prefix_class' => 'ay-stf-fit-' ) );
 		$this->cssvar( 'f_ipad', 'فاصلهٔ تصویر از لبهٔ قاب', '--ay-stf-ipad', 0, 30, 1, 8, '%', array( 'condition' => array( 'f_fit' => 'contain' ) ) );
+		$this->sel( 'f_m_shape', 'شکل قاب تصویر در موبایل', array( 'wide' => 'افقی (پهن و کوتاه)', 'tall' => 'عمودی', 'square' => 'مربع', 'auto' => 'هم‌شکل خودِ تصویر' ), 'wide', array( 'prefix_class' => 'ay-stf-m-', 'description' => 'برای عکس‌های عمودی «عمودی» یا «هم‌شکل خودِ تصویر» را انتخاب کنید.' ) );
+		$this->cssvar( 'f_m_ratio', 'نسبت قاب عمودی در موبایل (عرض ÷ ارتفاع)', '--ay-stf-mr', 0.4, 1, 0.01, 0.75, '', array( 'condition' => array( 'f_m_shape' => 'tall' ) ), false );
+		$this->add_control( 'f_m_w', array( 'label' => 'عرض قاب تصویر در موبایل', 'type' => CM::SLIDER, 'size_units' => array( '%' ), 'range' => array( '%' => array( 'min' => 30, 'max' => 100, 'step' => 1 ) ), 'default' => array( 'unit' => '%', 'size' => 62 ), 'selectors' => array( '{{WRAPPER}}' => '--ay-stf-mw: {{SIZE}}%; --ay-stf-mwn: calc({{SIZE}} / 100);' ), 'condition' => array( 'f_m_shape!' => 'wide' ), 'description' => 'اگر «روی‌هم افتادن» روشن است و متن کارت بلند باشد، قاب تصویر کمی کوتاه‌تر می‌شود تا کارت کامل در صفحهٔ گوشی جا شود.' ) );
+		$this->cssvar( 'f_m_h', 'ارتفاع قاب افقی در موبایل', '--ay-stf-mh', 12, 60, 1, null, 'vh', array( 'condition' => array( 'f_m_shape' => 'wide' ) ), false );
 		$this->sel( 'f_img', 'کدام تصویر اثر', array( 'cover' => 'تصویر اصلی', 'second' => 'دومین تصویر گالری (اگر باشد)' ), 'cover' );
 		$this->halo_switch();
 		$this->sel( 'f_eyebrow', 'برچسب بالای عنوان', array( 'none' => 'بدون برچسب', 'type' => 'نوع اثر', 'collection' => 'کالکشن اثر', 'both' => 'کالکشن · نوع', 'year' => 'سال', 'custom' => 'متن دلخواه' ), 'type' );
@@ -236,6 +240,7 @@ class Stack extends Base {
 
 		$this->sec( 's_stack', 'روی‌هم افتادن' );
 		$this->sw( 'stack', 'کارت‌ها هنگام اسکرول روی هم بچسبند', 'yes', array( 'prefix_class' => 'ay-stack-on-', 'description' => 'خاموش: کارت‌ها مثل یک فهرست عادی زیر هم می‌آیند.' ) );
+		$this->sel( 'stack_m', 'روی‌هم افتادن در موبایل', array( 'on' => 'روشن', 'off' => 'خاموش (کارت‌ها زیر هم، تصویر با اندازهٔ کامل)' ), 'on', array( 'prefix_class' => 'ay-stack-m-', 'condition' => array( 'stack' => 'yes' ), 'description' => 'وقتی روشن است، هر کارت باید کامل در صفحهٔ گوشی جا شود؛ اگر متن کارت بلند باشد قاب تصویر کوتاه‌تر می‌شود. برای تصویر عمودیِ بزرگ در موبایل، این را خاموش کنید.' ) );
 		$on = array( 'stack' => 'yes' );
 		$this->cssvar( 'top', 'فاصلهٔ چسبیدن از بالای صفحه', '--ay-st-top', 0, 400, 1, 128, 'px', array( 'condition' => $on, 'mobile_default' => array( 'unit' => 'px', 'size' => 96 ) ) );
 		$this->cssvar( 'layer', 'فاصلهٔ لبهٔ لایه‌ها از هم', '--ay-st-gap', 0, 120, 1, 28, 'px', array( 'condition' => $on ) );
